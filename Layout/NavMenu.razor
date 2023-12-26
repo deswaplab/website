@@ -1,39 +1,18 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">DeswapApp</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+﻿<nav class="relative container mx-auto p-6">
+    <!-- Flex container -->
+    <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <div class="pt-2">
+            <img src="img/logo.svg" alt="deswap" />
+        </div>
+        <!-- Menu Items -->
+        <div class="hidden space-x-6 md:flex">
+            <a href="#" class="hover:text-darkGrayishBlue">Governor</a>
+            <a href="#" class="hover:text-darkGrayishBlue">Blog</a>
+            <a href="#" class="hover:text-darkGrayishBlue">Contacts</a>
+            <a href="#" class="hover:text-darkGrayishBlue">FAQ</a>
+        </div>
+        <!-- Button -->
+        <a href="#" class="p-3 px-6 pt-2 text-white bg-red-500 rounded-full baseline">Launch APP</a>
     </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+</nav>
