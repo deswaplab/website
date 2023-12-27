@@ -52,9 +52,12 @@ else {
 
     private async Task GetChainId()
     {
-        var web3 = await _ethereumHostProvider.GetWeb3Async();
-        var chainId = await web3.Eth.ChainId.SendRequestAsync();
-        SelectedChainId = (long)chainId.Value;
+        if (_ethereumHostProvider is not null)
+        {
+            var web3 = await _ethereumHostProvider.GetWeb3Async();
+            var chainId = await web3.Eth.ChainId.SendRequestAsync();
+            SelectedChainId = (long)chainId.Value;
+        }
     }
 
     private async Task HostProvider_SelectedAccountChanged(string account)
@@ -77,18 +80,21 @@ else {
 
     protected override async Task OnInitializedAsync()
     {
-        EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
-        if (EthereumAvailable)
+        if (_ethereumHostProvider is not null) 
         {
-            SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
-            stateContainer.SelectedAccount = SelectedAccount;
+            EthereumAvailable = await _ethereumHostProvider.CheckProviderAvailabilityAsync();
+            if (EthereumAvailable)
+            {
+                SelectedAccount = await _ethereumHostProvider.GetProviderSelectedAccountAsync();
+                stateContainer.SelectedAccount = SelectedAccount;
 
-            ShortedAccount = ShortAccount(SelectedAccount);
-            CurrentHref = "/app/address/" + SelectedAccount;
+                ShortedAccount = ShortAccount(SelectedAccount);
+                CurrentHref = "/app/address/" + SelectedAccount;
 
-            await GetChainId();
-            StateHasChanged();
+                await GetChainId();
+                StateHasChanged();
 
+            }
         }
     }
 
