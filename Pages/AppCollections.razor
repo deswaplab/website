@@ -1,13 +1,18 @@
 @page "/app/collections/{*network}"
 @layout AppLayout
+@inject StateContainer stateContainer
 
 <PageTitle>App collections</PageTitle>
 
 <p>
 network: @Network
+selected Address: @stateContainer.SelectedAccount
 </p>
 
 @code {
     [Parameter]
     public string? Network { get; set; }
+
+    public string SelectedAddress {get; set; } = "";
+
 }
