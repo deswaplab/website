@@ -1,0 +1,13 @@
+@page "/app/collections/{*network}"
+@layout AppLayout
+
+<PageTitle>App collections</PageTitle>
+
+<p>
+network: @Network
+</p>
+
+@code {
+    [Parameter]
+    public string? Network { get; set; }
+}

@@ -1,0 +1,13 @@
+@page "/app/address/{*pageRoute}"
+@layout AppLayout
+
+<PageTitle>App Address</PageTitle>
+
+<p>
+address: @PageRoute
+</p>
+
+@code {
+    [Parameter]
+    public string? PageRoute { get; set; }
+}
