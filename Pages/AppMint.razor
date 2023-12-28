@@ -1,101 +1,156 @@
 @page "/app"
 @layout AppLayout
 @inject ILogger<AppMint> Logger
+@inject MetamaskHostProvider _metamaskHostProvider;
+@inject AuthenticationStateProvider _authenticationStateProvider;
+
+@using Nethereum.Web3;
+@using Nethereum.Contracts.CQS;
+@using Nethereum.Util;
+@using Nethereum.Web3.Accounts;
+@using Nethereum.Hex.HexConvertors.Extensions;
+@using Nethereum.Contracts;
+@using Nethereum.Contracts.Extensions;
+@using System.Numerics;
+@using System.Security.Claims
 
 <PageTitle>Mint</PageTitle>
 
-<section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div
-            class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                    Mint
-                </h1>
-                <form class="space-y-4 md:space-y-6" @onsubmit="Submit">
-                    <div>
-                        <label for="tokenPairs"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Token Pair</label>
-                        <select id="tokenPair"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            @bind="SelectedTokenPair"
-                            >
+<CascadingAuthenticationState>
+    <AuthorizeView Roles="EthereumConnected">
+        <Authorized>
+            <section class="bg-gray-50 dark:bg-gray-900">
+                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                    <div
+                        class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                                Mint
+                            </h1>
+                            <form class="space-y-4 md:space-y-6" @onsubmit="Submit">
+                                <div>
+                                    <label for="tokenPairs"
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Token Pair</label>
+                                    <select id="tokenPair"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        @onchange="SelectedTokenPairChanged"
+                                        >
+                                        <option></option>
+                                        @foreach(var tokenPair in AllTokenPairs.Inner)
+                                        {
+                                            <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="optionsKind"
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Options Kind</label>
+                                    <select id="optionsKind"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        @bind="SelectedOptionsKind">
 
-                            @foreach(var tokenPair in AllTokenPairs.Inner)
-                            {
-                                <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
-                            }
-                        </select>
+                                        <option>calls</option>
+                                        <option>puts</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                        @if (SelectedTokenPair is not null)
+                                        {
+                                        <span>
+                                            @if (SelectedOptionsKind == "calls") {
+                                                <b>You pay @SelectedTokenPair.BaseAssetName</b>
+                                            } else if (SelectedOptionsKind == "puts") {
+                                                <b>You will get @SelectedTokenPair.BaseAssetName</b>
+                                            }
+                                        </span>
+                                        <span>
+                                            @if(UserBaseAssetBalance is not null) {
+                                                @("Balance:" + UserBaseAssetBalance)
+                                            }
+                                        </span>
+                                        }
+                                        else
+                                        {
+                                            <span>N/A</span>
+                                        }
+                                        
+                                    </label>
+                                    <input type="number" name="baseAssetAmount" id="baseAssetAmount"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="you pay" required="" @bind-value="InputedBaseAssetAmount">
+                                </div>
+                                <div>
+                                    <label for="quoteAsset"
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                        @if (SelectedTokenPair is not null)
+                                        {
+                                        <span>
+                                            @if (SelectedOptionsKind == "calls") {
+                                                <b>You will get @SelectedTokenPair.QuoteAssetName</b>
+                                            } else if (SelectedOptionsKind == "puts") {
+                                                <b>You pay @SelectedTokenPair.QuoteAssetName</b>
+                                            }
+                                        </span>
+                                        <span>
+                                            @if(UserQuoteAssetBalance is not null) {
+                                                @("Balance:" + UserQuoteAssetBalance)
+                                            }
+                                        </span>
+                                        }
+                                        else
+                                        {
+                                            <span>N/A</span>
+                                        }
+                                        
+                                    </label>
+                                    <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        required="" @bind-value="InputedQuoteAssetAmount">
+                                </div>
+                                <button type="submit"
+                                    class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    Mint
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div>
-                        <label for="optionsKind"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Options Kind</label>
-                        <select id="optionsKind"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            @bind="SelectedOptionsKind">
-
-                            <option>calls</option>
-                            <option>puts</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            You pay @getToPayAsset().Item1
-                        </label>
-                        <input type="number" name="baseAssetAmount" id="baseAssetAmount"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="you pay" required="" @bind-value="InputedBaseAssetAmount">
-                    </div>
-                    <div>
-                        <label for="quoteAsset"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">You will get @getToPayAsset().Item2</label>
-                        <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            required="" @bind-value="InputedQuoteAssetAmount">
-                    </div>
-                    <button type="submit"
-                        class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                        Mint
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
+                </div>
+            </section>
+        </Authorized>
+        <NotAuthorized>
+            <MyMetamask />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
 
 @code {
     public TokenPairs AllTokenPairs = new TokenPairs();
 
-    public string SelectedOptionsKind {get; set;} = "";
+    public string SelectedOptionsKind {get; set;} = "calls";
 
-    public string SelectedTokenPair {get; set;} = "";
+    public string SelectedTokenPairName {get; set;} = "";
+
+    public decimal? UserBaseAssetBalance {get; set;}
+
+    public decimal? UserQuoteAssetBalance {get; set;}
+
+    public TokenPair? SelectedTokenPair {get; set;}
+    public (string, string) SelectedTokenPairTuple {get; set;} = ("", "");
 
     public string InputedBaseAssetAmount {get; set;} = "0";
 
     public string InputedQuoteAssetAmount {get; set;} = "0";
 
-    private (string, string) getToPayAsset()
-    {
-        var selectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPair);
-        if (selectedTokenPair is not null)
-        {
-            if (SelectedOptionsKind == "calls")
-            {
-                return (selectedTokenPair.BaseAssetName, selectedTokenPair.QuoteAssetName);
-            } else if (SelectedOptionsKind == "puts")
-            {
-                return (selectedTokenPair.QuoteAssetName, selectedTokenPair.BaseAssetName);
-            }
-        }
-        return ("", "");
-    }
 
-    private void Submit()
+    private async Task Submit()
     {
+        var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var currentAddr1 = state.User.FindFirst(c => c.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
         Logger.LogInformation("TokenPair={TokenPair}, OptionsKind={OptionsKind}, baseAsset={baseAsset}, quoteAsset={quoteAsset}", 
-            SelectedTokenPair, SelectedOptionsKind, InputedBaseAssetAmount, InputedQuoteAssetAmount);
-        var selectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPair);
+            SelectedTokenPairName, SelectedOptionsKind, InputedBaseAssetAmount, InputedQuoteAssetAmount);
+        var selectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPairName);
         if (selectedTokenPair is not null)
         {
             Logger.LogInformation($"baseAssetAddr={selectedTokenPair.BaseAssetAddress}, quoteAssetAddr={selectedTokenPair.QuoteAssetAddress}");
@@ -104,6 +159,44 @@
         {
             Logger.LogInformation("no token pair matched");
         }
+    }
+
+    private async Task SelectedTokenPairChanged(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            SelectedTokenPairName = (string)e.Value;
+            SelectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPairName);
+            if (SelectedTokenPair is not null)
+            {
+                var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                var currentAddr1 = state.User.FindFirst(c => c.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
+                var baseBalanceInWei = await GetUserBalance(currentAddr1!, SelectedTokenPair.BaseAssetAddress);
+                UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
+                var quoteBalanceInWei = await GetUserBalance(currentAddr1!, SelectedTokenPair.QuoteAssetAddress);
+                UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
+            }
+        }
+    }
+
+    [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
+    public class BalanceOfFunction : FunctionMessage
+    {
+        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "_owner", 1)]
+        public string Owner { get; set; }
+    }
+
+    private async Task<BigInteger> GetUserBalance(string userAddress, string contractAddress)
+    {
+        var balanceOfFunctionMessage = new BalanceOfFunction()
+        {
+            Owner = userAddress,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<BalanceOfFunction>();
+        var balance = await balanceHandler.QueryAsync<BigInteger>(contractAddress, balanceOfFunctionMessage);
+        return balance;
     }
 
 }

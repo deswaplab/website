@@ -14,3 +14,4 @@ dotnet watch
 - [ ] 切换地址的时候，状态同步有点问题
 - [ ] 加上网络选择菜单
 - [ ] mint表单优化校验
+- [ ] mint 表单 select token pair处使用的是 onchange事件，默认选中了 WETH/USDC 导致没触发这个事件，导致余额没更新
