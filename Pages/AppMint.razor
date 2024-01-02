@@ -27,7 +27,7 @@
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                                 Mint
                             </h1>
-                            <form class="space-y-4 md:space-y-6" @onsubmit="Submit">
+                            <form class="space-y-4 md:space-y-6">
                                 <div>
                                     <label for="tokenPairs"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Token Pair</label>
@@ -120,13 +120,13 @@
 
                                 <ol class="space-y-4 w-72">
                                     <li>
-                                        <MintProgressButton Text="1. Check Allowance" Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback=@CheckAllowance />
+                                        <MintProgressButton Text="1. Check Allowance" Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
                                     </li>
                                     <li>
-                                        <MintProgressButton Text="2. Approve" Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback=@Approve />
+                                        <MintProgressButton Text="2. Approve" Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
                                     </li>
                                     <li>
-                                        <MintProgressButton Text="3. Mint" Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback=@Mint />
+                                        <MintProgressButton Text="3. Mint" Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
                                     </li>
                                 </ol>
 
@@ -155,7 +155,8 @@
     public decimal? UserQuoteAssetBalance {get; set;}
 
     public TokenPair? SelectedTokenPair {get; set;}
-    public (string, string) SelectedTokenPairTuple {get; set;} = ("", "");
+
+    private string abi = File.ReadAllText("../OptionsNFT.abi.json");
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -232,23 +233,6 @@
     ];
 
 
-    private async Task Submit()
-    {
-        var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        var currentAddr1 = state.User.FindFirst(c => c.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-        Logger.LogInformation("TokenPair={TokenPair}, OptionsKind={OptionsKind}, baseAsset={baseAsset}, quoteAsset={quoteAsset}", 
-            SelectedTokenPairName, SelectedOptionsKind, InputedBaseAssetAmount, InputedQuoteAssetAmount);
-        var selectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPairName);
-        if (selectedTokenPair is not null)
-        {
-            Logger.LogInformation($"baseAssetAddr={selectedTokenPair.BaseAssetAddress}, quoteAssetAddr={selectedTokenPair.QuoteAssetAddress}");
-        }
-        else
-        {
-            Logger.LogInformation("no token pair matched");
-        }
-    }
-
     private async Task CheckAllowance(MouseEventArgs e)
     {
         if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0)
@@ -264,11 +248,24 @@
                     Logger.LogInformation($"weth allowance={baseAssetAllowance}");
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
                     {
-                        Logger.LogInformation($"weth allowance check passed");
+                        Logger.LogInformation($"base allowance is enough, skip approve step");
                         Steps[0].Finished = true;
                         Steps[0].Disabled = true;
 
+                        Steps[1].Finished = true;
+                        Steps[1].Disabled = true;
+
+                        Steps[2].Finished = false;
+                        Steps[2].Disabled = false;
+                    }
+                    else
+                    {
+                        Steps[0].Finished = true;
+                        Steps[0].Disabled = true;
+
+                        Steps[1].Finished = false;
                         Steps[1].Disabled = false;
+
                     }
                 }
                 else
@@ -286,10 +283,22 @@
                     var quoteAssetAllowance = Web3.Convert.FromWei(quoteAssetAllowanceWei, SelectedTokenPair.QuoteAssetDecimals);
                     if (quoteAssetAllowance >= InputedQuoteAssetAmount)
                     {
-                        Logger.LogInformation($"quote allowance check passed");
+                        Logger.LogInformation($"quote allowance is enough, skip approve");
                         Steps[0].Finished = true;
-                        Steps[0].Disabled = false;
+                        Steps[0].Disabled = true;
 
+                        Steps[1].Finished = true;
+                        Steps[1].Disabled = true;
+
+                        Steps[2].Finished = false;
+                        Steps[2].Disabled = false;
+                    }
+                    else
+                    {
+                        Steps[0].Finished = true;
+                        Steps[0].Disabled = true;
+
+                        Steps[1].Finished = false;
                         Steps[1].Disabled = false;
                     }
                 }
@@ -314,6 +323,13 @@
     private async Task Mint(MouseEventArgs e)
     {
         Logger.LogInformation("mint clicked");
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(abi, SelectedTokenPair!.NftAddress);
+        var callsFunction = contract.GetFunction("calls");
+        // TODO: fix me
+        var transactionHash = await callsFunction.SendTransactionAsync(_metamaskHostProvider.SelectedAccount, 7);
+
+
         await Task.CompletedTask;
     }
 
@@ -325,11 +341,9 @@
             SelectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPairName);
             if (SelectedTokenPair is not null)
             {
-                var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
-                var currentAddr1 = state.User.FindFirst(c => c.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
-                var baseBalanceInWei = await GetUserBalance(currentAddr1!, SelectedTokenPair.BaseAssetAddress);
+                var baseBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
                 UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
-                var quoteBalanceInWei = await GetUserBalance(currentAddr1!, SelectedTokenPair.QuoteAssetAddress);
+                var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
                 UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
             }
         }

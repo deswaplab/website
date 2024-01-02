@@ -39,9 +39,9 @@ public class TokenPairs
                 BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9", 
                 BaseAssetDecimals = 18, 
                 QuoteAssetName = "USDC", 
-                QuoteAssetAddress = "0x6CcB30b54Bf2B1Cf47E093B92aECCE404F9824Cd", 
+                QuoteAssetAddress = "0xFCAE2250864A678155f8F4A08fb557127053E59E", 
                 QuoteAssetDecimals = 6, 
-                NftAddress = "0xEB0bDd73ADB291B245CDB48c650Cf684607D2033", 
+                NftAddress = "0xe10C396C0635BEE8986de9A870852F528A0E0107", 
                 ChainId = 11155111,
                 EtherScanHost = "https://sepolia.etherscan.io" 
             },
