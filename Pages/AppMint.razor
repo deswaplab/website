@@ -78,7 +78,7 @@
                                     </label>
                                     <input type="number" name="baseAssetAmount" id="baseAssetAmount"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="you pay" required="" @bind-value="InputedBaseAssetAmount">
+                                        placeholder="you pay" required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount">
                                     @if(SelectedOptionsKind == "calls" && UserBaseAssetBalance == new Decimal(0))
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Balance not enough? Get some from uniswap or binance</p>
@@ -110,10 +110,10 @@
                                     </label>
                                     <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required="" @bind-value="InputedQuoteAssetAmount">
+                                        required="" @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount">
                                     @if(SelectedOptionsKind == "puts" && UserQuoteAssetBalance == 0)
                                     {
-                                        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Balance not enough? Get some from uniswap or binance</p>
+                                        <p id="helper-text-explanation" class="mt-2 text-sm text-red-600 dark:text-red-500">Balance not enough? Get some from uniswap or binance</p>
                                     }
                                 </div>
                                 
@@ -157,9 +157,66 @@
     public TokenPair? SelectedTokenPair {get; set;}
     public (string, string) SelectedTokenPairTuple {get; set;} = ("", "");
 
-    public string InputedBaseAssetAmount {get; set;} = "0";
+    public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
-    public string InputedQuoteAssetAmount {get; set;} = "0";
+    private void SetInputedBaseAssetAmount(decimal value)
+    {
+        if (SelectedOptionsKind == "calls")
+        {
+            if (UserBaseAssetBalance is not null)
+            {
+                if (value >= UserBaseAssetBalance)
+                {
+                    InputedBaseAssetAmount = UserBaseAssetBalance.Value;
+                } else if (value <= 0)
+                {
+                    InputedBaseAssetAmount = 0;
+                } else {
+                    InputedBaseAssetAmount = value;
+                }
+            } else {
+                InputedBaseAssetAmount = 0;
+            }
+        } else {
+            if (value <= 0)
+            {
+                InputedBaseAssetAmount = 0;
+            }
+            else
+            {
+                InputedBaseAssetAmount = value;
+            }
+        }
+    }
+
+    public decimal InputedQuoteAssetAmount {get; set;} = 0m;
+
+    private void SetInputedQuoteAssetAmount(decimal value)
+    {
+        if (SelectedOptionsKind == "puts")
+        {
+            if (UserQuoteAssetBalance is not null)
+            {
+                if (value >= UserQuoteAssetBalance)
+                {
+                    InputedQuoteAssetAmount = UserQuoteAssetBalance.Value;
+                } else if (value <= 0)
+                {
+                    InputedQuoteAssetAmount = 0;
+                }
+                else
+                {
+                    InputedQuoteAssetAmount = value;
+                }
+            } else {
+                InputedQuoteAssetAmount = 0;
+            }
+        }
+        else
+        {
+            InputedQuoteAssetAmount = value;
+        }
+    }
 
     public class Step
     {
@@ -194,33 +251,47 @@
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
-        var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        var currentAddr1 = state.User.FindFirst(c => c.Type.Contains(ClaimTypes.NameIdentifier))?.Value!;
-        if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount != "" && InputedQuoteAssetAmount != "")
+        if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0)
         {
             Logger.LogInformation("can click check allowance");
             if (SelectedOptionsKind == "calls")
             {
-                var baseAssetAmount = Decimal.Parse(InputedBaseAssetAmount);
-                if (baseAssetAmount <= UserBaseAssetBalance)
+                if (InputedBaseAssetAmount <= UserBaseAssetBalance)
                 {
                     Logger.LogInformation("user base balance is ok");
-                    // Check WETH allowance
-                    var wethAllowance = await GetAllowance(currentAddr1, SelectedTokenPair.NftAddress, SelectedTokenPair.BaseAssetAddress);
-                    Logger.LogInformation($"weth allowance={wethAllowance}");
+                    var baseAssetAllowanceWei = await GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.BaseAssetAddress);
+                    var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedTokenPair.BaseAssetDecimals);
+                    Logger.LogInformation($"weth allowance={baseAssetAllowance}");
+                    if (baseAssetAllowance >= InputedBaseAssetAmount)
+                    {
+                        Logger.LogInformation($"weth allowance check passed");
+                        Steps[0].Finished = true;
+                        Steps[0].Disabled = true;
+
+                        Steps[1].Disabled = false;
+                    }
                 }
                 else
                 {
                     Logger.LogInformation("base balance not enough");
                 }
             }
-            else
+            else if (SelectedOptionsKind == "puts")
             {
-                var quoteAssetAmount = Decimal.Parse(InputedQuoteAssetAmount);
-                if (quoteAssetAmount <= UserQuoteAssetBalance)
+                if (InputedQuoteAssetAmount <= UserQuoteAssetBalance)
                 {
                     Logger.LogInformation("user quote balance is ok");
                     // Check USDC allowance
+                    var quoteAssetAllowanceWei = await GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.QuoteAssetAddress);
+                    var quoteAssetAllowance = Web3.Convert.FromWei(quoteAssetAllowanceWei, SelectedTokenPair.QuoteAssetDecimals);
+                    if (quoteAssetAllowance >= InputedQuoteAssetAmount)
+                    {
+                        Logger.LogInformation($"quote allowance check passed");
+                        Steps[0].Finished = true;
+                        Steps[0].Disabled = false;
+
+                        Steps[1].Disabled = false;
+                    }
                 }
                 else
                 {
