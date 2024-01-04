@@ -3,6 +3,7 @@
 @inject ILogger<AppMint> Logger
 @inject MetamaskHostProvider _metamaskHostProvider;
 @inject AuthenticationStateProvider _authenticationStateProvider;
+@inject IJSRuntime JS
 
 @using Nethereum.Web3;
 @using Nethereum.Contracts.CQS;
@@ -12,7 +13,11 @@
 @using Nethereum.Contracts;
 @using Nethereum.Contracts.Extensions;
 @using System.Numerics;
-@using System.Security.Claims
+@using System.Security.Claims;
+@using DeswapApp.Pages;
+@using System;
+@using System.Reflection;
+@using System.Reflection.Emit;
 
 <PageTitle>Mint</PageTitle>
 
@@ -78,7 +83,9 @@
                                     </label>
                                     <input type="number" name="baseAssetAmount" id="baseAssetAmount"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="you pay" required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount">
+                                        placeholder="you pay" required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
+                                        min="0.001" max="10000000" step="0.001"
+                                    >
                                     @if(SelectedOptionsKind == "calls" && UserBaseAssetBalance == new Decimal(0))
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Balance not enough? Get some from uniswap or binance</p>
@@ -110,27 +117,36 @@
                                     </label>
                                     <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required="" @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount">
+                                        required="" @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount"
+                                        min="1" max="10000000" step="1"
+                                    >
                                     @if(SelectedOptionsKind == "puts" && UserQuoteAssetBalance == 0)
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-red-600 dark:text-red-500">Balance not enough? Get some from uniswap or binance</p>
                                     }
                                 </div>
-                                
 
-                                <ol class="space-y-4 w-72">
-                                    <li>
-                                        <MintProgressButton Text="1. Check Allowance" Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
-                                    </li>
-                                    <li>
-                                        <MintProgressButton Text="2. Approve" Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
-                                    </li>
-                                    <li>
-                                        <MintProgressButton Text="3. Mint" Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
-                                    </li>
-                                </ol>
-
+                                <div>
+                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Maturity Date</label>
+                                    <input id="maturityDate" type="date" 
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                        placeholder="Select date"
+                                        @bind-value="MaturityDate"
+                                        @bind-value:format="yyyy-MM-dd"
+                                    >
+                                </div>                                
                             </form>
+                            <ol class="space-y-4 w-72">
+                                <li>
+                                    <MintProgressButton Text="1. Check Allowance" Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
+                                </li>
+                                <li>
+                                    <MintProgressButton Text="2. Approve" Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
+                                </li>
+                                <li>
+                                    <MintProgressButton Text="3. Mint" Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
+                                </li>
+                            </ol>
                         </div>
                     </div>
                 </div>
@@ -156,7 +172,8 @@
 
     public TokenPair? SelectedTokenPair {get; set;}
 
-    private string abi = File.ReadAllText("../OptionsNFT.abi.json");
+    public DateOnly MaturityDate {get; set;} = DateOnly.FromDateTime(DateTime.Now).AddDays(3);
+
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -235,20 +252,22 @@
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
-        if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0)
+        var curAddr = _metamaskHostProvider.SelectedAccount;
+        Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
+        if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && MaturityDate > DateOnly.FromDateTime(DateTime.Now))
         {
-            Logger.LogInformation("can click check allowance");
+            Logger.LogInformation($"can click check allowance, maturityDate: {MaturityDate}");
             if (SelectedOptionsKind == "calls")
             {
                 if (InputedBaseAssetAmount <= UserBaseAssetBalance)
                 {
-                    Logger.LogInformation("user base balance is ok");
+                    Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedTokenPair.NftAddress}, {SelectedTokenPair.BaseAssetAddress}");
                     var baseAssetAllowanceWei = await GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.BaseAssetAddress);
                     var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedTokenPair.BaseAssetDecimals);
                     Logger.LogInformation($"weth allowance={baseAssetAllowance}");
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
                     {
-                        Logger.LogInformation($"base allowance is enough, skip approve step");
+                        Logger.LogInformation($"base allowance is enough, skip approve step, matutiryDate: 11");
                         Steps[0].Finished = true;
                         Steps[0].Disabled = true;
 
@@ -285,7 +304,7 @@
                     {
                         Logger.LogInformation($"quote allowance is enough, skip approve");
                         Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
+                        Steps[0].Disabled = false;
 
                         Steps[1].Finished = true;
                         Steps[1].Disabled = true;
@@ -296,7 +315,7 @@
                     else
                     {
                         Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
+                        Steps[0].Disabled = false;
 
                         Steps[1].Finished = false;
                         Steps[1].Disabled = false;
@@ -310,7 +329,7 @@
         }
         else
         {
-            Logger.LogInformation("can not click check allowance");
+            Logger.LogInformation($"can not click check allowance, maturityDate: {MaturityDate.Month}");
         }
     }
 
@@ -322,15 +341,35 @@
 
     private async Task Mint(MouseEventArgs e)
     {
-        Logger.LogInformation("mint clicked");
+        Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(abi, SelectedTokenPair!.NftAddress);
-        var callsFunction = contract.GetFunction("calls");
+        var funcName = SelectedOptionsKind == "calls" ? "calls" : "puts";
+        var callsFunction = contract.GetFunction(funcName);
         // TODO: fix me
-        var transactionHash = await callsFunction.SendTransactionAsync(_metamaskHostProvider.SelectedAccount, 7);
-
-
-        await Task.CompletedTask;
+        var gas = await callsFunction.EstimateGasAsync(
+            Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
+            Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
+            new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
+        );
+        Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}, {gas}");
+        var param = new object[3];
+        param[0] = Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals);
+        param[1] = Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
+        param[2] = new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds();
+        Type myType = (typeof(Nethereum.Contracts.Function));
+        MethodInfo? myMethodInfo = myType.GetMethod("SendTransactionAsync", BindingFlags.Public|BindingFlags.Instance,
+            null, CallingConventions.Any, new Type[] {typeof(string), typeof(Nethereum.Hex.HexTypes.HexBigInteger), typeof(Nethereum.Hex.HexTypes.HexBigInteger), typeof(object[])}, null);
+        Logger.LogInformation($"The name of the method is {myMethodInfo!.Name}.");
+        var transactionHash = await callsFunction.SendTransactionAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
+            Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
+            new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
+        );
+        Logger.LogInformation($"mint finished, tx: {transactionHash}");
     }
 
     private async Task SelectedTokenPairChanged(ChangeEventArgs e)
@@ -391,7 +430,6 @@
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var handler = web3.Eth.GetContractQueryHandler<AllowanceFunction>();
         var balance = await handler.QueryAsync<BigInteger>(contractAddress, allowanceFunctionMessage);
-        Logger.LogInformation($"GetAllowance: addr1={payAddr}, addr2={recvAddr}, contract={contractAddress}, balance={balance}");
         return balance;
     }
 

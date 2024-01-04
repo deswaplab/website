@@ -1,4 +1,7 @@
 @inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject ILogger<AppLayout> Logger
+
 @using DeswapApp.Layout
 
 <div class="page">
@@ -7,3 +10,13 @@
         @Body
     </main>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initFlowbite");
+        }
+    }
+}

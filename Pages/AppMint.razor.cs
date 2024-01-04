@@ -1,3 +1,8 @@
+namespace DeswapApp.Pages;
+
+public partial class AppMint
+{
+    private readonly string abi = """
 [
     {
         "inputs": [
@@ -71,3 +76,5 @@
         "type": "function"
     }
 ]
+""";
+}
