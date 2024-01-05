@@ -35,9 +35,10 @@
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Token Pair</label>
                                     <select id="tokenPair"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        @onchange="SelectedTokenPairChanged"
+                                        @bind:get="SelectedTokenPairName"
+                                        @bind:event="onchange"
+                                        @bind:set="ChangeSelectedTokenPairName"
                                         >
-                                        <option></option>
                                         @foreach(var tokenPair in AllTokenPairs.Inner)
                                         {
                                             <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
@@ -57,25 +58,14 @@
                                 </div>
                                 <div>
                                     <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                        @if (SelectedTokenPair is not null)
-                                        {
                                         <span>
-                                            @if (SelectedOptionsKind == "calls") {
-                                                <b>You pay @SelectedTokenPair.BaseAssetName</b>
-                                            } else if (SelectedOptionsKind == "puts") {
-                                                <b>You will get @SelectedTokenPair.BaseAssetName</b>
-                                            }
+                                            <b>@BaseAssetAction @BaseAssetName</b>
                                         </span>
                                         <span>
                                             @if(UserBaseAssetBalance is not null) {
-                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedTokenPair.GetEtherScanTokenBalanceUrl(@SelectedTokenPair.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">Balance: @UserBaseAssetBalance</a>
+                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedTokenPair!.GetEtherScanTokenBalanceUrl(@SelectedTokenPair.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">Balance: @UserBaseAssetBalance</a>
                                             }
                                         </span>
-                                        }
-                                        else
-                                        {
-                                            <span>N/A</span>
-                                        }
                                         
                                     </label>
                                     <input type="number" name="baseAssetAmount" id="baseAssetAmount"
@@ -91,25 +81,14 @@
                                 <div>
                                     <label for="quoteAsset"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                        @if (SelectedTokenPair is not null)
-                                        {
                                         <span>
-                                            @if (SelectedOptionsKind == "calls") {
-                                                <b>You will get @SelectedTokenPair.QuoteAssetName</b>
-                                            } else if (SelectedOptionsKind == "puts") {
-                                                <b>You pay @SelectedTokenPair.QuoteAssetName</b>
-                                            }
+                                            <b>@QuoteAssetAction @QuoteAssetName</b>
                                         </span>
                                         <span>
                                             @if(UserQuoteAssetBalance is not null) {
-                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedTokenPair.GetEtherScanTokenBalanceUrl(@SelectedTokenPair.QuoteAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">Balance: @UserQuoteAssetBalance</a>
+                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedTokenPair!.GetEtherScanTokenBalanceUrl(@SelectedTokenPair.QuoteAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">Balance: @UserQuoteAssetBalance</a>
                                             }
                                         </span>
-                                        }
-                                        else
-                                        {
-                                            <span>N/A</span>
-                                        }
                                         
                                     </label>
                                     <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
@@ -162,6 +141,27 @@
     public string SelectedOptionsKind {get; set;} = "calls";
 
     public string SelectedTokenPairName {get; set;} = "";
+
+    public string BaseAssetAction => SelectedOptionsKind == "calls" ? "You pay" : "You will get";
+
+    public string BaseAssetName => SelectedTokenPair is not null ? SelectedTokenPair.BaseAssetName : "";
+
+    public string QuoteAssetAction => SelectedOptionsKind == "calls" ? "You will get" : "You pay";
+
+    public string QuoteAssetName => SelectedTokenPair is not null ? SelectedTokenPair.QuoteAssetName : "";
+
+    private async Task ChangeSelectedTokenPairName(string value)
+    {
+        SelectedTokenPair = AllTokenPairs.FindByPair(value);
+        if (SelectedTokenPair is not null)
+        {
+            var baseBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
+            UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
+            var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
+            UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
+            SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;
+        }
+    }
 
     public decimal? UserBaseAssetBalance {get; set;}
 
@@ -361,22 +361,6 @@
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
         );
         Logger.LogInformation($"mint finished, tx: {transactionHash}");
-    }
-
-    private async Task SelectedTokenPairChanged(ChangeEventArgs e)
-    {
-        if (e.Value is not null)
-        {
-            SelectedTokenPairName = (string)e.Value;
-            SelectedTokenPair = AllTokenPairs.FindByPair(SelectedTokenPairName);
-            if (SelectedTokenPair is not null)
-            {
-                var baseBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
-                UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
-                var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
-                UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
-            }
-        }
     }
 
     [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
