@@ -1,18 +1,49 @@
 @page "/app/collections/{*network}"
 @layout AppLayout
-@inject StateContainer stateContainer
 
 <PageTitle>App collections</PageTitle>
 
-<p>
-network: @Network
-selected Address: @stateContainer.SelectedAccount
-</p>
+
+<section class="bg-gray-50 dark:bg-gray-900">
+<div class="flex flex-col items-center justify-center px-64 mx-auto md:h-screen lg:py-0">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">
+                    Name
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Contract Address
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Category
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Network
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <a href="https://testnets.opensea.io/assets/sepolia/0xe10c396c0635bee8986de9a870852f528a0e0107/" target="_blank">WETH/USDC</a>
+                </th>
+                <td class="px-6 py-4">
+                    <a href="https://sepolia.etherscan.io/address/0xe10c396c0635bee8986de9a870852f528a0e0107" target="_blank">0xe10c396c0635bee8986de9a870852f528a0e0107</a>
+                </td>
+                <td class="px-6 py-4">
+                    Options
+                </td>
+                <td class="px-6 py-4">
+                    Sepolia
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</section>
 
 @code {
     [Parameter]
-    public string? Network { get; set; }
-
-    public string SelectedAddress {get; set; } = "";
-
+    public string? Network {get; set;}
 }
