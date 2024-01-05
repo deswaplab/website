@@ -155,11 +155,13 @@
         SelectedTokenPair = AllTokenPairs.FindByPair(value);
         if (SelectedTokenPair is not null)
         {
+            SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;
+            Logger.LogInformation($"SelectedTokenPairName: {SelectedTokenPairName}");
+
             var baseBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
             UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
             var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
             UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
-            SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;
         }
     }
 
@@ -332,7 +334,31 @@
     private async Task Approve(MouseEventArgs e)
     {
         Logger.LogInformation("approve clicked");
-        await Task.CompletedTask;
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contractAddress = SelectedOptionsKind == "calls" ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
+        var wad = SelectedOptionsKind == "calls" ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
+        string erc20ApproveAbi = """[{"inputs":[{"internalType":"address","name":"guy","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]""";
+        var contract = web3.Eth.GetContract(erc20ApproveAbi, contractAddress);
+        var callsFunction = contract.GetFunction("approve");
+        var gas = await callsFunction.EstimateGasAsync(
+            SelectedTokenPair!.NftAddress,
+            wad
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            SelectedTokenPair!.NftAddress,
+            wad
+        );
+        Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
+        // 标记完成，且让第三步可点击
+        Steps[1].Finished = true;
+        Steps[1].Disabled = true;
+
+        Steps[2].Finished = false;
+        Steps[2].Disabled = false;
     }
 
     private async Task Mint(MouseEventArgs e)
@@ -361,6 +387,8 @@
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
         );
         Logger.LogInformation($"mint finished, tx: {transactionHash}");
+        Steps[2].Finished = true;
+        Steps[2].Disabled = true;
     }
 
     [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
