@@ -15,9 +15,6 @@
 @using System.Numerics;
 @using System.Security.Claims;
 @using DeswapApp.Pages;
-@using System;
-@using System.Reflection;
-@using System.Reflection.Emit;
 
 <PageTitle>Mint</PageTitle>
 
@@ -284,7 +281,6 @@
 
                         Steps[1].Finished = false;
                         Steps[1].Disabled = false;
-
                     }
                 }
                 else
@@ -346,7 +342,6 @@
         var contract = web3.Eth.GetContract(abi, SelectedTokenPair!.NftAddress);
         var funcName = SelectedOptionsKind == "calls" ? "calls" : "puts";
         var callsFunction = contract.GetFunction(funcName);
-        // TODO: fix me
         var gas = await callsFunction.EstimateGasAsync(
             Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
             Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
@@ -357,10 +352,6 @@
         param[0] = Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals);
         param[1] = Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
         param[2] = new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds();
-        Type myType = (typeof(Nethereum.Contracts.Function));
-        MethodInfo? myMethodInfo = myType.GetMethod("SendTransactionAsync", BindingFlags.Public|BindingFlags.Instance,
-            null, CallingConventions.Any, new Type[] {typeof(string), typeof(Nethereum.Hex.HexTypes.HexBigInteger), typeof(Nethereum.Hex.HexTypes.HexBigInteger), typeof(object[])}, null);
-        Logger.LogInformation($"The name of the method is {myMethodInfo!.Name}.");
         var transactionHash = await callsFunction.SendTransactionAsync(
             _metamaskHostProvider.SelectedAccount,
             gas,
