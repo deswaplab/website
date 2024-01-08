@@ -54,3 +54,15 @@ public class TokenPairs
         return res;
     }
 }
+
+public class EthNetwork
+{
+    public static string ChainIdToNetwork(long chainId)
+    {
+        if (chainId == 11155111)
+        {
+            return "sepolia";
+        }
+        return "ethereum";
+    }
+}

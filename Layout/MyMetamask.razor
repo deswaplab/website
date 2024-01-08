@@ -5,6 +5,7 @@
 @inject MetamaskHostProvider _metamaskHostProvider;
 @inject SelectedEthereumHostProviderService _selectedHostProvider;
 @inject AuthenticationStateProvider _authenticationStateProvider;
+@inject ILogger<MyMetamask> Logger
 
 <div>
     @if (MetamaskAvailable)
@@ -12,7 +13,7 @@
         <CascadingAuthenticationState>
             <AuthorizeView Roles="EthereumConnected">
                 <Authorized>
-                    <NavLink href=@($"/app/users/{SelectedAccount}/tokens") Match="NavLinkMatch.Prefix"
+                    <NavLink href=@($"/app/users/{SelectedAccount}/tokens/{CurrentNetwork}") Match="NavLinkMatch.Prefix"
                         ActiveClass="md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
                         class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                         @Truncate(SelectedAccount, SelectedAccountTruncateLength)
@@ -45,6 +46,15 @@
     [Parameter]
     public int SelectedAccountTruncateLength { get; set; } = 10;
 
+    private string CurrentNetwork = "";
+
+    public async Task<string> GetCurrentNetwork() {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var chainId = await web3.Eth.ChainId.SendRequestAsync();
+
+        return EthNetwork.ChainIdToNetwork((long)chainId.Value);
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -58,9 +68,10 @@
                 if (!string.IsNullOrEmpty(SelectedAccount))
                 {
                     await _selectedHostProvider.SetSelectedEthereumHostProvider(_metamaskHostProvider);
+                    CurrentNetwork = await GetCurrentNetwork();
                 }
-
             }
+            
             StateHasChanged();
         }
     }
