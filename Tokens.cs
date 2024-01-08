@@ -62,6 +62,9 @@ public class EthNetwork
         if (chainId == 11155111)
         {
             return "sepolia";
+        } else if (chainId == 5)
+        {
+            return "goerli";
         }
         return "ethereum";
     }
