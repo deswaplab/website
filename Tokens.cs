@@ -48,9 +48,15 @@ public class TokenPairs
         ];
     }
 
-    public TokenPair? FindByPair(string name)
+    public TokenPair? FindByName(string name)
     {
         var res = Inner.FirstOrDefault(item => item.BaseAssetName + "/" + item.QuoteAssetName == name);
+        return res;
+    }
+
+    public TokenPair? FindByNftContract(string nftContract)
+    {
+        var res = Inner.FirstOrDefault(item => item.NftAddress.Equals(nftContract, StringComparison.CurrentCultureIgnoreCase));
         return res;
     }
 }
@@ -68,4 +74,96 @@ public class EthNetwork
         }
         return "ethereum";
     }
+}
+
+public class OptionsNFT
+{
+    public static readonly string abi = """
+[
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "burn",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "baseAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "quoteAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maturityDate",
+                "type": "uint256"
+            }
+        ],
+        "name": "calls",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "baseAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "quoteAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maturityDate",
+                "type": "uint256"
+            }
+        ],
+        "name": "puts",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "exercise",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
+""";
 }

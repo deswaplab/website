@@ -2,8 +2,14 @@
 @layout AppLayout
 @inject HttpClient Http
 @inject ILogger<AppUserTokens> Logger
-@using System.Text.Json.Serialization
 @inject StateContainer StateContainer
+@inject MetamaskHostProvider _metamaskHostProvider;
+
+@using System.Text.Json.Serialization
+@using System.Numerics;
+@using Nethereum.Web3;
+@using Nethereum.Util;
+@using Nethereum.Contracts;
 
 <PageTitle>App user Tokens</PageTitle>
 
@@ -14,7 +20,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 px-64 mx-auto lg:py-0">
         @foreach (var token in Tokens)
         {
-            @if (token.Token is not null && token.Token.Metadata is not null)
+            @if (token.Token is not null 
+                && token.Token.TokenId is not null 
+                && token.Token.Contract is not null 
+                && token.Token.Metadata is not null
+                && token.Token.Attributes.Count > 0)
             {
                 <div class="flex flex-col items-center py-2 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                     <a href=@($"https://testnets.opensea.io/assets/sepolia/0xe10c396c0635bee8986de9a870852f528a0e0107/{token.Token.TokenId}") target="_blank">
@@ -31,15 +41,19 @@
                             }
                             @if (canExercise(token.Token.Attributes))
                             {
-                                <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                    @onclick="async () => await HandleExercise(token.Token.TokenId, token.Token.Contract, token.Token.Attributes)"
+                                >
                                     Exercise
-                                </a>
+                                </button>
                             }
                             @if (canBurn(token.Token.Attributes))
                             {
-                                <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                    @onclick="async () => await HandleBurn(token.Token.TokenId, token.Token.Contract)"
+                                >
                                     Burn
-                                </a>
+                                </button>
                             }
                         </div>
                     }
@@ -83,6 +97,7 @@
         {
             if (attr.Key == "maturityDate" && attr.Value is not null)
             {
+                inMaturityDate = true; // TODO: debug purpose
                 var maturityDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(attr.Value));
                 var now = DateTime.Now;
                 if (now >= maturityDate && now < maturityDate.AddDays(1))
@@ -149,9 +164,10 @@
         StateContainer.OnChange += StateHasChanged;
 
         var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"https://api-sepolia.reservoir.tools/users/{address}/tokens/v8?contract=0xe10C396C0635BEE8986de9A870852F528A0E0107&includeAttributes=true");
-        Tokens = tokensResponse.Tokens;
-        Logger.LogInformation($"total tokens: {tokensResponse.Tokens.Count}");
-        Logger.LogInformation($"Tokens 0: {Tokens[0].Token.Metadata.ImageOriginal}");
+        if (tokensResponse is not null && tokensResponse.Tokens is not null)
+        {
+            Tokens = tokensResponse!.Tokens;
+        }
     }
 
     public void Dispose()
@@ -192,7 +208,6 @@
 
         [JsonPropertyName("attributes")]
         public IList<ReservoirTokenAttribute> Attributes { get; set; } = [];
-        
     }
 
     public class ReservoirTokenMetadata
@@ -212,5 +227,168 @@
         [JsonPropertyName("value")]
         public string? Value { get; set; }
 
+    }
+
+    private async Task HandleExercise(string tokenId, string nftContractAddress, IList<ReservoirTokenAttribute> tokenAttributes)
+    {
+        Logger.LogInformation($"start handle exercise {tokenId}, {nftContractAddress}");
+        string optionsKind = "";
+        BigInteger baseAssetAmount = 0;
+        BigInteger quoteAssetAmount = 0;
+        foreach(var attr in tokenAttributes)
+        {
+            if (attr.Key == "optionsKind" && attr.Value is not null)
+            {
+                optionsKind = attr.Value;
+            }
+            if (attr.Key == "baseAssetAmount" && attr.Value is not null)
+            {
+                baseAssetAmount = BigInteger.Parse(attr.Value);
+            }
+            if (attr.Key == "quoteAssetAmount" && attr.Value is not null)
+            {
+                quoteAssetAmount = BigInteger.Parse(attr.Value);
+            }
+        }
+        var allTokenPairs = new TokenPairs();
+        var tokenPair = allTokenPairs.FindByNftContract(nftContractAddress);
+        if (tokenPair is null)
+        {
+            // TODO: 使用更好的错误提示
+            throw new Exception("unsupported nft contract");
+        }
+
+        string payAssetAddress = "";
+        BigInteger payAssetAmount = 0;
+        if (optionsKind == "call")
+        {
+            payAssetAddress = tokenPair.QuoteAssetAddress;
+            payAssetAmount = quoteAssetAmount;
+
+        } else if (optionsKind == "put") {
+            payAssetAddress = tokenPair.BaseAssetAddress;
+            payAssetAmount = baseAssetAmount;
+        }
+
+        // 1. Check balance
+        var userPayAssetBalance = await GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
+        if (userPayAssetBalance < payAssetAmount)
+        {
+            throw new Exception("current user doesnt have enough balance to exercise");
+        }
+
+        var userPayAllowance = await GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+        if (userPayAllowance < payAssetAmount)
+        {
+            // DO approve and wait seconds
+            await Approve(payAssetAddress, nftContractAddress, payAssetAmount);
+            await Task.Delay(3000);
+            userPayAllowance = await GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+            if (userPayAllowance < payAssetAmount)
+            {
+                throw new Exception("after approve, allowance is still not enough");
+            }
+        }
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftContractAddress);
+        var callsFunction = contract.GetFunction("exercise");
+        var gas = await callsFunction.EstimateGasAsync(
+            long.Parse(tokenId)
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            long.Parse(tokenId)
+        );
+        Logger.LogInformation($"exercise finished, tx: {receipt.TransactionHash.ToString()}");
+    }
+
+    private async Task HandleBurn(string tokenId, string nftContractAddress)
+    {
+        Logger.LogInformation($"handle burn");
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftContractAddress);
+        var callsFunction = contract.GetFunction("burn");
+        var gas = await callsFunction.EstimateGasAsync(
+            long.Parse(tokenId)
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            long.Parse(tokenId)
+        );
+        Logger.LogInformation($"burn finished, tx: {receipt.TransactionHash.ToString()}");
+    }
+
+
+    [Nethereum.ABI.FunctionEncoding.Attributes.Function("allowance", "uint256")]
+    public class AllowanceFunction : FunctionMessage
+    {
+        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr1", 1)]
+        public string Addr1 { get; set; } = "";
+
+        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr2", 2)]
+        public string Addr2 { get; set; } = "";
+
+    }
+
+    private async Task<BigInteger> GetAllowance(string payAddr, string recvAddr, string contractAddress)
+    {
+        var allowanceFunctionMessage = new AllowanceFunction()
+        {
+            Addr1 = payAddr,
+            Addr2 = recvAddr,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var handler = web3.Eth.GetContractQueryHandler<AllowanceFunction>();
+        var balance = await handler.QueryAsync<BigInteger>(contractAddress, allowanceFunctionMessage);
+        return balance;
+    }
+
+    [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
+    public class BalanceOfFunction : FunctionMessage
+    {
+        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "_owner", 1)]
+        public string Owner { get; set; } = "";
+    }
+
+    private async Task<BigInteger> GetUserBalance(string userAddress, string contractAddress)
+    {
+        var balanceOfFunctionMessage = new BalanceOfFunction()
+        {
+            Owner = userAddress,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<BalanceOfFunction>();
+        var balance = await balanceHandler.QueryAsync<BigInteger>(contractAddress, balanceOfFunctionMessage);
+        return balance;
+    }
+
+    private async Task Approve(string erc20ContractAddress, string nftContractAddress, BigInteger wad)
+    {
+        Logger.LogInformation("approve clicked");
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        string erc20ApproveAbi = """[{"inputs":[{"internalType":"address","name":"guy","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]""";
+        var contract = web3.Eth.GetContract(erc20ApproveAbi, erc20ContractAddress);
+        var callsFunction = contract.GetFunction("approve");
+        var gas = await callsFunction.EstimateGasAsync(
+            nftContractAddress,
+            wad
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            nftContractAddress,
+            wad
+        );
+        Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
     }
 }

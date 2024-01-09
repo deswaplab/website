@@ -151,7 +151,7 @@
 
     private async Task ChangeSelectedTokenPairName(string value)
     {
-        SelectedTokenPair = AllTokenPairs.FindByPair(value);
+        SelectedTokenPair = AllTokenPairs.FindByName(value);
         if (SelectedTokenPair is not null)
         {
             SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;
@@ -364,7 +364,7 @@
     {
         Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
         var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(abi, SelectedTokenPair!.NftAddress);
+        var contract = web3.Eth.GetContract(OptionsNFT.abi, SelectedTokenPair!.NftAddress);
         var funcName = SelectedOptionsKind == "calls" ? "calls" : "puts";
         var callsFunction = contract.GetFunction(funcName);
         var gas = await callsFunction.EstimateGasAsync(
@@ -373,19 +373,16 @@
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
         );
         Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}, {gas}");
-        var param = new object[3];
-        param[0] = Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals);
-        param[1] = Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
-        param[2] = new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds();
-        var transactionHash = await callsFunction.SendTransactionAsync(
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
             _metamaskHostProvider.SelectedAccount,
             gas,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
             Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
             Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
         );
-        Logger.LogInformation($"mint finished, tx: {transactionHash}");
+        Logger.LogInformation($"mint finished, tx: {receipt.TransactionHash.ToString()}");
         Steps[2].Finished = true;
         Steps[2].Disabled = true;
     }
