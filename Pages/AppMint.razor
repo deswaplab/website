@@ -49,7 +49,10 @@
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Options Kind</label>
                                     <select id="optionsKind"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        @bind="SelectedOptionsKind">
+                                        @bind:get="SelectedOptionsKind"
+                                        @bind:event="onchange"
+                                        @bind:set="ChangeOptionsKind"
+                                    >
 
                                         <option>calls</option>
                                         <option>puts</option>
@@ -139,6 +142,13 @@
 
     public string SelectedOptionsKind {get; set;} = "calls";
 
+    private async Task ChangeOptionsKind(string value)
+    {
+        SelectedOptionsKind = value;
+        ResetSteps();
+        await Task.CompletedTask;
+    }
+
     public string SelectedTokenPairName {get; set;} = "";
 
     public string BaseAssetAction => SelectedOptionsKind == "calls" ? "You pay" : "You will get";
@@ -161,6 +171,8 @@
             UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
             var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
             UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
+
+            ResetSteps();
         }
     }
 
@@ -203,6 +215,7 @@
                 InputedBaseAssetAmount = value;
             }
         }
+        ResetSteps();
     }
 
     public decimal InputedQuoteAssetAmount {get; set;} = 0m;
@@ -232,6 +245,7 @@
         {
             InputedQuoteAssetAmount = value;
         }
+        ResetSteps();
     }
 
     public class Step
@@ -247,11 +261,22 @@
         new Step { Finished = false, Disabled = true},
     ];
 
+    // 每次表单变化时都要重置步骤状态
+    private void ResetSteps()
+    {
+        Steps = [
+            new Step { Finished = false, Disabled = false},
+            new Step { Finished = false, Disabled = true},
+            new Step { Finished = false, Disabled = true},
+        ];
+    }
+
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
         var curAddr = _metamaskHostProvider.SelectedAccount;
         Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
+        Steps[0].Disabled = true; // 一点击就该置灰
         if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && MaturityDate > DateOnly.FromDateTime(DateTime.Now))
         {
             Logger.LogInformation($"can click check allowance, maturityDate: {MaturityDate}");
@@ -301,7 +326,7 @@
                     {
                         Logger.LogInformation($"quote allowance is enough, skip approve");
                         Steps[0].Finished = true;
-                        Steps[0].Disabled = false;
+                        Steps[0].Disabled = true;
 
                         Steps[1].Finished = true;
                         Steps[1].Disabled = true;
@@ -312,7 +337,7 @@
                     else
                     {
                         Steps[0].Finished = true;
-                        Steps[0].Disabled = false;
+                        Steps[0].Disabled = true;
 
                         Steps[1].Finished = false;
                         Steps[1].Disabled = false;
@@ -330,9 +355,10 @@
         }
     }
 
-    private async Task Approve(MouseEventArgs e)
+    private async Task Approve()
     {
         Logger.LogInformation("approve clicked");
+        Steps[1].Disabled = true; // 确保只点一次
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contractAddress = SelectedOptionsKind == "calls" ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
         var wad = SelectedOptionsKind == "calls" ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
@@ -343,26 +369,39 @@
             SelectedTokenPair!.NftAddress,
             wad
         );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
-            CancellationToken.None,
-            SelectedTokenPair!.NftAddress,
-            wad
-        );
-        Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
-        // 标记完成，且让第三步可点击
-        Steps[1].Finished = true;
-        Steps[1].Disabled = true;
+        try {
+            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+                _metamaskHostProvider.SelectedAccount,
+                gas,
+                new Nethereum.Hex.HexTypes.HexBigInteger(0),
+                CancellationToken.None,
+                SelectedTokenPair!.NftAddress,
+                wad
+            );
+            Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
+            // 标记完成，且让第三步可点击
+            Steps[1].Finished = true;
+            Steps[1].Disabled = true;
 
-        Steps[2].Finished = false;
-        Steps[2].Disabled = false;
+            Steps[2].Finished = false;
+            Steps[2].Disabled = false;
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                // TODO: 显示取消的toast
+                Logger.LogInformation("user cancel approve tx");
+            }
+            Steps[1].Disabled = false;
+
+            Steps[2].Finished = false; // approve 失败的话，mint按钮不可点
+            Steps[2].Disabled = true;
+        }
     }
 
-    private async Task Mint(MouseEventArgs e)
+    private async Task Mint()
     {
         Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
+        Steps[2].Disabled = true;
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsNFT.abi, SelectedTokenPair!.NftAddress);
         var funcName = SelectedOptionsKind == "calls" ? "calls" : "puts";
@@ -373,18 +412,28 @@
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
         );
         Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}, {gas}");
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
-            CancellationToken.None,
-            Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
-            Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
-            new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
-        );
-        Logger.LogInformation($"mint finished, tx: {receipt.TransactionHash.ToString()}");
-        Steps[2].Finished = true;
-        Steps[2].Disabled = true;
+        try {
+            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+                _metamaskHostProvider.SelectedAccount,
+                gas,
+                new Nethereum.Hex.HexTypes.HexBigInteger(0),
+                CancellationToken.None,
+                Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
+                Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
+                new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
+            );
+            Logger.LogInformation($"mint finished, tx: {receipt.TransactionHash.ToString()}");
+            Steps[2].Finished = true;
+            Steps[2].Disabled = true;
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                // TODO: 显示取消的toast
+                Logger.LogInformation("user canceled mint tx");
+            }
+            Steps[2].Finished = false;
+            Steps[2].Disabled = false;
+        }
     }
 
     [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]

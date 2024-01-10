@@ -41,8 +41,9 @@
                             }
                             @if (canExercise(token.Token.Attributes))
                             {
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
                                     @onclick="async () => await HandleExercise(token.Token.TokenId, token.Token.Contract, token.Token.Attributes)"
+                                    disabled=@ExerciseButtonDisabled
                                 >
                                     Exercise
                                 </button>
@@ -165,7 +166,12 @@
         StateContainer.OnChange += StateHasChanged;
 
         // TODO: 分页
-        var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"https://api-sepolia.reservoir.tools/users/{address}/tokens/v8?contract=0xe10C396C0635BEE8986de9A870852F528A0E0107&includeAttributes=true");
+        await fetchTokens();
+    }
+
+    private async Task fetchTokens()
+    {
+        var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"https://api-sepolia.reservoir.tools/users/{address}/tokens/v8?contract=0xe10C396C0635BEE8986de9A870852F528A0E0107&includeAttributes=true&limit=200");
         if (tokensResponse is not null && tokensResponse.Tokens is not null)
         {
             Tokens = tokensResponse!.Tokens;
@@ -231,9 +237,14 @@
 
     }
 
+    private bool ExerciseButtonDisabled = false;
+
+    private string ExerciseButtonDisabledClass => ExerciseButtonDisabled ? "cursor-not-allowed" : "";
+
     private async Task HandleExercise(string tokenId, string nftContractAddress, IList<ReservoirTokenAttribute> tokenAttributes)
     {
         Logger.LogInformation($"start handle exercise {tokenId}, {nftContractAddress}");
+        ExerciseButtonDisabled = true;
         string optionsKind = "";
         BigInteger baseAssetAmount = 0;
         BigInteger quoteAssetAmount = 0;
@@ -288,6 +299,7 @@
             userPayAllowance = await GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
             if (userPayAllowance < payAssetAmount)
             {
+                ExerciseButtonDisabled = false;
                 throw new Exception("after approve, allowance is still not enough");
             }
         }
@@ -297,14 +309,26 @@
         var gas = await callsFunction.EstimateGasAsync(
             long.Parse(tokenId)
         );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
-            CancellationToken.None,
-            long.Parse(tokenId)
-        );
-        Logger.LogInformation($"exercise finished, tx: {receipt.TransactionHash.ToString()}");
+        try {
+            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+                _metamaskHostProvider.SelectedAccount,
+                gas,
+                new Nethereum.Hex.HexTypes.HexBigInteger(0),
+                CancellationToken.None,
+                long.Parse(tokenId)
+            );
+            Logger.LogInformation($"exercise finished, tx: {receipt.TransactionHash.ToString()}");
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                // TODO: 显示取消的toast
+                Logger.LogInformation("user cancel tx");
+            }
+        } finally {
+            ExerciseButtonDisabled = false;
+        }
+        // 从 Tokens 删除当前行权的token，以实现页面刷新
+        Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
     }
 
     private bool BurnButtonDisabled = false;
@@ -342,6 +366,8 @@
         } finally {
             BurnButtonDisabled = false;
         }
+
+        Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
     }
 
 
@@ -367,6 +393,7 @@
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var handler = web3.Eth.GetContractQueryHandler<AllowanceFunction>();
         var balance = await handler.QueryAsync<BigInteger>(contractAddress, allowanceFunctionMessage);
+        Logger.LogInformation($"user allowance: {balance}, {payAddr}, {recvAddr}, {contractAddress}");
         return balance;
     }
 

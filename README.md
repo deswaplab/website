@@ -13,6 +13,6 @@ dotnet watch
 - [ ] 本地化[see doc](https://learn.microsoft.com/en-us/aspnet/core/blazor/globalization-localization?view=aspnetcore-8.0)
 - [ ] 加上网络选择菜单
 - [ ] mint表单优化校验
-- [ ] mint 表单 select token pair处使用的是 onchange事件，默认选中了 WETH/USDC 导致没触发这个事件，导致余额没更新
 - [ ] 实现期权拆分功能
 - [ ] 实现期货交易功能
+- [ ] 错误提示的toast
