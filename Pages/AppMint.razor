@@ -276,8 +276,7 @@
     private bool isSupportedNetwork()
     {
         Logger.LogInformation("start check supported chain");
-        var supportedNetworks = new SupportedNetworks();
-        var currentNetwork = supportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+        var currentNetwork = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
         if (currentNetwork is not null)
         {
             return true;

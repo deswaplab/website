@@ -1,5 +1,6 @@
-@page "/app/collections/{*network}"
+@page "/app/collections"
 @layout AppLayout
+@inject StateContainer StateContainer
 
 <PageTitle>App collections</PageTitle>
 
@@ -24,12 +25,14 @@
             </tr>
         </thead>
         <tbody>
+            @foreach(var collection in collections)
+            {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href="https://testnets.opensea.io/assets/sepolia/0xe10c396c0635bee8986de9a870852f528a0e0107/" target="_blank">WETH/USDC</a>
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
                 </th>
                 <td class="px-6 py-4">
-                    <a href="https://sepolia.etherscan.io/address/0xe10c396c0635bee8986de9a870852f528a0e0107" target="_blank">0xe10c396c0635bee8986de9a870852f528a0e0107</a>
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
                 </td>
                 <td class="px-6 py-4">
                     Options
@@ -38,12 +41,26 @@
                     Sepolia
                 </td>
             </tr>
+            }
         </tbody>
     </table>
 </div>
 </section>
 
 @code {
-    [Parameter]
-    public string? Network {get; set;}
+    public IList<TokenPair> collections {get; set;} = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.CompletedTask;
+        var tokenPairs = new TokenPairs();
+        if (StateContainer.SelectedChainId > 0 && SupportedNetworks.GetNetwork(StateContainer.SelectedChainId) is not null)
+        {
+            collections = tokenPairs.FilterByChainId(StateContainer.SelectedChainId);
+        }
+        else
+        {
+            collections = tokenPairs.Inner;
+        }
+    }
 }
