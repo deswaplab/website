@@ -4,6 +4,7 @@
 @inject MetamaskHostProvider _metamaskHostProvider;
 @inject AuthenticationStateProvider _authenticationStateProvider;
 @inject IJSRuntime JS
+@inject ToastService toastService
 
 @using Nethereum.Web3;
 @using Nethereum.Contracts.CQS;
@@ -127,6 +128,7 @@
                             </ol>
                         </div>
                     </div>
+                    <SingleToast />
                 </Authorized>
                 <NotAuthorized>
                     <MyMetamask />
@@ -271,9 +273,26 @@
         ];
     }
 
+    private bool isSupportedNetwork()
+    {
+        Logger.LogInformation("start check supported chain");
+        var supportedNetworks = new SupportedNetworks();
+        var currentNetwork = supportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+        if (currentNetwork is not null)
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
+        if (!isSupportedNetwork())
+        {
+            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            return;
+        }
         var curAddr = _metamaskHostProvider.SelectedAccount;
         Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
         Steps[0].Disabled = true; // 一点击就该置灰
@@ -358,6 +377,11 @@
     private async Task Approve()
     {
         Logger.LogInformation("approve clicked");
+        if (!isSupportedNetwork())
+        {
+            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            return;
+        }
         Steps[1].Disabled = true; // 确保只点一次
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contractAddress = SelectedOptionsKind == "calls" ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
@@ -401,6 +425,11 @@
     private async Task Mint()
     {
         Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
+        if (!isSupportedNetwork())
+        {
+            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            return;
+        }
         Steps[2].Disabled = true;
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsNFT.abi, SelectedTokenPair!.NftAddress);

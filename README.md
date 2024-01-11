@@ -16,5 +16,4 @@ dotnet watch
 - [ ] 实现期权拆分功能
 - [ ] 实现期货交易功能
 - [ ] 错误提示的toast
-- [ ] 尝试不要在每个页面都监听 metamask 事件
 - [ ] 解决下拉菜单 onblur 和 onclick 冲突的问题
