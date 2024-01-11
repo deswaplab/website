@@ -1,5 +1,9 @@
 @inject StateContainer StateContainer
-@inject MetamaskHostProvider _metamaskHostProvider;
+@inject IMetamaskInterop _metamaskInterop;
+@inject ILogger<AppNav> Logger;
+
+@using System.Text.Json.Serialization
+@using Nethereum.Web3
 
 <nav class="bg-white border-gray-200 dark:bg-gray-900">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -36,150 +40,57 @@
                         Collections
                     </NavLink>
                 </li>
+                <CascadingAuthenticationState>
+                    <AuthorizeView Roles="EthereumConnected">
+                        <Authorized>
                 <li>
                     <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" 
                         class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:w-auto md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-                        @onclick="DisplayNetworkList"
+                        @onclick="ToggleNetworkList"
                     >
                         <div class="inline-flex items-center">
-                            <svg class="h-3.5 w-3.5 rounded-full me-2" width="1535" height="2500" viewBox="0 0 256 417" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
-                                <path fill="#343434" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" />
-                                <path fill="#8C8C8C" d="M127.962 0L0 212.32l127.962 75.639V154.158z" />
-                                <path fill="#3C3C3B" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" />
-                                <path fill="#8C8C8C" d="M127.962 416.905v-104.72L0 236.585z" />
-                                <path fill="#141414" d="M127.961 287.958l127.96-75.637-127.96-58.162z" />
-                                <path fill="#393939" d="M0 212.32l127.96 75.638v-133.8z" />
+                            @if (currentConnectedNetwork is not null)
+                            {
+                            <img src=@($"img/{currentConnectedNetwork.Logo}") class="h-3.5 w-3.5 rounded-full me-2" />
+                            <span>@currentConnectedNetwork.Name</span>
+                            }
+                            else
+                            {
+                                <span>Unsupported Network</span>
+                            }
+                            <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                             </svg>
-                            <span>Sepolia</span>
                         </div> 
                     </button>
                     <!-- Dropdown menu -->
                     <div id="dropdownNavbar" class="@NetworkListClass z-10 absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
+                            @foreach (var network in supportedNetworks.Inner)
+                            {
                             <li>
-                                <a href="#" class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                                <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
+                                    @onclick="async () => await ToggleNetwork(network.ChainId)"
+                                >
                                     <div class="inline-flex items-center">
-                                    <svg class="h-3.5 w-3.5 rounded-full me-2" width="1535" height="2500" viewBox="0 0 256 417" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid">
-                                        <path fill="#343434" d="M127.961 0l-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" />
-                                        <path fill="#8C8C8C" d="M127.962 0L0 212.32l127.962 75.639V154.158z" />
-                                        <path fill="#3C3C3B" d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" />
-                                        <path fill="#8C8C8C" d="M127.962 416.905v-104.72L0 236.585z" />
-                                        <path fill="#141414" d="M127.961 287.958l127.96-75.637-127.96-58.162z" />
-                                        <path fill="#393939" d="M0 212.32l127.96 75.638v-133.8z" />
-                                    </svg>
-                                    <span>Sepolia</span>
+                                        <img src=@($"img/{network.Logo}") class="h-3.5 w-3.5 rounded-full me-2" />
+                                        <span>@network.Name</span>
                                     </div>
+                                    @if (StateContainer.SelectedChainId == network.ChainId)
+                                    {
                                     <svg class="w-2.5 h-2.5 text-blue-100 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
                                     </svg>
+                                    }
                                 </a>
                             </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                                    <div class="inline-flex items-center">
-                                    <svg class="h-3.5 w-3.5 rounded-full me-2" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                        viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
-                                    <style type="text/css">
-                                        .st0{fill:#FF0420;}
-                                        .st1{fill:#FFFFFF;}
-                                    </style>
-                                    <circle class="st0" cx="250" cy="250" r="250"/>
-                                    <path class="st1" d="M177.1,316.4c-14.9,0-27.1-3.5-36.6-10.5c-9.4-7.1-14.1-17.3-14.1-30.4c0-2.8,0.3-6.1,0.9-10.1
-                                        c1.6-9,3.9-19.8,6.9-32.5c8.5-34.4,30.5-51.6,65.9-51.6c9.6,0,18.3,1.6,25.9,4.9c7.6,3.1,13.6,7.9,18,14.3
-                                        c4.4,6.3,6.6,13.8,6.6,22.5c0,2.6-0.3,5.9-0.9,9.9c-1.9,11.1-4.1,22-6.8,32.5c-4.4,17.1-11.9,30-22.7,38.5
-                                        C209.5,312.3,195.1,316.4,177.1,316.4z M179.8,289.4c7,0,12.9-2.1,17.8-6.2c5-4.1,8.6-10.4,10.7-19c2.9-11.8,5.1-22,6.6-30.8
-                                        c0.5-2.6,0.8-5.3,0.8-8.1c0-11.4-5.9-17.1-17.8-17.1c-7,0-13,2.1-18,6.2c-4.9,4.1-8.4,10.4-10.5,19c-2.3,8.4-4.5,18.6-6.8,30.8
-                                        c-0.5,2.5-0.8,5.1-0.8,7.9C161.7,283.7,167.8,289.4,179.8,289.4z"/>
-                                    <path class="st1" d="M259.3,314.6c-1.4,0-2.4-0.4-3.2-1.3c-0.6-1-0.8-2.1-0.6-3.4l25.9-122c0.2-1.4,0.9-2.5,2.1-3.4
-                                        c1.1-0.9,2.3-1.3,3.6-1.3H337c13.9,0,25,2.9,33.4,8.6c8.5,5.8,12.8,14.1,12.8,25c0,3.1-0.4,6.4-1.1,9.8c-3.1,14.4-9.4,25-19,31.9
-                                        c-9.4,6.9-22.3,10.3-38.7,10.3h-25.3l-8.6,41.1c-0.3,1.4-0.9,2.5-2.1,3.4c-1.1,0.9-2.3,1.3-3.6,1.3H259.3z M325.7,242.9
-                                        c5.3,0,9.8-1.4,13.7-4.3c4-2.9,6.6-7,7.9-12.4c0.4-2.1,0.6-4,0.6-5.6c0-3.6-1.1-6.4-3.2-8.3c-2.1-2-5.8-3-10.9-3h-22.5l-7.1,33.6
-                                        H325.7z"/>
-                                    </svg>
-                                    Optimism Sepolia
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                                    <div class="inline-flex items-center">
-                                    <svg class="h-3.5 w-3.5 rounded-full me-2" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 2500 2500" style="enable-background:new 0 0 2500 2500;" xml:space="preserve">
-                                        <style type="text/css">
-                                            .st0{fill:none;}
-                                            .st1{fill:#213147;}
-                                            .st2{fill:#12AAFF;}
-                                            .st3{fill:#9DCCED;}
-                                            .st4{fill:#FFFFFF;}
-                                        </style>
-                                        <g id="Layer_x0020_1">
-                                            <g id="_2405588477232">
-                                                <rect class="st0" width="2500" height="2500"></rect>
-                                                <g>
-                                                    <g>
-                                                        <path class="st1" d="M226,760v980c0,63,33,120,88,152l849,490c54,31,121,31,175,0l849-490c54-31,88-89,88-152V760      c0-63-33-120-88-152l-849-490c-54-31-121-31-175,0L314,608c-54,31-87,89-87,152H226z"></path>
-                                                        <g>
-                                                            <g>
-                                                                <g>
-                                                                    <path class="st2" d="M1435,1440l-121,332c-3,9-3,19,0,29l208,571l241-139l-289-793C1467,1422,1442,1422,1435,1440z"></path>
-                                                                </g>
-                                                                <g>
-                                                                    <path class="st2" d="M1678,882c-7-18-32-18-39,0l-121,332c-3,9-3,19,0,29l341,935l241-139L1678,883V882z"></path>
-                                                                </g>
-                                                            </g>
-                                                        </g>
-                                                        <g>
-                                                            <path class="st3" d="M1250,155c6,0,12,2,17,5l918,530c11,6,17,18,17,30v1060c0,12-7,24-17,30l-918,530c-5,3-11,5-17,5       s-12-2-17-5l-918-530c-11-6-17-18-17-30V719c0-12,7-24,17-30l918-530c5-3,11-5,17-5l0,0V155z M1250,0c-33,0-65,8-95,25L237,555       c-59,34-95,96-95,164v1060c0,68,36,130,95,164l918,530c29,17,62,25,95,25s65-8,95-25l918-530c59-34,95-96,95-164V719       c0-68-36-130-95-164L1344,25c-29-17-62-25-95-25l0,0H1250z"></path>
-                                                        </g>
-                                                        <polygon class="st1" points="642,2179 727,1947 897,2088 738,2234     "></polygon>
-                                                        <g>
-                                                            <path class="st4" d="M1172,644H939c-17,0-33,11-39,27L401,2039l241,139l550-1507c5-14-5-28-19-28L1172,644z"></path>
-                                                            <path class="st4" d="M1580,644h-233c-17,0-33,11-39,27L738,2233l241,139l620-1701c5-14-5-28-19-28V644z"></path>
-                                                        </g>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                        </g>
-                                    </svg>
-                                    Arbitrum Sepolia
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                                    <div class="inline-flex items-center">
-                                    <svg class="h-3.5 w-3.5 rounded-full me-2" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                        viewBox="0 0 38.4 33.5" style="enable-background:new 0 0 38.4 33.5;" xml:space="preserve">
-                                    <style type="text/css">
-                                        .st0{fill:#8247E5;}
-                                    </style>
-                                    <g>
-                                        <path class="st0" d="M29,10.2c-0.7-0.4-1.6-0.4-2.4,0L21,13.5l-3.8,2.1l-5.5,3.3c-0.7,0.4-1.6,0.4-2.4,0L5,16.3
-                                            c-0.7-0.4-1.2-1.2-1.2-2.1v-5c0-0.8,0.4-1.6,1.2-2.1l4.3-2.5c0.7-0.4,1.6-0.4,2.4,0L16,7.2c0.7,0.4,1.2,1.2,1.2,2.1v3.3l3.8-2.2V7
-                                            c0-0.8-0.4-1.6-1.2-2.1l-8-4.7c-0.7-0.4-1.6-0.4-2.4,0L1.2,5C0.4,5.4,0,6.2,0,7v9.4c0,0.8,0.4,1.6,1.2,2.1l8.1,4.7
-                                            c0.7,0.4,1.6,0.4,2.4,0l5.5-3.2l3.8-2.2l5.5-3.2c0.7-0.4,1.6-0.4,2.4,0l4.3,2.5c0.7,0.4,1.2,1.2,1.2,2.1v5c0,0.8-0.4,1.6-1.2,2.1
-                                            L29,28.8c-0.7,0.4-1.6,0.4-2.4,0l-4.3-2.5c-0.7-0.4-1.2-1.2-1.2-2.1V21l-3.8,2.2v3.3c0,0.8,0.4,1.6,1.2,2.1l8.1,4.7
-                                            c0.7,0.4,1.6,0.4,2.4,0l8.1-4.7c0.7-0.4,1.2-1.2,1.2-2.1V17c0-0.8-0.4-1.6-1.2-2.1L29,10.2z"/>
-                                    </g>
-                                    </svg>
-                                    Polygon Mumbai
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                                    <div class="inline-flex items-center">
-                                    <svg class="h-3.5 w-3.5 rounded-full me-2" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 2500 2500" style="enable-background:new 0 0 2500 2500;" xml:space="preserve">
-                                    <g id="Layer_x0020_1">
-                                        <path d="M1247.8,2500c691.6,0,1252.2-559.6,1252.2-1250C2500,559.6,1939.4,0,1247.8,0C591.7,0,53.5,503.8,0,1144.9h1655.1v210.2H0   C53.5,1996.2,591.7,2500,1247.8,2500z"></path>
-                                    </g>
-                                    </svg>
-                                    Base Sepolia
-                                    </div>
-                                </a>
-                            </li>
+                            }
                         </ul>
                     </div>
                 </li>
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
                 <li>
                     <MyMetamask />
                 </li>
@@ -214,9 +125,25 @@
     private bool CollapseNetworkList = false;
 
     private string NetworkListClass => CollapseNetworkList ? "" : "hidden";
-    private async Task DisplayNetworkList()
+    private async Task ToggleNetworkList()
     {
+        Logger.LogInformation("toggle networklist");
         CollapseNetworkList = !CollapseNetworkList;
         await Task.CompletedTask;
+    }
+
+    private SupportedNetworks supportedNetworks = new SupportedNetworks();
+
+    private Network? currentConnectedNetwork => supportedNetworks.GetNetwork(StateContainer.SelectedChainId);
+
+
+    private async Task ToggleNetwork(long chainId)
+    {
+        Logger.LogInformation("start trigger metamask to change network");
+        var p = new Dictionary<string, string>();
+        p.Add("chainId", "0x"+Convert.ToString(chainId, 16));
+        await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+        CollapseNetworkList = false; // 收起网络菜单
+        Logger.LogInformation("change network succeed");
     }
 }
