@@ -39,6 +39,7 @@
                                         @bind:event="onchange"
                                         @bind:set="ChangeSelectedTokenPairName"
                                         >
+                                        <option></option>
                                         @foreach(var tokenPair in AllTokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
                                         {
                                             <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
@@ -163,6 +164,7 @@
 
     private async Task ChangeSelectedTokenPairName(string value)
     {
+        Logger.LogInformation($"selected token pair changed: {value}");
         SelectedTokenPair = AllTokenPairs.FindByName(value);
         if (SelectedTokenPair is not null)
         {
