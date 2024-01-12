@@ -181,6 +181,16 @@
         _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await fetchTokens();
+            await InvokeAsync(() => this.StateHasChanged());
+            Logger.LogInformation($"after render, token length: {Tokens.Count}"); // first render chainId = 0
+        }
+    }
+
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
         await fetchTokens();
@@ -197,17 +207,17 @@
     private async Task fetchTokens()
     {
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
+        loadingTokens = true;
         var curNetwork = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
         if (curNetwork is not null)
         {
-            loadingTokens = true;
             var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?contract=0xe10C396C0635BEE8986de9A870852F528A0E0107&includeAttributes=true&limit=200");
             if (tokensResponse is not null && tokensResponse.Tokens is not null)
             {
                 Tokens = tokensResponse!.Tokens;
             }
-            loadingTokens = false; // 网络请求结束
         }
+        loadingTokens = false; // 网络请求结束
     }
 
     public void Dispose()
