@@ -1,11 +1,12 @@
-@using Microsoft.AspNetCore.Components.Authorization
-@using Nethereum.Blazor
-@using Nethereum.UI
 @implements IDisposable;
 @inject MetamaskHostProvider _metamaskHostProvider;
 @inject SelectedEthereumHostProviderService _selectedHostProvider;
 @inject AuthenticationStateProvider _authenticationStateProvider;
 @inject ILogger<MyMetamask> Logger
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Nethereum.Blazor
+@using Nethereum.UI
 
 <div>
     @if (MetamaskAvailable)
@@ -46,19 +47,6 @@
     [Parameter]
     public int SelectedAccountTruncateLength { get; set; } = 10;
 
-    private string CurrentNetwork = "";
-
-    public long NetworkChainId {get; set;}
-
-    public async Task GetCurrentNetwork() {
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var chainId = await web3.Eth.ChainId.SendRequestAsync();
-        NetworkChainId = (long)chainId.Value;
-
-        CurrentNetwork = EthNetwork.ChainIdToNetwork(NetworkChainId);
-    }
-
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -69,9 +57,9 @@
             if (MetamaskAvailable)
             {
                 SelectedAccount = await _metamaskHostProvider.GetProviderSelectedAccountAsync();
-                await GetCurrentNetwork();
-                await _metamaskHostProvider.ChangeSelectedNetworkAsync(NetworkChainId);
-
+                var web3 = await _metamaskHostProvider.GetWeb3Async();
+                var chainId = await web3.Eth.ChainId.SendRequestAsync();
+                await _metamaskHostProvider.ChangeSelectedNetworkAsync((long)chainId.Value);
                 if (!string.IsNullOrEmpty(SelectedAccount))
                 {
                     await _selectedHostProvider.SetSelectedEthereumHostProvider(_metamaskHostProvider);
@@ -97,8 +85,6 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        NetworkChainId = chainId;
-        CurrentNetwork = EthNetwork.ChainIdToNetwork(chainId);
         Logger.LogInformation($"Network Chain Id changed: {chainId}");
         await InvokeAsync(() => this.StateHasChanged());
     }
@@ -107,7 +93,6 @@
     {
        
         SelectedAccount = await _metamaskHostProvider.EnableProviderAsync();
-        await GetCurrentNetwork();
         await _selectedHostProvider.SetSelectedEthereumHostProvider(_metamaskHostProvider);
 
         if (_authenticationStateProvider is EthereumAuthenticationStateProvider)

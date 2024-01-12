@@ -98,22 +98,6 @@ public static class SupportedNetworks
     }
 }
 
-public class EthNetwork
-{
-    public static string ChainIdToNetwork(long chainId)
-    {
-        if (chainId == 11155111)
-        {
-            return "sepolia";
-        }
-        else if (chainId == 5)
-        {
-            return "goerli";
-        }
-        return "ethereum";
-    }
-}
-
 public class OptionsNFT
 {
     public static readonly string abi = """

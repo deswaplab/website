@@ -39,7 +39,7 @@
                                         @bind:event="onchange"
                                         @bind:set="ChangeSelectedTokenPairName"
                                         >
-                                        @foreach(var tokenPair in AllTokenPairs.Inner)
+                                        @foreach(var tokenPair in AllTokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
                                         {
                                             <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
                                         }
@@ -509,4 +509,26 @@
         return balance;
     }
 
+    protected override void OnInitialized()
+    {
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        // 通知到这个组件更新状态
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
 }

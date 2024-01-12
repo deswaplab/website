@@ -110,8 +110,6 @@
         await Task.CompletedTask;
     }
 
-    private string CurrentNetwork => EthNetwork.ChainIdToNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-
     protected override void OnInitialized()
     {
         _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
