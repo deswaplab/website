@@ -46,7 +46,7 @@ public class TokenPairs
                 Network = SupportedNetworks.GetNetwork(11155111)!,
             },
             new TokenPair{
-                BaseAssetName = "WETH",
+                BaseAssetName = "WMATIC",
                 BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
                 BaseAssetDecimals = 18,
                 QuoteAssetName = "USDC",
@@ -68,7 +68,7 @@ public class TokenPairs
                 Network = SupportedNetworks.GetNetwork(11155111)!,
             },
             new TokenPair{
-                BaseAssetName = "WETH",
+                BaseAssetName = "WMATIC",
                 BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
                 BaseAssetDecimals = 18,
                 QuoteAssetName = "TUSDC",
@@ -96,6 +96,12 @@ public class TokenPairs
     {
         return Inner.Where(item => item.Network.ChainId == chainId).ToList();
     }
+
+    public TokenPairs FilterByChainIdAndReturn(long chainId)
+    {
+        var inn = Inner.Where(item => item.Network.ChainId == chainId).ToList();
+        return new TokenPairs { Inner = inn };
+    }
 }
 
 public class Network
@@ -120,7 +126,7 @@ public static class SupportedNetworks
     public static readonly IList<Network> Inner = [
         // we use reservoir to fetch user tokens, so supported chains are limited, in the future we should switch to other api providers
         new Network{Name = "Sepolia", ChainId=11155111, EtherscanHost="https://sepolia.etherscan.io", OpenseaHost="https://testnets.opensea.io/assets/sepolia", ReservoirHost="https://api-sepolia.reservoir.tools", Logo="ethereum_logo.svg", IsTestNet=true},
-        new Network{Name = "Pylogon Mumbai", ChainId=80001, EtherscanHost="https://sepolia.arbiscan.io", OpenseaHost="https://mumbai.polygonscan.com", ReservoirHost="https://api-mumbai.reservoir.tools", Logo="polygon_logo.svg", IsTestNet=true},
+        new Network{Name = "Pylogon Mumbai", ChainId=80001, EtherscanHost="https://mumbai.polygonscan.com", OpenseaHost="https://testnets.opensea.io/assets/mumbai", ReservoirHost="https://api-mumbai.reservoir.tools", Logo="polygon_logo.svg", IsTestNet=true},
 
     ];
 

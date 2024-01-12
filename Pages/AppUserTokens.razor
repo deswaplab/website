@@ -209,13 +209,21 @@
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
         var curNetwork = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-        if (curNetwork is not null)
+        var allTokenPairs = new TokenPairs();
+        var supportedTokenPairs = allTokenPairs.FilterByChainIdAndReturn(_metamaskHostProvider.SelectedNetworkChainId);
+        if (curNetwork is not null && supportedTokenPairs is not null)
         {
-            var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?contract=0xe10C396C0635BEE8986de9A870852F528A0E0107&includeAttributes=true&limit=200");
-            if (tokensResponse is not null && tokensResponse.Tokens is not null)
+            IList<ReservoirTokenResponse> curTokens = [];
+            foreach (var pair in supportedTokenPairs.Inner)
             {
-                Tokens = tokensResponse!.Tokens;
+                var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?contract={pair.NftAddress}&includeAttributes=true&limit=200");
+                if (tokensResponse is not null && tokensResponse.Tokens is not null)
+                {
+                    var theTokens = tokensResponse!.Tokens;
+                    curTokens = curTokens.Concat(theTokens).ToList();
+                }
             }
+            Tokens = curTokens;
         }
         loadingTokens = false; // 网络请求结束
     }

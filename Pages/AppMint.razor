@@ -165,7 +165,7 @@
     private async Task ChangeSelectedTokenPairName(string value)
     {
         Logger.LogInformation($"selected token pair changed: {value}");
-        SelectedTokenPair = AllTokenPairs.FindByName(value);
+        SelectedTokenPair = AllTokenPairs.FilterByChainIdAndReturn(_metamaskHostProvider.SelectedNetworkChainId).FindByName(value);
         if (SelectedTokenPair is not null)
         {
             SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;

@@ -16,3 +16,4 @@ dotnet watch
 - [ ] 实现期权拆分功能
 - [ ] 实现期货交易功能
 - [ ] 解决下拉菜单 onblur 和 onclick 冲突的问题
+- [ ] reservoir 接口测试环境总是报错，考虑切换到opensea的接口
