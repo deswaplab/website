@@ -434,9 +434,10 @@
         Steps[2].Disabled = true;
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsNFT.abi, SelectedTokenPair!.NftAddress);
-        var funcName = SelectedOptionsKind == "calls" ? "calls" : "puts";
-        var callsFunction = contract.GetFunction(funcName);
+        var callsFunction = contract.GetFunction("mint");
+        int optionsKind = SelectedOptionsKind == "calls" ? 0 : 1;
         var gas = await callsFunction.EstimateGasAsync(
+            optionsKind,
             Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
             Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
             new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
@@ -448,6 +449,7 @@
                 gas,
                 new Nethereum.Hex.HexTypes.HexBigInteger(0),
                 CancellationToken.None,
+                optionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()

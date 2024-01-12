@@ -34,15 +34,48 @@ public class TokenPairs
     public TokenPairs()
     {
         Inner = [
+            // WETH/USDC
             new TokenPair{
                 BaseAssetName = "WETH",
                 BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
                 BaseAssetDecimals = 18,
                 QuoteAssetName = "USDC",
-                QuoteAssetAddress = "0xFCAE2250864A678155f8F4A08fb557127053E59E",
+                QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
                 QuoteAssetDecimals = 6,
-                NftAddress = "0xe10C396C0635BEE8986de9A870852F528A0E0107",
+                NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
                 Network = SupportedNetworks.GetNetwork(11155111)!,
+            },
+            new TokenPair{
+                BaseAssetName = "WETH",
+                BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+                BaseAssetDecimals = 18,
+                QuoteAssetName = "USDC",
+                QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
+                QuoteAssetDecimals = 6,
+                NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
+                Network = SupportedNetworks.GetNetwork(80001)!,
+            },
+
+            // WETH/TUSDC
+            new TokenPair{
+                BaseAssetName = "WETH",
+                BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+                BaseAssetDecimals = 18,
+                QuoteAssetName = "TUSDC",
+                QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+                QuoteAssetDecimals = 6,
+                NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+                Network = SupportedNetworks.GetNetwork(11155111)!,
+            },
+            new TokenPair{
+                BaseAssetName = "WETH",
+                BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+                BaseAssetDecimals = 18,
+                QuoteAssetName = "TUSDC",
+                QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+                QuoteAssetDecimals = 6,
+                NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+                Network = SupportedNetworks.GetNetwork(80001)!,
             },
         ];
     }
@@ -118,34 +151,10 @@ public class OptionsNFT
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "baseAssetAmount",
-                "type": "uint256"
+                "internalType": "enum OptionsNFT.OptionsKind",
+                "name": "kind",
+                "type": "uint8"
             },
-            {
-                "internalType": "uint256",
-                "name": "quoteAssetAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "maturityDate",
-                "type": "uint256"
-            }
-        ],
-        "name": "calls",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
             {
                 "internalType": "uint256",
                 "name": "baseAssetAmount",
@@ -162,7 +171,7 @@ public class OptionsNFT
                 "type": "uint256"
             }
         ],
-        "name": "puts",
+        "name": "mint",
         "outputs": [
             {
                 "internalType": "uint256",
