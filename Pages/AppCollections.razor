@@ -1,6 +1,5 @@
 @page "/app/collections"
 @layout AppLayout
-@inject StateContainer StateContainer
 
 <PageTitle>App collections</PageTitle>
 
@@ -54,13 +53,6 @@
     {
         await Task.CompletedTask;
         var tokenPairs = new TokenPairs();
-        if (StateContainer.SelectedChainId > 0 && SupportedNetworks.GetNetwork(StateContainer.SelectedChainId) is not null)
-        {
-            collections = tokenPairs.FilterByChainId(StateContainer.SelectedChainId);
-        }
-        else
-        {
-            collections = tokenPairs.Inner;
-        }
+        collections = tokenPairs.Inner;
     }
 }

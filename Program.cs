@@ -27,7 +27,6 @@ builder.Services.AddSingleton(services =>
 
 
 builder.Services.AddSingleton<AuthenticationStateProvider, EthereumAuthenticationStateProvider>();
-builder.Services.AddSingleton<StateContainer>();
 builder.Services.AddSingleton<ToastService>();
 
 await builder.Build().RunAsync();

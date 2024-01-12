@@ -1,5 +1,5 @@
-@inject StateContainer StateContainer
 @inject IMetamaskInterop _metamaskInterop;
+@inject MetamaskHostProvider _metamaskHostProvider;
 @inject ILogger<AppNav> Logger;
 
 @using System.Text.Json.Serialization
@@ -76,7 +76,7 @@
                                         <img src=@($"img/{network.Logo}") class="h-3.5 w-3.5 rounded-full me-2" />
                                         <span>@network.Name</span>
                                     </div>
-                                    @if (StateContainer.SelectedChainId == network.ChainId)
+                                    @if (_metamaskHostProvider.SelectedNetworkChainId == network.ChainId)
                                     {
                                     <svg class="w-2.5 h-2.5 text-blue-100 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
@@ -110,16 +110,29 @@
         await Task.CompletedTask;
     }
 
-    private string CurrentNetwork => EthNetwork.ChainIdToNetwork(StateContainer.SelectedChainId);
+    private string CurrentNetwork => EthNetwork.ChainIdToNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     protected override void OnInitialized()
     {
-        StateContainer.OnChange += StateHasChanged;
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        // 通知到这个组件更新状态
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
     }
 
     public void Dispose()
     {
-        StateContainer.OnChange -= StateHasChanged;
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
     private bool CollapseNetworkList = false;
@@ -132,7 +145,7 @@
         await Task.CompletedTask;
     }
 
-    private Network? currentConnectedNetwork => SupportedNetworks.GetNetwork(StateContainer.SelectedChainId);
+    private Network? currentConnectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
 
     private async Task ToggleNetwork(long chainId)

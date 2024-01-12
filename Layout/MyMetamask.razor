@@ -6,7 +6,6 @@
 @inject SelectedEthereumHostProviderService _selectedHostProvider;
 @inject AuthenticationStateProvider _authenticationStateProvider;
 @inject ILogger<MyMetamask> Logger
-@inject StateContainer StateContainer
 
 <div>
     @if (MetamaskAvailable)
@@ -66,17 +65,12 @@
         {
             _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
             _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
-            StateContainer.OnChange += StateHasChanged;
             MetamaskAvailable = await _metamaskHostProvider.CheckProviderAvailabilityAsync();
             if (MetamaskAvailable)
             {
                 SelectedAccount = await _metamaskHostProvider.GetProviderSelectedAccountAsync();
                 await GetCurrentNetwork();
                 await _metamaskHostProvider.ChangeSelectedNetworkAsync(NetworkChainId);
-
-                // 手动设置状态
-                StateContainer.SelectedAccount = SelectedAccount;
-                StateContainer.SelectedChainId = NetworkChainId;
 
                 if (!string.IsNullOrEmpty(SelectedAccount))
                 {
@@ -92,13 +86,11 @@
     {
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
         _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
-        StateContainer.OnChange -= StateHasChanged;
     }
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
         SelectedAccount = account;
-        StateContainer.SelectedAccount = account;
         Logger.LogInformation($"Selected Account changed: {account}");
         await InvokeAsync(() => this.StateHasChanged());
     }
@@ -107,7 +99,6 @@
     {
         NetworkChainId = chainId;
         CurrentNetwork = EthNetwork.ChainIdToNetwork(chainId);
-        StateContainer.SelectedChainId = chainId;
         Logger.LogInformation($"Network Chain Id changed: {chainId}");
         await InvokeAsync(() => this.StateHasChanged());
     }
