@@ -102,6 +102,15 @@ public class TokenPairs
         var inn = Inner.Where(item => item.Network.ChainId == chainId).ToList();
         return new TokenPairs { Inner = inn };
     }
+
+    // list of nft contract address, in lower case for better comparision
+    public IList<string> FilterSupportedContracts(long chainId)
+    {
+        var inn = Inner.Where(item => item.Network.ChainId == chainId)
+            .Select(p => p.NftAddress.ToLower())
+            .ToList();
+        return inn;
+    }
 }
 
 public class Network

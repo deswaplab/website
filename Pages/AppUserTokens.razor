@@ -203,7 +203,6 @@
         await InvokeAsync(() => this.StateHasChanged());
     }
 
-    // TODO: 加上一个合约筛选器
     private async Task fetchTokens()
     {
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
@@ -214,16 +213,41 @@
         if (curNetwork is not null && supportedTokenPairs is not null)
         {
             IList<ReservoirTokenResponse> curTokens = [];
-            foreach (var pair in supportedTokenPairs.Inner)
+            bool hasMore = true;
+            string continuation = "";
+            while (hasMore)
             {
-                var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>($"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?contract={pair.NftAddress}&includeAttributes=true&limit=200");
+                string url = $"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?includeAttributes=true&limit=200";
+                if (continuation != "")
+                {
+                    url += $"&continuation={continuation}";
+                }
+                var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>(url);
                 if (tokensResponse is not null && tokensResponse.Tokens is not null)
                 {
                     var theTokens = tokensResponse!.Tokens;
                     curTokens = curTokens.Concat(theTokens).ToList();
                 }
+                else
+                {
+                    break;
+                }
+                if (tokensResponse is not null && tokensResponse.Continuation is not null)
+                {
+                    hasMore = true;
+                    continuation = tokensResponse.Continuation;
+                }
+                else
+                {
+                    break;
+                }
             }
-            Tokens = curTokens;
+            // 过滤当前支持的合约
+            var supportedContracts = allTokenPairs.FilterSupportedContracts(_metamaskHostProvider.SelectedNetworkChainId);
+            Tokens = curTokens
+                .Where(item => item.Token is not null && item.Token.Contract is not null)
+                .Where(item => supportedContracts.Contains(item.Token!.Contract!.ToLower()))
+                .ToList();
         }
         loadingTokens = false; // 网络请求结束
     }
@@ -239,6 +263,8 @@
         [JsonPropertyName("tokens")]
         public IList<ReservoirTokenResponse> Tokens { get; set; } = [];
 
+        [JsonPropertyName("continuation")]
+        public string? Continuation { get; set; }
     }
 
     public class ReservoirTokenResponse
