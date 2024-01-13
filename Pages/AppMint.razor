@@ -40,7 +40,7 @@
                                         @bind:set="ChangeSelectedTokenPairName"
                                         >
                                         <option></option>
-                                        @foreach(var tokenPair in AllTokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
+                                        @foreach(var tokenPair in TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
                                         {
                                             <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
                                         }
@@ -141,8 +141,6 @@
 
 
 @code {
-    public TokenPairs AllTokenPairs = new TokenPairs();
-
     public string SelectedOptionsKind {get; set;} = "calls";
 
     private async Task ChangeOptionsKind(string value)
@@ -165,7 +163,9 @@
     private async Task ChangeSelectedTokenPairName(string value)
     {
         Logger.LogInformation($"selected token pair changed: {value}");
-        SelectedTokenPair = AllTokenPairs.FilterByChainIdAndReturn(_metamaskHostProvider.SelectedNetworkChainId).FindByName(value);
+        SelectedTokenPair = TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId)
+            .Where(item => item.BaseAssetName + "/" + item.QuoteAssetName == value)
+            .FirstOrDefault();
         if (SelectedTokenPair is not null)
         {
             SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;

@@ -208,8 +208,7 @@
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
         var curNetwork = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-        var allTokenPairs = new TokenPairs();
-        var supportedTokenPairs = allTokenPairs.FilterByChainIdAndReturn(_metamaskHostProvider.SelectedNetworkChainId);
+        var supportedTokenPairs = TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId);
         if (curNetwork is not null && supportedTokenPairs is not null)
         {
             IList<ReservoirTokenResponse> curTokens = [];
@@ -243,7 +242,7 @@
                 }
             }
             // 过滤当前支持的合约
-            var supportedContracts = allTokenPairs.FilterSupportedContracts(_metamaskHostProvider.SelectedNetworkChainId);
+            var supportedContracts = TokenPairs.FilterSupportedContracts(_metamaskHostProvider.SelectedNetworkChainId);
             Tokens = curTokens
                 .Where(item => item.Token is not null && item.Token.Contract is not null)
                 .Where(item => supportedContracts.Contains(item.Token!.Contract!.ToLower()))
@@ -340,8 +339,9 @@
                 quoteAssetAmount = BigInteger.Parse(attr.Value);
             }
         }
-        var allTokenPairs = new TokenPairs();
-        var tokenPair = allTokenPairs.FindByNftContract(nftContractAddress);
+        var tokenPair = TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId)
+            .Where(item => item.NftAddress.ToLower() == nftContractAddress.ToLower())
+            .FirstOrDefault();
         if (tokenPair is null)
         {
             // TODO: 使用更好的错误提示

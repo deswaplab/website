@@ -52,7 +52,6 @@
     protected override async Task OnInitializedAsync()
     {
         await Task.CompletedTask;
-        var tokenPairs = new TokenPairs();
-        collections = tokenPairs.Inner;
+        collections = TokenPairs.Inner;
     }
 }

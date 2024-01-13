@@ -27,84 +27,61 @@ public class TokenPair
     public string Name => BaseAssetName + "/" + QuoteAssetName;
 }
 
-public class TokenPairs
+public static class TokenPairs
 {
-    public IList<TokenPair> Inner { get; set; }
+    public static readonly IList<TokenPair> Inner = [
+        // WETH/USDC
+        new TokenPair{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "USDC",
+            QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
+            Network = SupportedNetworks.GetNetwork(11155111)!,
+        },
+        new TokenPair{
+            BaseAssetName = "WMATIC",
+            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "USDC",
+            QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+        },
 
-    public TokenPairs()
-    {
-        Inner = [
-            // WETH/USDC
-            new TokenPair{
-                BaseAssetName = "WETH",
-                BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
-                BaseAssetDecimals = 18,
-                QuoteAssetName = "USDC",
-                QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-                QuoteAssetDecimals = 6,
-                NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
-                Network = SupportedNetworks.GetNetwork(11155111)!,
-            },
-            new TokenPair{
-                BaseAssetName = "WMATIC",
-                BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
-                BaseAssetDecimals = 18,
-                QuoteAssetName = "USDC",
-                QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
-                QuoteAssetDecimals = 6,
-                NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
-                Network = SupportedNetworks.GetNetwork(80001)!,
-            },
+        // WETH/TUSDC
+        new TokenPair{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+            Network = SupportedNetworks.GetNetwork(11155111)!,
+        },
+        new TokenPair{
+            BaseAssetName = "WMATIC",
+            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+        },
+    ];
 
-            // WETH/TUSDC
-            new TokenPair{
-                BaseAssetName = "WETH",
-                BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
-                BaseAssetDecimals = 18,
-                QuoteAssetName = "TUSDC",
-                QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
-                QuoteAssetDecimals = 6,
-                NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
-                Network = SupportedNetworks.GetNetwork(11155111)!,
-            },
-            new TokenPair{
-                BaseAssetName = "WMATIC",
-                BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
-                BaseAssetDecimals = 18,
-                QuoteAssetName = "TUSDC",
-                QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
-                QuoteAssetDecimals = 6,
-                NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
-                Network = SupportedNetworks.GetNetwork(80001)!,
-            },
-        ];
-    }
-
-    public TokenPair? FindByName(string name)
-    {
-        var res = Inner.FirstOrDefault(item => item.BaseAssetName + "/" + item.QuoteAssetName == name);
-        return res;
-    }
-
-    public TokenPair? FindByNftContract(string nftContract)
-    {
-        var res = Inner.FirstOrDefault(item => item.NftAddress.Equals(nftContract, StringComparison.CurrentCultureIgnoreCase));
-        return res;
-    }
-
-    public IList<TokenPair> FilterByChainId(long chainId)
+    public static IList<TokenPair> FilterByChainId(long chainId)
     {
         return Inner.Where(item => item.Network.ChainId == chainId).ToList();
     }
 
-    public TokenPairs FilterByChainIdAndReturn(long chainId)
-    {
-        var inn = Inner.Where(item => item.Network.ChainId == chainId).ToList();
-        return new TokenPairs { Inner = inn };
-    }
-
     // list of nft contract address, in lower case for better comparision
-    public IList<string> FilterSupportedContracts(long chainId)
+    public static IList<string> FilterSupportedContracts(long chainId)
     {
         var inn = Inner.Where(item => item.Network.ChainId == chainId)
             .Select(p => p.NftAddress.ToLower())
