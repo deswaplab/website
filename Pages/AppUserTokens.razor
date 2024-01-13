@@ -2,7 +2,8 @@
 @layout AppLayout
 @inject HttpClient Http
 @inject ILogger<AppUserTokens> Logger
-@inject MetamaskHostProvider _metamaskHostProvider;
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject Web3Service _web3Service
 
 @using System.Text.Json.Serialization
 @using System.Numerics;
@@ -361,40 +362,28 @@
         }
 
         // 1. Check balance
-        var userPayAssetBalance = await GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
+        var userPayAssetBalance = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
         if (userPayAssetBalance < payAssetAmount)
         {
             throw new Exception("current user doesnt have enough balance to exercise");
         }
 
-        var userPayAllowance = await GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+        var userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
         if (userPayAllowance < payAssetAmount)
         {
             // DO approve and wait seconds
-            await Approve(payAssetAddress, nftContractAddress, payAssetAmount);
+            await _web3Service.Approve(nftContractAddress, payAssetAmount, payAssetAddress);
             await Task.Delay(3000);
-            userPayAllowance = await GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+            userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
             if (userPayAllowance < payAssetAmount)
             {
                 ExerciseButtonDisabled = false;
                 throw new Exception("after approve, allowance is still not enough");
             }
         }
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftContractAddress);
-        var callsFunction = contract.GetFunction("exercise");
-        var gas = await callsFunction.EstimateGasAsync(
-            long.Parse(tokenId)
-        );
         try {
-            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-                _metamaskHostProvider.SelectedAccount,
-                gas,
-                new Nethereum.Hex.HexTypes.HexBigInteger(0),
-                CancellationToken.None,
-                long.Parse(tokenId)
-            );
-            Logger.LogInformation($"exercise finished, tx: {receipt.TransactionHash.ToString()}");
+            var txHash = await _web3Service.ExerciseOptions(long.Parse(tokenId), nftContractAddress);
+            Logger.LogInformation($"exercise finished, tx: {txHash}");
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
@@ -416,21 +405,9 @@
     {
         Logger.LogInformation($"handle burn");
         BurnButtonDisabled = true; // 弹出小狐狸期间禁止点击
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftContractAddress);
-        var callsFunction = contract.GetFunction("burn");
-        var gas = await callsFunction.EstimateGasAsync(
-            long.Parse(tokenId)
-        );
         try {
-            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-                _metamaskHostProvider.SelectedAccount,
-                gas,
-                new Nethereum.Hex.HexTypes.HexBigInteger(0),
-                CancellationToken.None,
-                long.Parse(tokenId)
-            );
-            Logger.LogInformation($"burn finished, tx: {receipt.TransactionHash.ToString()}");
+            var txHash = await _web3Service.BurnOptions(long.Parse(tokenId), nftContractAddress);
+            Logger.LogInformation($"burn finished, tx: {txHash}");
             // TODO: 显示成功的toast
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             Logger.LogInformation("burn failed");
@@ -445,74 +422,5 @@
         }
 
         Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
-    }
-
-
-    [Nethereum.ABI.FunctionEncoding.Attributes.Function("allowance", "uint256")]
-    public class AllowanceFunction : FunctionMessage
-    {
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr1", 1)]
-        public string Addr1 { get; set; } = "";
-
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr2", 2)]
-        public string Addr2 { get; set; } = "";
-
-    }
-
-    private async Task<BigInteger> GetAllowance(string payAddr, string recvAddr, string contractAddress)
-    {
-        var allowanceFunctionMessage = new AllowanceFunction()
-        {
-            Addr1 = payAddr,
-            Addr2 = recvAddr,
-        };
-
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var handler = web3.Eth.GetContractQueryHandler<AllowanceFunction>();
-        var balance = await handler.QueryAsync<BigInteger>(contractAddress, allowanceFunctionMessage);
-        Logger.LogInformation($"user allowance: {balance}, {payAddr}, {recvAddr}, {contractAddress}");
-        return balance;
-    }
-
-    [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
-    public class BalanceOfFunction : FunctionMessage
-    {
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "_owner", 1)]
-        public string Owner { get; set; } = "";
-    }
-
-    private async Task<BigInteger> GetUserBalance(string userAddress, string contractAddress)
-    {
-        var balanceOfFunctionMessage = new BalanceOfFunction()
-        {
-            Owner = userAddress,
-        };
-
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var balanceHandler = web3.Eth.GetContractQueryHandler<BalanceOfFunction>();
-        var balance = await balanceHandler.QueryAsync<BigInteger>(contractAddress, balanceOfFunctionMessage);
-        return balance;
-    }
-
-    private async Task Approve(string erc20ContractAddress, string nftContractAddress, BigInteger wad)
-    {
-        Logger.LogInformation("approve clicked");
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        string erc20ApproveAbi = """[{"inputs":[{"internalType":"address","name":"guy","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]""";
-        var contract = web3.Eth.GetContract(erc20ApproveAbi, erc20ContractAddress);
-        var callsFunction = contract.GetFunction("approve");
-        var gas = await callsFunction.EstimateGasAsync(
-            nftContractAddress,
-            wad
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
-            CancellationToken.None,
-            nftContractAddress,
-            wad
-        );
-        Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
     }
 }

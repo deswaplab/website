@@ -17,8 +17,8 @@ dotnet watch
 - [ ] 实现期货交易功能
 - [ ] 解决下拉菜单 onblur 和 onclick 冲突的问题
 - [ ] reservoir 接口测试环境总是报错，考虑切换到opensea的接口(待定，免费的api少)
-- [ ] TokenPairs 改为static class
-
+- [ ] 合约方法抽象为一个service
+- [ ] 把reservoir方法封装，便于未来替换
 
 ## note
 

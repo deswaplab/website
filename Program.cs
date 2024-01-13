@@ -24,6 +24,7 @@ builder.Services.AddSingleton(services =>
     selectedHostProvider.SetSelectedEthereumHostProvider(metamaskHostProvider);
     return selectedHostProvider;
 });
+builder.Services.AddSingleton<Web3Service>();
 
 
 builder.Services.AddSingleton<AuthenticationStateProvider, EthereumAuthenticationStateProvider>();

@@ -5,6 +5,7 @@
 @inject AuthenticationStateProvider _authenticationStateProvider;
 @inject IJSRuntime JS
 @inject ToastService toastService
+@inject Web3Service _web3Service
 
 @using Nethereum.Web3;
 @using Nethereum.Contracts.CQS;
@@ -171,9 +172,9 @@
             SelectedTokenPairName = SelectedTokenPair.BaseAssetName + "/" + SelectedTokenPair.QuoteAssetName;
             Logger.LogInformation($"SelectedTokenPairName: {SelectedTokenPairName}");
 
-            var baseBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
+            var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.BaseAssetAddress);
             UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedTokenPair.BaseAssetDecimals);
-            var quoteBalanceInWei = await GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
+            var quoteBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.QuoteAssetAddress);
             UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedTokenPair.QuoteAssetDecimals);
 
             ResetSteps();
@@ -305,7 +306,7 @@
                 if (InputedBaseAssetAmount <= UserBaseAssetBalance)
                 {
                     Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedTokenPair.NftAddress}, {SelectedTokenPair.BaseAssetAddress}");
-                    var baseAssetAllowanceWei = await GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.BaseAssetAddress);
+                    var baseAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.BaseAssetAddress);
                     var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedTokenPair.BaseAssetDecimals);
                     Logger.LogInformation($"weth allowance={baseAssetAllowance}");
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
@@ -340,7 +341,7 @@
                 {
                     Logger.LogInformation("user quote balance is ok");
                     // Check USDC allowance
-                    var quoteAssetAllowanceWei = await GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.QuoteAssetAddress);
+                    var quoteAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair.NftAddress, SelectedTokenPair.QuoteAssetAddress);
                     var quoteAssetAllowance = Web3.Convert.FromWei(quoteAssetAllowanceWei, SelectedTokenPair.QuoteAssetDecimals);
                     if (quoteAssetAllowance >= InputedQuoteAssetAmount)
                     {
@@ -384,26 +385,11 @@
             return;
         }
         Steps[1].Disabled = true; // 确保只点一次
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contractAddress = SelectedOptionsKind == "calls" ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
         var wad = SelectedOptionsKind == "calls" ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
-        string erc20ApproveAbi = """[{"inputs":[{"internalType":"address","name":"guy","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]""";
-        var contract = web3.Eth.GetContract(erc20ApproveAbi, contractAddress);
-        var callsFunction = contract.GetFunction("approve");
-        var gas = await callsFunction.EstimateGasAsync(
-            SelectedTokenPair!.NftAddress,
-            wad
-        );
         try {
-            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-                _metamaskHostProvider.SelectedAccount,
-                gas,
-                new Nethereum.Hex.HexTypes.HexBigInteger(0),
-                CancellationToken.None,
-                SelectedTokenPair!.NftAddress,
-                wad
-            );
-            Logger.LogInformation($"approve finished, tx: {receipt.TransactionHash.ToString()}");
+            var txHash = await _web3Service.Approve(SelectedTokenPair!.NftAddress, wad, contractAddress);
+            Logger.LogInformation($"approve finished, tx: {txHash}");
             // 标记完成，且让第三步可点击
             Steps[1].Finished = true;
             Steps[1].Disabled = true;
@@ -432,29 +418,18 @@
             return;
         }
         Steps[2].Disabled = true;
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, SelectedTokenPair!.NftAddress);
-        var callsFunction = contract.GetFunction("mint");
         int optionsKind = SelectedOptionsKind == "calls" ? 0 : 1;
-        var gas = await callsFunction.EstimateGasAsync(
-            optionsKind,
-            Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
-            Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
-            new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
-        );
-        Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}, {gas}");
+        Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}");
         try {
-            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-                _metamaskHostProvider.SelectedAccount,
-                gas,
-                new Nethereum.Hex.HexTypes.HexBigInteger(0),
-                CancellationToken.None,
+            var txHash = await _web3Service.MintOptions(
                 optionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
-                new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()
+                new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
+                SelectedTokenPair!.NftAddress
             );
-            Logger.LogInformation($"mint finished, tx: {receipt.TransactionHash.ToString()}");
+
+            Logger.LogInformation($"mint finished, tx: {txHash}");
             Steps[2].Finished = true;
             Steps[2].Disabled = true;
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
@@ -466,51 +441,6 @@
             Steps[2].Finished = false;
             Steps[2].Disabled = false;
         }
-    }
-
-    [Nethereum.ABI.FunctionEncoding.Attributes.Function("balanceOf", "uint256")]
-    public class BalanceOfFunction : FunctionMessage
-    {
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "_owner", 1)]
-        public string Owner { get; set; } = "";
-    }
-
-    private async Task<BigInteger> GetUserBalance(string userAddress, string contractAddress)
-    {
-        var balanceOfFunctionMessage = new BalanceOfFunction()
-        {
-            Owner = userAddress,
-        };
-
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var balanceHandler = web3.Eth.GetContractQueryHandler<BalanceOfFunction>();
-        var balance = await balanceHandler.QueryAsync<BigInteger>(contractAddress, balanceOfFunctionMessage);
-        return balance;
-    }
-
-    [Nethereum.ABI.FunctionEncoding.Attributes.Function("allowance", "uint256")]
-    public class AllowanceFunction : FunctionMessage
-    {
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr1", 1)]
-        public string Addr1 { get; set; } = "";
-
-        [Nethereum.ABI.FunctionEncoding.Attributes.ParameterAttribute("address", "addr2", 2)]
-        public string Addr2 { get; set; } = "";
-
-    }
-
-    private async Task<BigInteger> GetAllowance(string payAddr, string recvAddr, string contractAddress)
-    {
-        var allowanceFunctionMessage = new AllowanceFunction()
-        {
-            Addr1 = payAddr,
-            Addr2 = recvAddr,
-        };
-
-        var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var handler = web3.Eth.GetContractQueryHandler<AllowanceFunction>();
-        var balance = await handler.QueryAsync<BigInteger>(contractAddress, allowanceFunctionMessage);
-        return balance;
     }
 
     protected override void OnInitialized()
