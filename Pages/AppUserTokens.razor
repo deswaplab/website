@@ -4,6 +4,7 @@
 @inject ILogger<AppUserTokens> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
+@inject ToastService toastService
 
 @using System.Text.Json.Serialization
 @using System.Numerics;
@@ -83,6 +84,7 @@
                         }
                     }
                 }
+                <SingleToast />
             </section>
         </Authorized>
         <NotAuthorized>
@@ -345,8 +347,8 @@
             .FirstOrDefault();
         if (tokenPair is null)
         {
-            // TODO: 使用更好的错误提示
-            throw new Exception("unsupported nft contract");
+            toastService.ShowToast("unsupported nft contract", ToastLevel.Error);
+            return;
         }
 
         string payAssetAddress = "";
@@ -365,7 +367,9 @@
         var userPayAssetBalance = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
         if (userPayAssetBalance < payAssetAmount)
         {
-            throw new Exception("current user doesnt have enough balance to exercise");
+            toastService.ShowToast("insufficient balance to exercise", ToastLevel.Error);
+            ExerciseButtonDisabled = false;
+            return;
         }
 
         var userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
@@ -373,28 +377,30 @@
         {
             // DO approve and wait seconds
             await _web3Service.Approve(nftContractAddress, payAssetAmount, payAssetAddress);
-            await Task.Delay(3000);
+            await Task.Delay(1000);
             userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
             if (userPayAllowance < payAssetAmount)
             {
                 ExerciseButtonDisabled = false;
-                throw new Exception("after approve, allowance is still not enough");
+                toastService.ShowToast("after approve still insufficient balance to exercise", ToastLevel.Error);
+                return;
             }
         }
         try {
             var txHash = await _web3Service.ExerciseOptions(long.Parse(tokenId), nftContractAddress);
             Logger.LogInformation($"exercise finished, tx: {txHash}");
+            toastService.ShowToast($"{tokenId} exercised successfully", ToastLevel.Success);
+            // 从 Tokens 删除当前行权的token，以实现页面刷新
+            Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
-                // TODO: 显示取消的toast
+                toastService.ShowToast("User cancelled exercise, nothing will be executed", ToastLevel.Error);
                 Logger.LogInformation("user cancel tx");
             }
         } finally {
             ExerciseButtonDisabled = false;
         }
-        // 从 Tokens 删除当前行权的token，以实现页面刷新
-        Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
     }
 
     private bool BurnButtonDisabled = false;
@@ -408,19 +414,18 @@
         try {
             var txHash = await _web3Service.BurnOptions(long.Parse(tokenId), nftContractAddress);
             Logger.LogInformation($"burn finished, tx: {txHash}");
-            // TODO: 显示成功的toast
+            toastService.ShowToast($"{tokenId} burned successfully", ToastLevel.Success);
+            Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             Logger.LogInformation("burn failed");
             Logger.LogError($"{e.ToString()}, {e.Message}");
             if (e.Message.Contains("User denied transaction signature"))
             {
-                // TODO: 显示取消的toast
-                Logger.LogInformation("user cancel tx");
+                toastService.ShowToast("User cancelled burn, nothing will be executed", ToastLevel.Error);
+                Logger.LogInformation("user cancel burn");
             }
         } finally {
             BurnButtonDisabled = false;
         }
-
-        Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
     }
 }

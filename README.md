@@ -19,6 +19,10 @@ dotnet watch
 - [ ] reservoir 接口测试环境总是报错，考虑切换到opensea的接口(待定，免费的api少)
 - [ ] 合约方法抽象为一个service
 - [ ] 把reservoir方法封装，便于未来替换
+- [ ] 优化日志
+- [ ] onblur问题已经影响到了手机上菜单栏的点击
+- [ ] 手机上菜单栏 z-index absolute 问题未解决
+- [ ] mint时给出当前推荐价格
 
 ## note
 
