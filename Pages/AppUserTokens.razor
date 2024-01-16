@@ -5,6 +5,7 @@
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
+@inject INftFetcher _nftFetcher
 
 @using System.Text.Json.Serialization
 @using System.Numerics;
@@ -30,49 +31,42 @@
                 }
                 else
                 {
-                    @if (Tokens.Count > 0)
+                    @if (UserTokens.Count > 0)
                     {
                         <div class="mx-auto max-w-screen-xl grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 mx-auto lg:py-0">
-                        @foreach (var token in Tokens)
+                        @foreach (var token in UserTokens)
                         {
-                            @if (token.Token is not null 
-                                && token.Token.TokenId is not null 
-                                && token.Token.Contract is not null 
-                                && token.Token.Metadata is not null
-                                && token.Token.Attributes.Count > 0)
-                            {
-                                <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                    <a href="@buildOpenseaTokenUrl(token.Token)" target="_blank">
-                                        <img class="rounded-t-lg" src="@token.Token.Metadata.ImageOriginal" alt="" />
-                                    </a>
-                                        <div class="flex flex-row items-center gap-2 p-5">
-                                            @if (canList(token.Token.Attributes))
-                                            {
-                                                <a href="@buildListUrl(token.Token)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                                    List
-                                                </a>
-                                            }
-                                            @if (canExercise(token.Token.Attributes))
-                                            {
-                                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
-                                                    @onclick="async () => await HandleExercise(token.Token.TokenId, token.Token.Contract, token.Token.Attributes)"
-                                                    disabled=@ExerciseButtonDisabled
-                                                >
-                                                    Exercise
-                                                </button>
-                                            }
-                                            @if (canBurn(token.Token.Attributes))
-                                            {
-                                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
-                                                    @onclick="async () => await HandleBurn(token.Token.TokenId, token.Token.Contract)"
-                                                    disabled=@BurnButtonDisabled
-                                                >
-                                                    Burn
-                                                </button>
-                                            }
-                                        </div>
-                                </div>
-                            }
+                            <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a href="@buildOpenseaTokenUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank">
+                                    <img class="rounded-t-lg" src="@token.ImageData" alt="" />
+                                </a>
+                                    <div class="flex flex-row items-center gap-2 p-5">
+                                        @if (token.Listable())
+                                        {
+                                            <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                                List
+                                            </a>
+                                        }
+                                        @if (token.Exercisable())
+                                        {
+                                            <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
+                                                @onclick="async () => await HandleExercise(token)"
+                                                disabled=@ExerciseButtonDisabled
+                                            >
+                                                Exercise
+                                            </button>
+                                        }
+                                        @if (token.Burnable())
+                                        {
+                                            <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
+                                                @onclick="async () => await HandleBurn(token.TokenId, token.Contract)"
+                                                disabled=@BurnButtonDisabled
+                                            >
+                                                Burn
+                                            </button>
+                                        }
+                                    </div>
+                            </div>
                         }
                         </div>
                     }
@@ -95,103 +89,25 @@
 @code {
     private bool loadingTokens = false;
 
-    private string buildListUrl(ReservoirToken token)
+    private string buildListUrl(string nftContractAddress, long tokenId, long chainId)
     {
-        var network = SupportedNetworks.GetNetwork(token.ChainId);
-        return $"{network!.OpenseaHost}/{token.Contract}/{token.TokenId}/sell";
+        var network = SupportedNetworks.GetNetwork(chainId);
+        return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}/sell";
     }
 
-    private string buildOpenseaTokenUrl(ReservoirToken token)
+    private string buildOpenseaTokenUrl(string nftContractAddress, long tokenId, long chainId)
     {
-        var network = SupportedNetworks.GetNetwork(token.ChainId);
-        return $"{network!.OpenseaHost}/{token.Contract}/{token.TokenId}";
+        var network = SupportedNetworks.GetNetwork(chainId);
+        return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}";
     }
 
-    private bool canExercise(IList<ReservoirTokenAttribute> tokenAttributes)
-    {
-        bool inMaturityDate = false;
-
-        foreach(var attr in tokenAttributes)
-        {
-            if (attr.Key == "maturityDate" && attr.Value is not null)
-            {
-                inMaturityDate = true; // TODO: debug purpose
-                var maturityDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(attr.Value));
-                var now = DateTime.Now;
-                if (now >= maturityDate && now < maturityDate.AddDays(1))
-                {
-                    inMaturityDate = true;
-                }
-            }
-        }
-        if (inMaturityDate)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private bool canBurn(IList<ReservoirTokenAttribute> tokenAttributes)
-    {
-        bool afterMaturityDate = false;
-
-        foreach(var attr in tokenAttributes)
-        {
-            if (attr.Key == "maturityDate" && attr.Value is not null)
-            {
-                var maturityDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(attr.Value));
-                var now = DateTime.Now;
-                if (now >= maturityDate.AddDays(1))
-                {
-                    afterMaturityDate = true;
-                }
-            }
-        }
-        if (afterMaturityDate)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private bool canList(IList<ReservoirTokenAttribute> tokenAttributes)
-    {
-        bool writerIsOwner = false;
-
-        foreach(var attr in tokenAttributes)
-        {
-            if (attr.Key == "writer" && attr.Value is not null)
-            {
-                if (attr.Value == _metamaskHostProvider.SelectedAccount)
-                {
-                    writerIsOwner = true;
-                }
-            }
-        }
-        if (writerIsOwner && !canBurn(tokenAttributes) && !canExercise(tokenAttributes))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private IList<ReservoirTokenResponse> Tokens {get; set;} = [];
+    private IList<UserToken> UserTokens {get; set;} = [];
 
     protected override async Task OnInitializedAsync()
     {
         await Task.CompletedTask;
         _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
         _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await fetchTokens();
-            await InvokeAsync(() => this.StateHasChanged());
-            Logger.LogInformation($"after render, token length: {Tokens.Count}"); // first render chainId = 0
-        }
     }
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
@@ -210,47 +126,7 @@
     {
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
-        var curNetwork = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-        var supportedTokenPairs = TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId);
-        if (curNetwork is not null && supportedTokenPairs is not null)
-        {
-            IList<ReservoirTokenResponse> curTokens = [];
-            bool hasMore = true;
-            string continuation = "";
-            while (hasMore)
-            {
-                string url = $"{curNetwork.ReservoirHost}/users/{_metamaskHostProvider.SelectedAccount}/tokens/v8?includeAttributes=true&limit=200";
-                if (continuation != "")
-                {
-                    url += $"&continuation={continuation}";
-                }
-                var tokensResponse = await Http.GetFromJsonAsync<ReservoirTokensResponse>(url);
-                if (tokensResponse is not null && tokensResponse.Tokens is not null)
-                {
-                    var theTokens = tokensResponse!.Tokens;
-                    curTokens = curTokens.Concat(theTokens).ToList();
-                }
-                else
-                {
-                    break;
-                }
-                if (tokensResponse is not null && tokensResponse.Continuation is not null)
-                {
-                    hasMore = true;
-                    continuation = tokensResponse.Continuation;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            // 过滤当前支持的合约
-            var supportedContracts = TokenPairs.FilterSupportedContracts(_metamaskHostProvider.SelectedNetworkChainId);
-            Tokens = curTokens
-                .Where(item => item.Token is not null && item.Token.Contract is not null)
-                .Where(item => supportedContracts.Contains(item.Token!.Contract!.ToLower()))
-                .ToList();
-        }
+        UserTokens = await _nftFetcher.GetUserOptionTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
         loadingTokens = false; // 网络请求结束
     }
 
@@ -260,108 +136,15 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    public class ReservoirTokensResponse
-    {
-        [JsonPropertyName("tokens")]
-        public IList<ReservoirTokenResponse> Tokens { get; set; } = [];
-
-        [JsonPropertyName("continuation")]
-        public string? Continuation { get; set; }
-    }
-
-    public class ReservoirTokenResponse
-    {
-        [JsonPropertyName("token")]
-        public ReservoirToken? Token { get; set; }
-
-    }
-    public class ReservoirToken
-    {
-        [JsonPropertyName("chainId")]
-        public long ChainId { get; set; }
-
-        [JsonPropertyName("contract")]
-        public string? Contract { get; set; }
-
-        [JsonPropertyName("tokenId")]
-        public string? TokenId { get; set; }
-
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        [JsonPropertyName("metadata")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ReservoirTokenMetadata? Metadata { get; set; }
-
-        [JsonPropertyName("attributes")]
-        public IList<ReservoirTokenAttribute> Attributes { get; set; } = [];
-    }
-
-    public class ReservoirTokenMetadata
-    {
-        [JsonPropertyName("imageOriginal")]
-        public string? ImageOriginal { get; set; }
-    }
-
-    public class ReservoirTokenAttribute
-    {
-        [JsonPropertyName("key")]
-        public string? Key { get; set; }
-
-        [JsonPropertyName("kind")]
-        public string? Kind { get; set; }
-
-        [JsonPropertyName("value")]
-        public string? Value { get; set; }
-
-    }
-
     private bool ExerciseButtonDisabled = false;
 
     private string ExerciseButtonDisabledClass => ExerciseButtonDisabled ? "cursor-not-allowed" : "";
 
-    private async Task HandleExercise(string tokenId, string nftContractAddress, IList<ReservoirTokenAttribute> tokenAttributes)
+    private async Task HandleExercise(UserToken token)
     {
-        Logger.LogInformation($"start handle exercise {tokenId}, {nftContractAddress}");
+        Logger.LogInformation($"start handle exercise {token.TokenId}, {token.Contract}");
         ExerciseButtonDisabled = true;
-        string optionsKind = "";
-        BigInteger baseAssetAmount = 0;
-        BigInteger quoteAssetAmount = 0;
-        foreach(var attr in tokenAttributes)
-        {
-            if (attr.Key == "optionsKind" && attr.Value is not null)
-            {
-                optionsKind = attr.Value;
-            }
-            if (attr.Key == "baseAssetAmount" && attr.Value is not null)
-            {
-                baseAssetAmount = BigInteger.Parse(attr.Value);
-            }
-            if (attr.Key == "quoteAssetAmount" && attr.Value is not null)
-            {
-                quoteAssetAmount = BigInteger.Parse(attr.Value);
-            }
-        }
-        var tokenPair = TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId)
-            .Where(item => item.NftAddress.ToLower() == nftContractAddress.ToLower())
-            .FirstOrDefault();
-        if (tokenPair is null)
-        {
-            toastService.ShowToast("unsupported nft contract", ToastLevel.Error);
-            return;
-        }
-
-        string payAssetAddress = "";
-        BigInteger payAssetAmount = 0;
-        if (optionsKind == "call")
-        {
-            payAssetAddress = tokenPair.QuoteAssetAddress;
-            payAssetAmount = quoteAssetAmount;
-
-        } else if (optionsKind == "put") {
-            payAssetAddress = tokenPair.BaseAssetAddress;
-            payAssetAmount = baseAssetAmount;
-        }
+        var (payAssetAddress, payAssetAmount) = token.GetPayAsset();
 
         // 1. Check balance
         var userPayAssetBalance = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
@@ -372,13 +155,13 @@
             return;
         }
 
-        var userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+        var userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, token.Contract, payAssetAddress);
         if (userPayAllowance < payAssetAmount)
         {
             // DO approve and wait seconds
-            await _web3Service.Approve(nftContractAddress, payAssetAmount, payAssetAddress);
+            await _web3Service.Approve(token.Contract, payAssetAmount, payAssetAddress);
             await Task.Delay(1000);
-            userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, nftContractAddress, payAssetAddress);
+            userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, token.Contract, payAssetAddress);
             if (userPayAllowance < payAssetAmount)
             {
                 ExerciseButtonDisabled = false;
@@ -387,11 +170,11 @@
             }
         }
         try {
-            var txHash = await _web3Service.ExerciseOptions(long.Parse(tokenId), nftContractAddress);
+            var txHash = await _web3Service.ExerciseOptions(token.TokenId, token.Contract);
             Logger.LogInformation($"exercise finished, tx: {txHash}");
-            toastService.ShowToast($"{tokenId} exercised successfully", ToastLevel.Success);
+            toastService.ShowToast($"Token: {token.TokenId} exercised successfully", ToastLevel.Success);
             // 从 Tokens 删除当前行权的token，以实现页面刷新
-            Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
+            UserTokens.Remove(UserTokens.First(item => item.TokenId == token.TokenId));
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
@@ -407,15 +190,15 @@
 
     private string BurnButtonDisabledClass => BurnButtonDisabled ? "cursor-not-allowed" : "";
 
-    private async Task HandleBurn(string tokenId, string nftContractAddress)
+    private async Task HandleBurn(long tokenId, string nftContractAddress)
     {
         Logger.LogInformation($"handle burn");
         BurnButtonDisabled = true; // 弹出小狐狸期间禁止点击
         try {
-            var txHash = await _web3Service.BurnOptions(long.Parse(tokenId), nftContractAddress);
+            var txHash = await _web3Service.BurnOptions(tokenId, nftContractAddress);
             Logger.LogInformation($"burn finished, tx: {txHash}");
             toastService.ShowToast($"{tokenId} burned successfully", ToastLevel.Success);
-            Tokens.Remove(Tokens.First(item => item.Token!.TokenId == tokenId));
+            UserTokens.Remove(UserTokens.First(item => item.TokenId == tokenId));
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             Logger.LogInformation("burn failed");
             Logger.LogError($"{e.ToString()}, {e.Message}");
