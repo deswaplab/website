@@ -112,8 +112,11 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
-        await fetchTokens();
-        await InvokeAsync(() => this.StateHasChanged());
+        if (_metamaskHostProvider.SelectedNetworkChainId != 0)
+        {
+            await fetchTokens();
+            await InvokeAsync(() => this.StateHasChanged());
+        }
     }
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
@@ -127,6 +130,7 @@
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
         UserTokens = await _nftFetcher.GetUserOptionTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
+        Logger.LogInformation($"fetch tokens done, chainId={_metamaskHostProvider.SelectedNetworkChainId}, tokenCount={UserTokens.Count}");
         loadingTokens = false; // 网络请求结束
     }
 

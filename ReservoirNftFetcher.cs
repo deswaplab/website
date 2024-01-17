@@ -11,6 +11,10 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
     public async Task<IList<UserToken>> GetUserOptionTokens(string userAddress, long chainId)
     {
         var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        if (curNetwork.ReservoirHost is null)
+        {
+            throw new Exception($"reservoir doesnt support chain {chainId}");
+        }
         var supportedTokenPairs = TokenPairs.FilterByChainId(chainId);
         if (supportedTokenPairs.Count == 0)
         {

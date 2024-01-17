@@ -16,7 +16,7 @@ public class TokenPair
 
     public required string NftAddress { get; set; }
 
-    public required Network Network {get; set;}
+    public required Network Network { get; set; }
 
     // Like: https://sepolia.etherscan.io/token/0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9?a=0x7e727520B29773e7F23a8665649197aAf064CeF1
     public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
@@ -92,27 +92,50 @@ public static class TokenPairs
 
 public class Network
 {
-    public string Name { get; set; } = "";
+    public required string Name { get; set; }
 
     public long ChainId { get; set; }
 
-    public string EtherscanHost { get; set; } = "";
+    public required string EtherscanHost { get; set; }
 
-    public string OpenseaHost { get; set; } = "";
+    // opensea 主界面对应的host
+    public required string OpenseaHost { get; set; }
 
-    public string ReservoirHost { get; set; } = "";
+    // opensea api 对应的host
+    public required string OpenseaApiHost { get; set; }
 
-    public string Logo {get; set;} = ""; // svg文件，保存在 wwwroot/img 下
+    // reservoir 可能有些网络不支持，所以可能会null
+    public string? ReservoirHost { get; set; }
 
-    public bool IsTestNet {get; set;}
+    public required string Logo { get; set; } // svg文件，保存在 wwwroot/img 下
+
+    public bool IsTestNet { get; set; }
 }
 
 public static class SupportedNetworks
 {
     public static readonly IList<Network> Inner = [
         // we use reservoir to fetch user tokens, so supported chains are limited, in the future we should switch to other api providers
-        new Network{Name = "Sepolia", ChainId=11155111, EtherscanHost="https://sepolia.etherscan.io", OpenseaHost="https://testnets.opensea.io/assets/sepolia", ReservoirHost="https://api-sepolia.reservoir.tools", Logo="ethereum_logo.svg", IsTestNet=true},
-        new Network{Name = "Pylogon Mumbai", ChainId=80001, EtherscanHost="https://mumbai.polygonscan.com", OpenseaHost="https://testnets.opensea.io/assets/mumbai", ReservoirHost="https://api-mumbai.reservoir.tools", Logo="polygon_logo.svg", IsTestNet=true},
+        new Network{
+            Name = "Sepolia",
+            ChainId=11155111,
+            EtherscanHost="https://sepolia.etherscan.io",
+            OpenseaHost="https://testnets.opensea.io/assets/sepolia",
+            OpenseaApiHost="https://testnets-api.opensea.io/api/v2/chain/sepolia",
+            ReservoirHost="https://api-sepolia.reservoir.tools",
+            Logo="ethereum_logo.svg",
+            IsTestNet=true
+        },
+        new Network{
+            Name = "Pylogon Mumbai", 
+            ChainId=80001, 
+            EtherscanHost="https://mumbai.polygonscan.com", 
+            OpenseaHost="https://testnets.opensea.io/assets/mumbai", 
+            OpenseaApiHost="https://testnets-api.opensea.io/api/v2/chain/mumbai",
+            ReservoirHost="https://api-mumbai.reservoir.tools", 
+            Logo="polygon_logo.svg", 
+            IsTestNet=true
+        },
 
     ];
 
