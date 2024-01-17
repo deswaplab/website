@@ -110,6 +110,18 @@
         _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (_metamaskHostProvider.SelectedNetworkChainId != 0 && _metamaskHostProvider.SelectedAccount != "")
+            {
+                await fetchTokens();
+                await InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+    }
+
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
         if (_metamaskHostProvider.SelectedNetworkChainId != 0)
