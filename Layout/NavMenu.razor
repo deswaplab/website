@@ -54,9 +54,8 @@
 
     private string hiddenClass => collapse ? "" : "hidden";
 
-    private async Task ToggleMenuAsync()
+    private void ToggleMenuAsync()
     {
         collapse = !collapse;
-        await Task.CompletedTask;
     }
 }

@@ -143,11 +143,10 @@
 @code {
     public OptionsKind SelectedOptionsKind {get; set;}
 
-    private async Task ChangeOptionsKind(OptionsKind value)
+    private void ChangeOptionsKind(OptionsKind value)
     {
         SelectedOptionsKind = value;
         ResetSteps();
-        await Task.CompletedTask;
     }
 
     public string SelectedTokenPairName {get; set;} = "";

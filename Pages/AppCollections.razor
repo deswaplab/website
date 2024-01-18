@@ -47,11 +47,5 @@
 </section>
 
 @code {
-    public IList<TokenPair> collections {get; set;} = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.CompletedTask;
-        collections = TokenPairs.Inner;
-    }
+    public IList<TokenPair> collections {get; set;} = TokenPairs.Inner;
 }

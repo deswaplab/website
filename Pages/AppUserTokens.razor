@@ -40,32 +40,32 @@
                                 <a href="@buildOpenseaTokenUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank">
                                     <img class="rounded-t-lg" src="@token.ImageData" alt="" />
                                 </a>
-                                    <div class="flex flex-row items-center gap-2 p-5">
-                                        @if (token.Listable())
-                                        {
-                                            <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                                List
-                                            </a>
-                                        }
-                                        @if (token.Exercisable())
-                                        {
-                                            <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
-                                                @onclick="async () => await HandleExercise(token)"
-                                                disabled=@ExerciseButtonDisabled
-                                            >
-                                                Exercise
-                                            </button>
-                                        }
-                                        @if (token.Burnable())
-                                        {
-                                            <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
-                                                @onclick="async () => await HandleBurn(token.TokenId, token.Contract)"
-                                                disabled=@BurnButtonDisabled
-                                            >
-                                                Burn
-                                            </button>
-                                        }
-                                    </div>
+                                <div class="flex flex-row items-center gap-2 p-5">
+                                    @if (token.Listable())
+                                    {
+                                        <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                            List
+                                        </a>
+                                    }
+                                    @if (token.Exercisable())
+                                    {
+                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
+                                            @onclick="async () => await HandleExercise(token)"
+                                            disabled=@ExerciseButtonDisabled
+                                        >
+                                            Exercise
+                                        </button>
+                                    }
+                                    @if (token.Burnable())
+                                    {
+                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
+                                            @onclick="async () => await HandleBurn(token.TokenId, token.Contract)"
+                                            disabled=@BurnButtonDisabled
+                                        >
+                                            Burn
+                                        </button>
+                                    }
+                                </div>
                             </div>
                         }
                         </div>

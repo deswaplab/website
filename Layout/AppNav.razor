@@ -104,10 +104,9 @@
 
     private string hiddenClass => collapse ? "" : "hidden";
 
-    private async Task ToggleMenuAsync()
+    private void ToggleMenuAsync()
     {
         collapse = !collapse;
-        await Task.CompletedTask;
     }
 
     protected override void OnInitialized()
@@ -136,15 +135,13 @@
     private bool CollapseNetworkList = false;
 
     private string NetworkListClass => CollapseNetworkList ? "" : "hidden";
-    private async Task ToggleNetworkList()
+    private void ToggleNetworkList()
     {
         Logger.LogInformation("toggle networklist");
         CollapseNetworkList = !CollapseNetworkList;
-        await Task.CompletedTask;
     }
 
     private Network? currentConnectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-
 
     private async Task ToggleNetwork(long chainId)
     {
