@@ -88,13 +88,19 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
         throw new Exception("can find maturity date");
     }
 
-    private static string ParseOptionsKind(IList<ReservoirTokenAttribute> tokenAttributes)
+    private static OptionsKind ParseOptionsKind(IList<ReservoirTokenAttribute> tokenAttributes)
     {
         foreach(var attr in tokenAttributes)
         {
             if (attr.Key == "optionsKind" && attr.Value is not null)
             {
-                return attr.Value;
+                if (attr.Value == "call")
+                {
+                    return OptionsKind.CALL;
+                } else if (attr.Value == "put")
+                {
+                    return OptionsKind.PUT;
+                }
             }
         }
         throw new Exception("no options kind found");

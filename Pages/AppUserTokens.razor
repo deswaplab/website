@@ -103,17 +103,13 @@
 
     private IList<UserToken> UserTokens {get; set;} = [];
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.CompletedTask;
-        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
-        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+            _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+
             if (_metamaskHostProvider.SelectedNetworkChainId != 0 && _metamaskHostProvider.SelectedAccount != "")
             {
                 await fetchTokens();

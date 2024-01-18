@@ -56,9 +56,8 @@
                                         @bind:event="onchange"
                                         @bind:set="ChangeOptionsKind"
                                     >
-
-                                        <option>calls</option>
-                                        <option>puts</option>
+                                        <option value="@OptionsKind.CALL">calls</option>
+                                        <option value="@OptionsKind.PUT">puts</option>
                                     </select>
                                 </div>
                                 <div>
@@ -78,7 +77,7 @@
                                         placeholder="you pay" required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
                                         min="0.001" max="10000000" step="0.001"
                                     >
-                                    @if(SelectedOptionsKind == "calls" && UserBaseAssetBalance == new Decimal(0))
+                                    @if(SelectedOptionsKind == OptionsKind.CALL && UserBaseAssetBalance == new Decimal(0))
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Balance not enough? Get some from uniswap or binance</p>
                                     }
@@ -101,7 +100,7 @@
                                         required="" @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount"
                                         min="1" max="10000000" step="1"
                                     >
-                                    @if(SelectedOptionsKind == "puts" && UserQuoteAssetBalance == 0)
+                                    @if(SelectedOptionsKind == OptionsKind.PUT && UserQuoteAssetBalance == 0)
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-red-600 dark:text-red-500">Balance not enough? Get some from uniswap or binance</p>
                                     }
@@ -142,9 +141,9 @@
 
 
 @code {
-    public string SelectedOptionsKind {get; set;} = "calls";
+    public OptionsKind SelectedOptionsKind {get; set;}
 
-    private async Task ChangeOptionsKind(string value)
+    private async Task ChangeOptionsKind(OptionsKind value)
     {
         SelectedOptionsKind = value;
         ResetSteps();
@@ -153,11 +152,11 @@
 
     public string SelectedTokenPairName {get; set;} = "";
 
-    public string BaseAssetAction => SelectedOptionsKind == "calls" ? "You pay" : "You will get";
+    public string BaseAssetAction => SelectedOptionsKind == OptionsKind.CALL ? "You pay" : "You will get";
 
     public string BaseAssetName => SelectedTokenPair is not null ? SelectedTokenPair.BaseAssetName : "";
 
-    public string QuoteAssetAction => SelectedOptionsKind == "calls" ? "You will get" : "You pay";
+    public string QuoteAssetAction => SelectedOptionsKind == OptionsKind.CALL ? "You will get" : "You pay";
 
     public string QuoteAssetName => SelectedTokenPair is not null ? SelectedTokenPair.QuoteAssetName : "";
 
@@ -194,7 +193,7 @@
 
     private void SetInputedBaseAssetAmount(decimal value)
     {
-        if (SelectedOptionsKind == "calls")
+        if (SelectedOptionsKind == OptionsKind.CALL)
         {
             if (UserBaseAssetBalance is not null)
             {
@@ -227,7 +226,7 @@
 
     private void SetInputedQuoteAssetAmount(decimal value)
     {
-        if (SelectedOptionsKind == "puts")
+        if (SelectedOptionsKind == OptionsKind.PUT)
         {
             if (UserQuoteAssetBalance is not null)
             {
@@ -298,10 +297,10 @@
         var curAddr = _metamaskHostProvider.SelectedAccount;
         Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
         Steps[0].Disabled = true; // 一点击就该置灰
-        if (SelectedTokenPair is not null && SelectedOptionsKind != "" && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && MaturityDate > DateOnly.FromDateTime(DateTime.Now))
+        if (SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && MaturityDate > DateOnly.FromDateTime(DateTime.Now))
         {
             Logger.LogInformation($"can click check allowance, maturityDate: {MaturityDate}");
-            if (SelectedOptionsKind == "calls")
+            if (SelectedOptionsKind == OptionsKind.CALL)
             {
                 if (InputedBaseAssetAmount <= UserBaseAssetBalance)
                 {
@@ -335,7 +334,7 @@
                     Logger.LogInformation("base balance not enough");
                 }
             }
-            else if (SelectedOptionsKind == "puts")
+            else if (SelectedOptionsKind == OptionsKind.PUT)
             {
                 if (InputedQuoteAssetAmount <= UserQuoteAssetBalance)
                 {
@@ -385,8 +384,8 @@
             return;
         }
         Steps[1].Disabled = true; // 确保只点一次
-        var contractAddress = SelectedOptionsKind == "calls" ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
-        var wad = SelectedOptionsKind == "calls" ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
+        var contractAddress = SelectedOptionsKind == OptionsKind.CALL ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
+        var wad = SelectedOptionsKind == OptionsKind.CALL ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
         try {
             var txHash = await _web3Service.Approve(SelectedTokenPair!.NftAddress, wad, contractAddress);
             Logger.LogInformation($"approve finished, tx: {txHash}");
@@ -418,7 +417,7 @@
             return;
         }
         Steps[2].Disabled = true;
-        int optionsKind = SelectedOptionsKind == "calls" ? 0 : 1;
+        int optionsKind = (int)SelectedOptionsKind;
         Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}");
         try {
             var txHash = await _web3Service.MintOptions(

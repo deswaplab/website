@@ -94,14 +94,22 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("can find maturity date");
     }
 
-    private static string ParseOptionsKind(IList<OpenseaTraits> tokenAttributes)
+    private static OptionsKind ParseOptionsKind(IList<OpenseaTraits> tokenAttributes)
     {
 
         foreach (var attr in tokenAttributes)
         {
             if (attr.TraitType == "optionsKind")
             {
-                return attr.Value.GetString() ?? "";
+                var s = attr.Value.GetString() ?? "";
+                if (s == "call")
+                {
+                    return OptionsKind.CALL;
+                }
+                else if (s == "put")
+                {
+                    return OptionsKind.PUT;
+                }
             }
         }
         throw new Exception("no options kind found");

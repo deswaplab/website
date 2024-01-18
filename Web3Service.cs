@@ -7,6 +7,71 @@ namespace DeswapApp;
 
 public class Web3Service(MetamaskHostProvider metamaskHostProvider)
 {
+    private readonly string OptionsABI = """
+[
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "burn",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "enum OptionsNFT.OptionsKind",
+                "name": "kind",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "baseAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "quoteAssetAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maturityDate",
+                "type": "uint256"
+            }
+        ],
+        "name": "mint",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+            }
+        ],
+        "name": "exercise",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
+""";
+
     private readonly MetamaskHostProvider _metamaskHostProvider = metamaskHostProvider;
 
     [Function("balanceOf", "uint256")]
@@ -80,7 +145,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     public async Task<string> MintOptions(int optionsKind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftAddress);
+        var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
         var gas = await callsFunction.EstimateGasAsync(
             optionsKind,
@@ -105,7 +170,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     public async Task<string> ExerciseOptions(long tokenId, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftAddress);
+        var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("exercise");
         var gas = await callsFunction.EstimateGasAsync(
             tokenId
@@ -124,7 +189,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     public async Task<string> BurnOptions(long tokenId, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
-        var contract = web3.Eth.GetContract(OptionsNFT.abi, nftAddress);
+        var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("burn");
         var gas = await callsFunction.EstimateGasAsync(
             tokenId

@@ -21,6 +21,7 @@ dotnet watch
 - [ ] onblur问题已经影响到了手机上菜单栏的点击
 - [ ] 手机上菜单栏 z-index absolute 问题未解决
 - [ ] mint时给出当前推荐价格
+- [ ] OptionsKind 用enum表示
 
 ## note
 
