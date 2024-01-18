@@ -80,7 +80,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         public required string Image { get; set; }
     }
 
-    private DateTimeOffset ParseMaturityDate(IList<OpenseaTraits> tokenAttributes)
+    private static DateTimeOffset ParseMaturityDate(IList<OpenseaTraits> tokenAttributes)
     {
         foreach (var attr in tokenAttributes)
         {
@@ -94,7 +94,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("can find maturity date");
     }
 
-    private string ParseOptionsKind(IList<OpenseaTraits> tokenAttributes)
+    private static string ParseOptionsKind(IList<OpenseaTraits> tokenAttributes)
     {
 
         foreach (var attr in tokenAttributes)
@@ -107,7 +107,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no options kind found");
     }
 
-    private BigInteger ParseBaseAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static BigInteger ParseBaseAssetAmount(IList<OpenseaTraits> tokenAttributes)
     {
         foreach (var attr in tokenAttributes)
         {
@@ -119,7 +119,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no baseAssetAmount found");
     }
 
-    private BigInteger ParseQuoteAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static BigInteger ParseQuoteAssetAmount(IList<OpenseaTraits> tokenAttributes)
     {
         foreach (var attr in tokenAttributes)
         {
