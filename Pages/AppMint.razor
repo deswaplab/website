@@ -293,10 +293,16 @@
             toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
             return;
         }
+        var minDate = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
+        if (MaturityDate < minDate)
+        {
+            toastService.ShowToast($"Maturity Date must at least be {minDate}", ToastLevel.Error);
+            return;
+        }
         var curAddr = _metamaskHostProvider.SelectedAccount;
         Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
         Steps[0].Disabled = true; // 一点击就该置灰
-        if (SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && MaturityDate > DateOnly.FromDateTime(DateTime.Now))
+        if (SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0)
         {
             Logger.LogInformation($"can click check allowance, maturityDate: {MaturityDate}");
             if (SelectedOptionsKind == OptionsKind.CALL)
@@ -309,7 +315,7 @@
                     Logger.LogInformation($"weth allowance={baseAssetAllowance}");
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
                     {
-                        Logger.LogInformation($"base allowance is enough, skip approve step, matutiryDate: 11");
+                        Logger.LogInformation($"base allowance is enough, skip approve step");
                         Steps[0].Finished = true;
                         Steps[0].Disabled = true;
 
@@ -330,7 +336,10 @@
                 }
                 else
                 {
-                    Logger.LogInformation("base balance not enough");
+                    toastService.ShowToast($"{SelectedTokenPair.BaseAssetName} balance not enough, please trasfer some", ToastLevel.Error);
+                    Steps[0].Disabled = false;
+
+                    return;
                 }
             }
             else if (SelectedOptionsKind == OptionsKind.PUT)
@@ -364,13 +373,16 @@
                 }
                 else
                 {
-                    Logger.LogInformation("quote balance not enough");
+                    toastService.ShowToast($"{SelectedTokenPair.QuoteAssetName} balance not enough, please trasfer some", ToastLevel.Error);
+                    Steps[0].Disabled = false;
+                    return;
                 }
             }
         }
         else
         {
-            Logger.LogInformation($"can not click check allowance, maturityDate: {MaturityDate.Month}");
+            Logger.LogInformation($"can not click check allowance, maturityDate: {MaturityDate}");
+            toastService.ShowToast("invalid form, please check your input", ToastLevel.Error);
         }
     }
 
@@ -397,8 +409,7 @@
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
-                // TODO: 显示取消的toast
-                Logger.LogInformation("user cancel approve tx");
+                toastService.ShowToast("user cancelled approve", ToastLevel.Error);
             }
             Steps[1].Disabled = false;
 
@@ -430,11 +441,12 @@
             Logger.LogInformation($"mint finished, tx: {txHash}");
             Steps[2].Finished = true;
             Steps[2].Disabled = true;
+
+            toastService.ShowToast("Options minted, goto trade now", ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
-                // TODO: 显示取消的toast
-                Logger.LogInformation("user canceled mint tx");
+                toastService.ShowToast("user cancelled mint", ToastLevel.Error);
             }
             Steps[2].Finished = false;
             Steps[2].Disabled = false;
