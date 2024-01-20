@@ -1,5 +1,5 @@
 using System.Numerics;
-using System.Text.RegularExpressions;
+using Nethereum.Web3;
 
 namespace DeswapApp;
 
@@ -22,9 +22,11 @@ public class UserToken
 
     public OptionsKind OptionsKind { get; set; }
 
-    public BigInteger BaseAssetAmount { get; set; }
+    public Decimal BaseAssetAmount { get; set; }
 
-    public BigInteger QuoteAssetAmount { get; set; }
+    public Decimal QuoteAssetAmount { get; set; }
+
+    public Decimal Price { get; set; }
 
     public bool Listable()
     {
@@ -67,11 +69,11 @@ public class UserToken
             .First();
         if (OptionsKind == OptionsKind.CALL)
         {
-            return (tokenPair.QuoteAssetAddress, QuoteAssetAmount);
+            return (tokenPair.QuoteAssetAddress, Web3.Convert.ToWei(QuoteAssetAmount, tokenPair.QuoteAssetDecimals));
         }
         else if (OptionsKind == OptionsKind.PUT)
         {
-            return (tokenPair.BaseAssetAddress, BaseAssetAmount);
+            return (tokenPair.BaseAssetAddress, Web3.Convert.ToWei(BaseAssetAmount, tokenPair.BaseAssetDecimals));
         }
         throw new Exception("invalid token");
     }

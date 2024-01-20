@@ -55,6 +55,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     OptionsKind = ParseOptionsKind(item.Traits),
                     BaseAssetAmount = ParseBaseAssetAmount(item.Traits),
                     QuoteAssetAmount = ParseQuoteAssetAmount(item.Traits),
+                    Price = ParsePrice(item.Traits),
                 };
             })
             .ToList();
@@ -115,28 +116,40 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no options kind found");
     }
 
-    private static BigInteger ParseBaseAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static decimal ParseBaseAssetAmount(IList<OpenseaTraits> tokenAttributes)
     {
         foreach (var attr in tokenAttributes)
         {
             if (attr.TraitType == "baseAssetAmount" && attr.DisplayType == "number")
             {
-                return BigInteger.Parse(attr.Value.GetRawText());
+                return attr.Value.GetDecimal();
             }
         }
         throw new Exception("no baseAssetAmount found");
     }
 
-    private static BigInteger ParseQuoteAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static decimal ParseQuoteAssetAmount(IList<OpenseaTraits> tokenAttributes)
     {
         foreach (var attr in tokenAttributes)
         {
             if (attr.TraitType == "quoteAssetAmount" && attr.DisplayType == "number")
             {
-                return BigInteger.Parse(attr.Value.GetRawText());
+                return attr.Value.GetDecimal();
             }
         }
         throw new Exception("no quoteAssetAmount found");
+    }
+
+    private static decimal ParsePrice(IList<OpenseaTraits> tokenAttributes)
+    {
+        foreach (var attr in tokenAttributes)
+        {
+            if (attr.TraitType == "price" && attr.DisplayType == "number")
+            {
+                return attr.Value.GetDecimal();
+            }
+        }
+        throw new Exception("no price found");
     }
 
     public class OpenseaTokensResponse

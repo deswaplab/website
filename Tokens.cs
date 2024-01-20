@@ -38,7 +38,7 @@ public static class TokenPairs
             QuoteAssetName = "USDC",
             QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
+            NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new TokenPair{
@@ -48,7 +48,7 @@ public static class TokenPairs
             QuoteAssetName = "USDC",
             QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x5cC0c202a402cf02Be73387C20867158db8bb235",
+            NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
             Network = SupportedNetworks.GetNetwork(80001)!,
         },
 
@@ -60,7 +60,7 @@ public static class TokenPairs
             QuoteAssetName = "TUSDC",
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+            NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new TokenPair{
@@ -70,7 +70,7 @@ public static class TokenPairs
             QuoteAssetName = "TUSDC",
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x4b8D9d541A5B60CC1dD90D2fc870D28c965Ea2Fb",
+            NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
             Network = SupportedNetworks.GetNetwork(80001)!,
         },
     ];

@@ -68,6 +68,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
                     OptionsKind = ParseOptionsKind(item.Token.Attributes),
                     BaseAssetAmount = ParseBaseAssetAmount(item.Token.Attributes),
                     QuoteAssetAmount = ParseQuoteAssetAmount(item.Token.Attributes),
+                    Price = ParsePrice(item.Token.Attributes),
                 };
             })
             .ToList();
@@ -106,28 +107,40 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
         throw new Exception("no options kind found");
     }
 
-    private static BigInteger ParseBaseAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
+    private static decimal ParseBaseAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
     {
         foreach(var attr in tokenAttributes)
         {
             if (attr.Key == "baseAssetAmount" && attr.Value is not null)
             {
-                return BigInteger.Parse(attr.Value);
+                return decimal.Parse(attr.Value);
             }
         }
         throw new Exception("no baseAssetAmount found");
     }
 
-    private static BigInteger ParseQuoteAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
+    private static decimal ParseQuoteAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
     {
         foreach(var attr in tokenAttributes)
         {
             if (attr.Key == "quoteAssetAmount" && attr.Value is not null)
             {
-                return BigInteger.Parse(attr.Value);
+                return decimal.Parse(attr.Value);
             }
         }
         throw new Exception("no quoteAssetAmount found");
+    }
+
+    private static decimal ParsePrice(IList<ReservoirTokenAttribute> tokenAttributes)
+    {
+        foreach(var attr in tokenAttributes)
+        {
+            if (attr.Key == "price" && attr.Value is not null)
+            {
+                return decimal.Parse(attr.Value);
+            }
+        }
+        throw new Exception("no price found");
     }
 
     public class ReservoirTokensResponse

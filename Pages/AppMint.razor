@@ -400,12 +400,25 @@
         try {
             var txHash = await _web3Service.Approve(SelectedTokenPair!.NftAddress, wad, contractAddress);
             Logger.LogInformation($"approve finished, tx: {txHash}");
+            await Task.Delay(1000);
+            // check allowance again
+            var newAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedTokenPair!.NftAddress, contractAddress);
+            if (newAllowance < wad)
+            {
+                // 没有授权足够的金额
+                toastService.ShowToast("allowance not enough, please try approve again", ToastLevel.Error);
+                Steps[1].Disabled = false;
+                return;
+            }
+
             // 标记完成，且让第三步可点击
             Steps[1].Finished = true;
             Steps[1].Disabled = true;
 
             Steps[2].Finished = false;
             Steps[2].Disabled = false;
+
+            toastService.ShowToast("approved success, goto mint now", ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
