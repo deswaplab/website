@@ -181,4 +181,10 @@
   <data name="Learn more" xml:space="preserve">
     <value>Learn more</value>
   </data>
+  <data name="Connect Wallet" xml:space="preserve">
+    <value>Connect Wallet</value>
+  </data>
+  <data name="InstallMetamask_Stmt" xml:space="preserve">
+    <value>Please install Metamask</value>
+  </data>
 </root>

@@ -181,4 +181,10 @@
   <data name="Learn more" xml:space="preserve">
     <value>了解更多</value>
   </data>
+  <data name="Connect Wallet" xml:space="preserve">
+    <value>连接钱包</value>
+  </data>
+  <data name="InstallMetamask_Stmt" xml:space="preserve">
+    <value>请安装Metamask钱包</value>
+  </data>
 </root>
