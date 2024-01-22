@@ -187,4 +187,10 @@
   <data name="InstallMetamask_Stmt" xml:space="preserve">
     <value>请安装Metamask钱包</value>
   </data>
+  <data name="Balance" xml:space="preserve">
+    <value>余额</value>
+  </data>
+  <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
+    <value>余额不足？去uniswap或者binance充值一点到钱包里</value>
+  </data>
 </root>

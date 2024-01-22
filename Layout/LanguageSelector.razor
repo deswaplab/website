@@ -6,6 +6,7 @@
 
 <button type="button" data-dropdown-toggle="language-dropdown-menu"
     @onclick="ToggleLanguageList"
+    @onclick:stopPropagation="true"
     class="inline-flex items-center font-medium justify-between w-full px-4 py-2 text-sm text-gray-900 dark:text-white rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
     <img src=@($"img/{selectedCulture.Item2.TwoLetterISOLanguageName}_flag.svg") class="h-3.5 w-3.5 rounded-full me-2" />
 

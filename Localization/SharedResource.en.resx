@@ -187,4 +187,10 @@
   <data name="InstallMetamask_Stmt" xml:space="preserve">
     <value>Please install Metamask</value>
   </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
+    <value>Balance not enough? Get some from uniswap or binance</value>
+  </data>
 </root>

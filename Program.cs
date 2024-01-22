@@ -26,7 +26,7 @@ builder.Services.AddSingleton(services =>
     return selectedHostProvider;
 });
 builder.Services.AddSingleton<Web3Service>();
-builder.Services.AddScoped<INftFetcher, OpenseaNftFetcher>();
+builder.Services.AddScoped<INftFetcher, ReservoirNftFetcher>();
 
 builder.Services.AddSingleton<AuthenticationStateProvider, EthereumAuthenticationStateProvider>();
 builder.Services.AddSingleton<ToastService>();
