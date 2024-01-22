@@ -95,6 +95,9 @@
                     <MyMetamask />
                 </li>
                 <li>
+                    <LanguageSelector />
+                </li>
+                <li>
                     <ThemeSwitch />
                 </li>
             </ul>
@@ -149,9 +152,12 @@
     private async Task ToggleNetwork(long chainId)
     {
         Logger.LogInformation("start trigger metamask to change network");
-        var p = new Dictionary<string, string>();
-        p.Add("chainId", "0x"+Convert.ToString(chainId, 16));
-        await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+        if (chainId != _metamaskHostProvider.SelectedNetworkChainId)
+        {
+            var p = new Dictionary<string, string>();
+            p.Add("chainId", "0x"+Convert.ToString(chainId, 16));
+            await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+        }
         CollapseNetworkList = false; // 收起网络菜单
         Logger.LogInformation("change network succeed");
     }

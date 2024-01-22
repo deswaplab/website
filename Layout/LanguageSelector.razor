@@ -1,0 +1,70 @@
+@using System.Globalization
+@using System.Collections.Generic
+
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject ILogger<LanguageSelector> Logger
+
+<button type="button" data-dropdown-toggle="language-dropdown-menu"
+    @onclick="ToggleLanguageList"
+    class="inline-flex items-center font-medium justify-between w-full px-4 py-2 text-sm text-gray-900 dark:text-white rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
+    <img src=@($"img/{selectedCulture.Item2.TwoLetterISOLanguageName}_flag.svg") class="h-3.5 w-3.5 rounded-full me-2" />
+
+    @selectedCulture.Item1
+</button>
+<!-- Dropdown -->
+<div class="@languageListClass z-50 absolute w-40 my-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
+    id="language-dropdown-menu">
+    <ul class="py-2 font-medium" role="none">
+        @foreach (var entry in allCultures)
+        {
+        <li>
+            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                @onclick="async () => await ChangeLanguage(entry.Value)"
+                role="menuitem">
+                <div class="inline-flex items-center">
+                    <img src=@($"img/{entry.Value.TwoLetterISOLanguageName}_flag.svg") class="h-3.5 w-3.5 rounded-full me-2" />
+                    @entry.Key
+                </div>
+                @if (CultureInfo.CurrentCulture.Equals(entry.Value))
+                {
+                <svg class="w-2.5 h-2.5 text-blue-100 dark:text-blue-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                </svg>
+                }
+            </a>
+        </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private bool showLanguageList = false;
+
+    private string languageListClass => showLanguageList ? "" : "hidden";
+
+    private void ToggleLanguageList()
+    {
+        showLanguageList = !showLanguageList;
+    }
+
+    private (string, CultureInfo) selectedCulture => (allCultures.First(x => x.Value.Equals(CultureInfo.CurrentCulture)).Key, CultureInfo.CurrentCulture);
+    
+    private string? selectedCulturyDisplayName {get; set;}
+
+    private Dictionary<string, CultureInfo> allCultures = new Dictionary<string, CultureInfo> {
+        {"English (US)", new CultureInfo("en-US")},
+        {"中文 (简体)", new CultureInfo("zh-CN")},
+    };
+
+    private async Task ChangeLanguage(CultureInfo value)
+    {
+        if (CultureInfo.CurrentCulture != value)
+        {
+            await JS.InvokeVoidAsync("blazorCulture.set", value.Name);
+            Navigation.NavigateTo(Navigation.Uri, forceLoad:true);
+        }
+        showLanguageList = false;
+    }
+
+}
