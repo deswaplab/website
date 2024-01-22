@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Governor" xml:space="preserve">
+    <value>Governor</value>
+  </data>
+  <data name="FAQ" xml:space="preserve">
+    <value>FAQ</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>APP</value>
+  </data>
+  <data name="Mint" xml:space="preserve">
+    <value>Mint</value>
+  </data>
+  <data name="Collections" xml:space="preserve">
+    <value>Collections</value>
+  </data>
+  <data name="Toggle light mode" xml:space="preserve">
+    <value>Toggle light mode</value>
+  </data>
+  <data name="Toggle dark mode" xml:space="preserve">
+    <value>Toggle dark mode</value>
+  </data>
+  <data name="Select Token Pair" xml:space="preserve">
+    <value>Select Token Pair</value>
+  </data>
+  <data name="Select Options Kind" xml:space="preserve">
+    <value>Select Options Kind</value>
+  </data>
+  <data name="Call" xml:space="preserve">
+    <value>Call</value>
+  </data>
+  <data name="Put" xml:space="preserve">
+    <value>Put</value>
+  </data>
+  <data name="You Pay" xml:space="preserve">
+    <value>You Pay</value>
+  </data>
+  <data name="You Will Get" xml:space="preserve">
+    <value>You Will Get</value>
+  </data>
+  <data name="Select Maturity Date" xml:space="preserve">
+    <value>Select Maturity Date</value>
+  </data>
+  <data name="Check Allowance" xml:space="preserve">
+    <value>Check Allowance</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="InvalidNetwork_Stmt" xml:space="preserve">
+    <value>Unsupported network, please change in metamask</value>
+  </data>
+  <data name="InsufficientBalance_Stmt" xml:space="preserve">
+    <value>balance not enough, please trasfer some</value>
+  </data>
+  <data name="InvalidForm_Stmt" xml:space="preserve">
+    <value>invalid form, please check your input</value>
+  </data>
+  <data name="InsufficientAllowance_Stmt" xml:space="preserve">
+    <value>allowance not enough, please try approve</value>
+  </data>
+  <data name="ApproveSuccess_Stmt" xml:space="preserve">
+    <value>approved success, goto mint now</value>
+  </data>
+  <data name="TxCancelled_Stmt" xml:space="preserve">
+    <value>you cancelled this transaction</value>
+  </data>
+  <data name="OptionsMinted_Stmt" xml:space="preserve">
+    <value>Options minted, goto trade now</value>
+  </data>
+  <data name="MaturityTooEarly_Stmt" xml:space="preserve">
+    <value>Maturity Date must at least be</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Contract Address" xml:space="preserve">
+    <value>Contract Address</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Network" xml:space="preserve">
+    <value>Network</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="List_Stmt" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="Exercise_Stmt" xml:space="preserve">
+    <value>Exercise</value>
+  </data>
+  <data name="Burn_Stmt" xml:space="preserve">
+    <value>Burn</value>
+  </data>
+  <data name="InsufficientBalanceToExercise_Stmt" xml:space="preserve">
+    <value>insufficient balance to exercise</value>
+  </data>
+  <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
+    <value>after approve still insufficient balance to exercise</value>
+  </data>
+  <data name="My Tokens" xml:space="preserve">
+    <value>My Tokens</value>
+  </data>
+  <data name="ExerciseSuccess_Stmt" xml:space="preserve">
+    <value>exercised successfully</value>
+  </data>
+  <data name="BurnSuccess_Stmt" xml:space="preserve">
+    <value>burned successfully</value>
+  </data>
+  <data name="Slogan" xml:space="preserve">
+    <value>Deswap is the first Options as NFT decenterlized trading platform</value>
+  </data>
+  <data name="SloganDetail" xml:space="preserve">
+    <value>Deswap is a decenterlized cryto exchange(DEX), but the traded assets are options, which means you trade the option to exercise the asset in the future</value>
+  </data>
+  <data name="Learn more" xml:space="preserve">
+    <value>Learn more</value>
+  </data>
+</root>

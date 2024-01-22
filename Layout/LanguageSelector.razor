@@ -1,5 +1,4 @@
 @using System.Globalization
-@using System.Collections.Generic
 
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
@@ -59,7 +58,7 @@
 
     private async Task ChangeLanguage(CultureInfo value)
     {
-        if (CultureInfo.CurrentCulture != value)
+        if (!CultureInfo.CurrentCulture.Equals(value))
         {
             await JS.InvokeVoidAsync("blazorCulture.set", value.Name);
             Navigation.NavigateTo(Navigation.Uri, forceLoad:true);

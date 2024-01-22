@@ -1,5 +1,8 @@
+@using DeswapApp.Localization
+
 @inject IJSRuntime JS
 @inject ILogger<ThemeSwitch> Logger
+@inject IStringLocalizer<SharedResource> Loc
 
 <button id="theme-toggle" @onmouseenter="ShowToolTip" @onmouseleave="HideToolTip" @onclick="ToggleTheme" type="button" 
     data-popover-target="popover-default" data-popover-placement="top" 
@@ -26,7 +29,7 @@
 
     private string opacityLevel => toolTipVisible ? "opacity-100" : "opacity-0";
 
-    private string toolTipText => isDark ? "Toggle light mode" : "Toggle dark mode";
+    private string toolTipText => isDark ? Loc["Toggle light mode"] : Loc["Toggle dark mode"];
 
     private async Task ToggleTheme()
     {

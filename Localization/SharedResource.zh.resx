@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve">
+    <value>首页</value>
+  </data>
+  <data name="Governor" xml:space="preserve">
+    <value>治理</value>
+  </data>
+  <data name="FAQ" xml:space="preserve">
+    <value>问题</value>
+  </data>
+  <data name="APP" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="Mint" xml:space="preserve">
+    <value>铸造</value>
+  </data>
+  <data name="Collections" xml:space="preserve">
+    <value>合集</value>
+  </data>
+  <data name="Toggle light mode" xml:space="preserve">
+    <value>切换到白天</value>
+  </data>
+  <data name="Toggle dark mode" xml:space="preserve">
+    <value>切换到夜间</value>
+  </data>
+  <data name="Select Token Pair" xml:space="preserve">
+    <value>选择币对</value>
+  </data>
+  <data name="Select Options Kind" xml:space="preserve">
+    <value>选择期权类型</value>
+  </data>
+  <data name="Call" xml:space="preserve">
+    <value>看涨</value>
+  </data>
+  <data name="Put" xml:space="preserve">
+    <value>看跌</value>
+  </data>
+  <data name="You Pay" xml:space="preserve">
+    <value>你支付</value>
+  </data>
+  <data name="You Will Get" xml:space="preserve">
+    <value>你将获得</value>
+  </data>
+  <data name="Select Maturity Date" xml:space="preserve">
+    <value>选择到期日</value>
+  </data>
+  <data name="Check Allowance" xml:space="preserve">
+    <value>校验零钱额度</value>
+  </data>
+  <data name="Approve" xml:space="preserve">
+    <value>授权</value>
+  </data>
+  <data name="InvalidNetwork_Stmt" xml:space="preserve">
+    <value>不支持的网络，请切换到支持的网络</value>
+  </data>
+  <data name="InsufficientBalance_Stmt" xml:space="preserve">
+    <value>余额不足，请充值</value>
+  </data>
+  <data name="InvalidForm_Stmt" xml:space="preserve">
+    <value>表单参数错误，请检查</value>
+  </data>
+  <data name="InsufficientAllowance_Stmt" xml:space="preserve">
+    <value>零钱余额不足，请授权转移</value>
+  </data>
+  <data name="ApproveSuccess_Stmt" xml:space="preserve">
+    <value>授权成功，现在去铸造</value>
+  </data>
+  <data name="TxCancelled_Stmt" xml:space="preserve">
+    <value>您取消了本次交易</value>
+  </data>
+  <data name="OptionsMinted_Stmt" xml:space="preserve">
+    <value>铸造成功，现在去交易吧</value>
+  </data>
+  <data name="MaturityTooEarly_Stmt" xml:space="preserve">
+    <value>成熟日期不得早于</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="Contract Address" xml:space="preserve">
+    <value>合约地址</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="Network" xml:space="preserve">
+    <value>网络</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>期权</value>
+  </data>
+  <data name="List_Stmt" xml:space="preserve">
+    <value>挂单</value>
+  </data>
+  <data name="Exercise_Stmt" xml:space="preserve">
+    <value>行权</value>
+  </data>
+  <data name="Burn_Stmt" xml:space="preserve">
+    <value>销毁</value>
+  </data>
+  <data name="InsufficientBalanceToExercise_Stmt" xml:space="preserve">
+    <value>余额不足无法行权</value>
+  </data>
+  <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
+    <value>授权后余额仍旧不足，无法行权</value>
+  </data>
+  <data name="My Tokens" xml:space="preserve">
+    <value>我的代币</value>
+  </data>
+  <data name="ExerciseSuccess_Stmt" xml:space="preserve">
+    <value>成功行权</value>
+  </data>
+  <data name="BurnSuccess_Stmt" xml:space="preserve">
+    <value>成功销毁</value>
+  </data>
+  <data name="Slogan" xml:space="preserve">
+    <value>Deswap是第一个去中心化的期权即NFT交易平台</value>
+  </data>
+  <data name="SloganDetail" xml:space="preserve">
+    <value>Deswap 是一个去中心化的加密货币交易所，交易的资产是期权衍生品，也就是说你获取到期权后，可以在未来的到期日进行行权，从而对冲现货市场的风险</value>
+  </data>
+  <data name="Learn more" xml:space="preserve">
+    <value>了解更多</value>
+  </data>
+</root>

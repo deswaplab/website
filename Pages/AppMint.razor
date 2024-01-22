@@ -1,24 +1,27 @@
+@using Nethereum.Web3
+@using Nethereum.Contracts.CQS
+@using Nethereum.Util
+@using Nethereum.Web3.Accounts
+@using Nethereum.Hex.HexConvertors.Extensions
+@using Nethereum.Contracts
+@using Nethereum.Contracts.Extensions
+@using System.Numerics
+@using System.Security.Claims
+@using DeswapApp.Pages
+@using DeswapApp.Localization
+
 @page "/app"
+
 @layout AppLayout
 @inject ILogger<AppMint> Logger
-@inject MetamaskHostProvider _metamaskHostProvider;
-@inject AuthenticationStateProvider _authenticationStateProvider;
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject AuthenticationStateProvider _authenticationStateProvider
 @inject IJSRuntime JS
 @inject ToastService toastService
 @inject Web3Service _web3Service
+@inject IStringLocalizer<SharedResource> Loc
 
-@using Nethereum.Web3;
-@using Nethereum.Contracts.CQS;
-@using Nethereum.Util;
-@using Nethereum.Web3.Accounts;
-@using Nethereum.Hex.HexConvertors.Extensions;
-@using Nethereum.Contracts;
-@using Nethereum.Contracts.Extensions;
-@using System.Numerics;
-@using System.Security.Claims;
-@using DeswapApp.Pages;
-
-<PageTitle>Mint</PageTitle>
+<PageTitle>@Loc["Mint"]</PageTitle>
 
 <section class="bg-gray-50 dark:bg-gray-900">
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -28,12 +31,12 @@
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                Mint
+                                @Loc["Mint"]
                             </h1>
                             <form class="space-y-4 md:space-y-6">
                                 <div>
                                     <label for="tokenPairs"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Token Pair</label>
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
                                     <select id="tokenPair"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         @bind:get="SelectedTokenPairName"
@@ -49,15 +52,15 @@
                                 </div>
                                 <div>
                                     <label for="optionsKind"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Options Kind</label>
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Options Kind"]</label>
                                     <select id="optionsKind"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         @bind:get="SelectedOptionsKind"
                                         @bind:event="onchange"
                                         @bind:set="ChangeOptionsKind"
                                     >
-                                        <option value="@OptionsKind.CALL">calls</option>
-                                        <option value="@OptionsKind.PUT">puts</option>
+                                        <option value="@OptionsKind.CALL">@Loc["Call"]</option>
+                                        <option value="@OptionsKind.PUT">@Loc["Put"]</option>
                                     </select>
                                 </div>
                                 <div>
@@ -74,7 +77,7 @@
                                     </label>
                                     <input type="number" name="baseAssetAmount" id="baseAssetAmount"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="you pay" required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
+                                        required="" @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
                                         min="0.001" max="10000000" step="0.001"
                                     >
                                     @if(SelectedOptionsKind == OptionsKind.CALL && UserBaseAssetBalance == new Decimal(0))
@@ -95,7 +98,7 @@
                                         </span>
                                         
                                     </label>
-                                    <input type="number" name="quoteAsset" id="quoteAsset" placeholder="you will get"
+                                    <input type="number" name="quoteAsset" id="quoteAsset"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         required="" @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount"
                                         min="1" max="10000000" step="1"
@@ -107,7 +110,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Maturity Date</label>
+                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
                                     <input id="maturityDate" type="date" 
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                                         placeholder="Select date"
@@ -118,13 +121,13 @@
                             </form>
                             <ol class="space-y-4 md:space-y-6">
                                 <li>
-                                    <MintProgressButton Text="1. Check Allowance" Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
+                                    <MintProgressButton Text=@($"1. {Loc["Check Allowance"]}") Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
                                 </li>
                                 <li>
-                                    <MintProgressButton Text="2. Approve" Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
+                                    <MintProgressButton Text=@($"2. {Loc["Approve"]}") Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
                                 </li>
                                 <li>
-                                    <MintProgressButton Text="3. Mint" Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
+                                    <MintProgressButton Text=@($"3. {Loc["Mint"]}") Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
                                 </li>
                             </ol>
                         </div>
@@ -151,11 +154,11 @@
 
     public string SelectedTokenPairName {get; set;} = "";
 
-    public string BaseAssetAction => SelectedOptionsKind == OptionsKind.CALL ? "You pay" : "You will get";
+    public string BaseAssetAction => SelectedOptionsKind == OptionsKind.CALL ? Loc["You Pay"] : Loc["You Will Get"];
 
     public string BaseAssetName => SelectedTokenPair is not null ? SelectedTokenPair.BaseAssetName : "";
 
-    public string QuoteAssetAction => SelectedOptionsKind == OptionsKind.CALL ? "You will get" : "You pay";
+    public string QuoteAssetAction => SelectedOptionsKind == OptionsKind.CALL ? Loc["You Will Get"] : Loc["You Pay"];
 
     public string QuoteAssetName => SelectedTokenPair is not null ? SelectedTokenPair.QuoteAssetName : "";
 
@@ -290,13 +293,13 @@
     {
         if (!isSupportedNetwork())
         {
-            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            toastService.ShowToast(@Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
         var minDate = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
         if (MaturityDate < minDate)
         {
-            toastService.ShowToast($"Maturity Date must at least be {minDate}", ToastLevel.Error);
+            toastService.ShowToast($"{Loc["MaturityTooEarly_Stmt"]} {minDate}", ToastLevel.Error);
             return;
         }
         var curAddr = _metamaskHostProvider.SelectedAccount;
@@ -336,7 +339,7 @@
                 }
                 else
                 {
-                    toastService.ShowToast($"{SelectedTokenPair.BaseAssetName} balance not enough, please trasfer some", ToastLevel.Error);
+                    toastService.ShowToast($"{SelectedTokenPair.BaseAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
                     Steps[0].Disabled = false;
 
                     return;
@@ -373,7 +376,7 @@
                 }
                 else
                 {
-                    toastService.ShowToast($"{SelectedTokenPair.QuoteAssetName} balance not enough, please trasfer some", ToastLevel.Error);
+                    toastService.ShowToast($"{SelectedTokenPair.QuoteAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
                     Steps[0].Disabled = false;
                     return;
                 }
@@ -382,7 +385,7 @@
         else
         {
             Logger.LogInformation($"can not click check allowance, maturityDate: {MaturityDate}");
-            toastService.ShowToast("invalid form, please check your input", ToastLevel.Error);
+            toastService.ShowToast(Loc["InvalidForm_Stmt"], ToastLevel.Error);
         }
     }
 
@@ -391,7 +394,7 @@
         Logger.LogInformation("approve clicked");
         if (!isSupportedNetwork())
         {
-            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
         Steps[1].Disabled = true; // 确保只点一次
@@ -406,7 +409,7 @@
             if (newAllowance < wad)
             {
                 // 没有授权足够的金额
-                toastService.ShowToast("allowance not enough, please try approve again", ToastLevel.Error);
+                toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
                 Steps[1].Disabled = false;
                 return;
             }
@@ -418,11 +421,11 @@
             Steps[2].Finished = false;
             Steps[2].Disabled = false;
 
-            toastService.ShowToast("approved success, goto mint now", ToastLevel.Success);
+            toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
-                toastService.ShowToast("user cancelled approve", ToastLevel.Error);
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
             Steps[1].Disabled = false;
 
@@ -436,17 +439,16 @@
         Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
         if (!isSupportedNetwork())
         {
-            toastService.ShowToast("Unsupported network, please change in metamask", ToastLevel.Error);
+            toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
         Steps[2].Disabled = true;
         int optionsKind = (int)SelectedOptionsKind;
-        Logger.LogInformation($"tx details1, {Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals)}, {Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals)}, {new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds()}");
         try {
             var txHash = await _web3Service.MintOptions(
                 optionsKind,
-                Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals), 
-                Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals), 
+                Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals), 
+                Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair!.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 SelectedTokenPair!.NftAddress
             );
@@ -455,11 +457,11 @@
             Steps[2].Finished = true;
             Steps[2].Disabled = true;
 
-            toastService.ShowToast("Options minted, goto trade now", ToastLevel.Success);
+            toastService.ShowToast(Loc["OptionsMinted_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
-                toastService.ShowToast("user cancelled mint", ToastLevel.Error);
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
             Steps[2].Finished = false;
             Steps[2].Disabled = false;
