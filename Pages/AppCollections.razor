@@ -1,7 +1,11 @@
+@using DeswapApp.Localization
+
+@inject IStringLocalizer<SharedResource> Loc
+
 @page "/app/collections"
 @layout AppLayout
 
-<PageTitle>App collections</PageTitle>
+<PageTitle>@Loc["Collections"]</PageTitle>
 
 
 <section class="bg-gray-50 dark:bg-gray-900">
@@ -10,16 +14,16 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-6 py-3">
-                    Name
+                    @Loc["Name"]
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Contract Address
+                    @Loc["Contract Address"]
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Category
+                    @Loc["Category"]
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Network
+                    @Loc["Network"]
                 </th>
             </tr>
         </thead>
@@ -34,7 +38,7 @@
                     <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
                 </td>
                 <td class="px-6 py-4">
-                    Options
+                    @Loc["Options"]
                 </td>
                 <td class="px-6 py-4">
                     @collection.Network.Name

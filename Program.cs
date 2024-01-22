@@ -6,7 +6,8 @@ using Nethereum.Blazor;
 using Nethereum.Metamask;
 using Nethereum.Metamask.Blazor;
 using Nethereum.UI;
-
+using System.Globalization;
+using Microsoft.JSInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -27,8 +28,28 @@ builder.Services.AddSingleton(services =>
 builder.Services.AddSingleton<Web3Service>();
 builder.Services.AddScoped<INftFetcher, OpenseaNftFetcher>();
 
-
 builder.Services.AddSingleton<AuthenticationStateProvider, EthereumAuthenticationStateProvider>();
 builder.Services.AddSingleton<ToastService>();
 
-await builder.Build().RunAsync();
+builder.Services.AddLocalization();
+
+var host = builder.Build();
+
+CultureInfo culture;
+var js = host.Services.GetRequiredService<IJSRuntime>();
+var result = await js.InvokeAsync<string>("blazorCulture.get");
+
+if (result != null)
+{
+    culture = new CultureInfo(result);
+}
+else
+{
+    culture = new CultureInfo("en-US");
+    await js.InvokeVoidAsync("blazorCulture.set", "en-US");
+}
+
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+await host.RunAsync();

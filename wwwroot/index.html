@@ -18,6 +18,12 @@
             document.documentElement.classList.remove('dark')
             localStorage.setItem('color-theme', 'light');
         }
+
+        // set culture
+        window.blazorCulture = {
+            get: () => window.localStorage['BlazorCulture'],
+            set: (value) => window.localStorage['BlazorCulture'] = value
+        };
     </script>
 </head>
 
