@@ -114,7 +114,8 @@
                                     <input id="maturityDate" type="date" 
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                                         placeholder="Select date"
-                                        @bind-value="MaturityDate"
+                                        @bind-value:get="MaturityDate"
+                                        @bind-value:set="ChangeMaturityDate"
                                         @bind-value:format="yyyy-MM-dd"
                                     >
                                 </div>                                
@@ -190,6 +191,15 @@
 
     public DateOnly MaturityDate {get; set;} = DateOnly.FromDateTime(DateTime.Now).AddDays(3);
 
+    public bool IsMaturityDateValid => MaturityDate >= DateOnly.FromDateTime(DateTime.Now.AddDays(2));
+
+    private void ChangeMaturityDate(DateOnly value)
+    {
+        MaturityDate = value;
+        ResetSteps();
+    }
+
+    public bool IsFormValid => SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && IsMaturityDateValid;
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -255,7 +265,7 @@
     }
 
     public MintProgressButton.Progress[] Steps = [
-        MintProgressButton.Progress.ToStart,
+        MintProgressButton.Progress.NotStarted,
         MintProgressButton.Progress.NotStarted,
         MintProgressButton.Progress.NotStarted,
     ];
@@ -264,10 +274,14 @@
     private void ResetSteps()
     {
         Steps = [
-            MintProgressButton.Progress.ToStart,
+            MintProgressButton.Progress.NotStarted,
             MintProgressButton.Progress.NotStarted,
             MintProgressButton.Progress.NotStarted,
         ];
+        if (IsFormValid)
+        {
+            Steps[0] = MintProgressButton.Progress.ToStart;
+        }
     }
 
     private bool isSupportedNetwork()
@@ -289,9 +303,9 @@
             toastService.ShowToast(@Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
-        var minDate = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
-        if (MaturityDate < minDate)
+        if (!IsMaturityDateValid)
         {
+            var minDate = DateOnly.FromDateTime(DateTime.Now.AddDays(2));
             toastService.ShowToast($"{Loc["MaturityTooEarly_Stmt"]} {minDate}", ToastLevel.Error);
             return;
         }
