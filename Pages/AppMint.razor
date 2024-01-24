@@ -121,13 +121,13 @@
                             </form>
                             <ol class="space-y-4 md:space-y-6">
                                 <li>
-                                    <MintProgressButton Text=@($"1. {Loc["Check Allowance"]}") Finished=@Steps[0].Finished Disabled=@Steps[0].Disabled ClickCallback="CheckAllowance" />
+                                    <MintProgressButton Text=@($"1. {Loc["Check Allowance"]}") CurrentProgress="@Steps[0]" ClickCallback="CheckAllowance" />
                                 </li>
                                 <li>
-                                    <MintProgressButton Text=@($"2. {Loc["Approve"]}") Finished=@Steps[1].Finished Disabled=@Steps[1].Disabled ClickCallback="Approve" />
+                                    <MintProgressButton Text=@($"2. {Loc["Approve"]}") CurrentProgress="@Steps[1]" ClickCallback="Approve" />
                                 </li>
                                 <li>
-                                    <MintProgressButton Text=@($"3. {Loc["Mint"]}") Finished=@Steps[2].Finished Disabled=@Steps[2].Disabled ClickCallback="Mint" />
+                                    <MintProgressButton Text=@($"3. {Loc["Mint"]}") CurrentProgress="@Steps[2]" ClickCallback="Mint" />
                                 </li>
                             </ol>
                         </div>
@@ -254,26 +254,19 @@
         ResetSteps();
     }
 
-    public class Step
-    {
-        public bool Finished {get; set;} = false;
-
-        public bool Disabled {get; set;} = true;
-    }
-
-    public Step[] Steps = [
-        new Step { Finished = false, Disabled = false},
-        new Step { Finished = false, Disabled = true},
-        new Step { Finished = false, Disabled = true},
+    public MintProgressButton.Progress[] Steps = [
+        MintProgressButton.Progress.ToStart,
+        MintProgressButton.Progress.NotStarted,
+        MintProgressButton.Progress.NotStarted,
     ];
 
     // 每次表单变化时都要重置步骤状态
     private void ResetSteps()
     {
         Steps = [
-            new Step { Finished = false, Disabled = false},
-            new Step { Finished = false, Disabled = true},
-            new Step { Finished = false, Disabled = true},
+            MintProgressButton.Progress.ToStart,
+            MintProgressButton.Progress.NotStarted,
+            MintProgressButton.Progress.NotStarted,
         ];
     }
 
@@ -304,7 +297,7 @@
         }
         var curAddr = _metamaskHostProvider.SelectedAccount;
         Logger.LogInformation($"start check allowance, cur address is {curAddr}, date: {MaturityDate}");
-        Steps[0].Disabled = true; // 一点击就该置灰
+        Steps[0] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         if (SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0)
         {
             Logger.LogInformation($"can click check allowance, maturityDate: {MaturityDate}");
@@ -319,28 +312,20 @@
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
                     {
                         Logger.LogInformation($"base allowance is enough, skip approve step");
-                        Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
-
-                        Steps[1].Finished = true;
-                        Steps[1].Disabled = true;
-
-                        Steps[2].Finished = false;
-                        Steps[2].Disabled = false;
+                        Steps[0] = MintProgressButton.Progress.Finished;
+                        Steps[1] = MintProgressButton.Progress.Finished;
+                        Steps[2] = MintProgressButton.Progress.ToStart;
                     }
                     else
                     {
-                        Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
-
-                        Steps[1].Finished = false;
-                        Steps[1].Disabled = false;
+                        Steps[0] = MintProgressButton.Progress.Finished;
+                        Steps[1] = MintProgressButton.Progress.ToStart;
                     }
                 }
                 else
                 {
                     toastService.ShowToast($"{SelectedTokenPair.BaseAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
-                    Steps[0].Disabled = false;
+                    Steps[0] = MintProgressButton.Progress.ToStart;
 
                     return;
                 }
@@ -356,28 +341,20 @@
                     if (quoteAssetAllowance >= InputedQuoteAssetAmount)
                     {
                         Logger.LogInformation($"quote allowance is enough, skip approve");
-                        Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
-
-                        Steps[1].Finished = true;
-                        Steps[1].Disabled = true;
-
-                        Steps[2].Finished = false;
-                        Steps[2].Disabled = false;
+                        Steps[0] = MintProgressButton.Progress.Finished;
+                        Steps[1] = MintProgressButton.Progress.Finished;
+                        Steps[2] = MintProgressButton.Progress.ToStart;
                     }
                     else
                     {
-                        Steps[0].Finished = true;
-                        Steps[0].Disabled = true;
-
-                        Steps[1].Finished = false;
-                        Steps[1].Disabled = false;
+                        Steps[0] = MintProgressButton.Progress.Finished;
+                        Steps[1] = MintProgressButton.Progress.ToStart;
                     }
                 }
                 else
                 {
                     toastService.ShowToast($"{SelectedTokenPair.QuoteAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
-                    Steps[0].Disabled = false;
+                    Steps[0] = MintProgressButton.Progress.ToStart;
                     return;
                 }
             }
@@ -385,6 +362,7 @@
         else
         {
             Logger.LogInformation($"can not click check allowance, maturityDate: {MaturityDate}");
+            Steps[0] = MintProgressButton.Progress.ToStart; // 让用户重来
             toastService.ShowToast(Loc["InvalidForm_Stmt"], ToastLevel.Error);
         }
     }
@@ -397,7 +375,7 @@
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
-        Steps[1].Disabled = true; // 确保只点一次
+        Steps[1] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         var contractAddress = SelectedOptionsKind == OptionsKind.CALL ? SelectedTokenPair!.BaseAssetAddress : SelectedTokenPair!.QuoteAssetAddress;
         var wad = SelectedOptionsKind == OptionsKind.CALL ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair.QuoteAssetDecimals);
         try {
@@ -410,16 +388,13 @@
             {
                 // 没有授权足够的金额
                 toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
-                Steps[1].Disabled = false;
+                Steps[1] = MintProgressButton.Progress.ToStart; // 让用户重新开始再来一遍
                 return;
             }
 
             // 标记完成，且让第三步可点击
-            Steps[1].Finished = true;
-            Steps[1].Disabled = true;
-
-            Steps[2].Finished = false;
-            Steps[2].Disabled = false;
+            Steps[1] = MintProgressButton.Progress.Finished;
+            Steps[2] = MintProgressButton.Progress.ToStart;
 
             toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
@@ -427,10 +402,7 @@
             {
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
-            Steps[1].Disabled = false;
-
-            Steps[2].Finished = false; // approve 失败的话，mint按钮不可点
-            Steps[2].Disabled = true;
+            Steps[1] = MintProgressButton.Progress.ToStart; // 让用户重来一次
         }
     }
 
@@ -442,7 +414,7 @@
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
-        Steps[2].Disabled = true;
+        Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         int optionsKind = (int)SelectedOptionsKind;
         try {
             var txHash = await _web3Service.MintOptions(
@@ -454,8 +426,7 @@
             );
 
             Logger.LogInformation($"mint finished, tx: {txHash}");
-            Steps[2].Finished = true;
-            Steps[2].Disabled = true;
+            Steps[2] = MintProgressButton.Progress.Finished;
 
             toastService.ShowToast(Loc["OptionsMinted_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
@@ -463,8 +434,7 @@
             {
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
-            Steps[2].Finished = false;
-            Steps[2].Disabled = false;
+            Steps[2] = MintProgressButton.Progress.ToStart;
         }
     }
 
