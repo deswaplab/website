@@ -193,4 +193,7 @@
   <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
     <value>Balance not enough? Get some from uniswap or binance</value>
   </data>
+  <data name="LearnMoreLink" xml:space="preserve">
+    <value>/app</value>
+  </data>
 </root>

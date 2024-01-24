@@ -193,4 +193,7 @@
   <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
     <value>余额不足？去uniswap或者binance充值一点到钱包里</value>
   </data>
+  <data name="LearnMoreLink" xml:space="preserve">
+    <value>https://medium.com/@xcaptain/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E5%BB%BAdeswap-8961a6d68bc9</value>
+  </data>
 </root>
