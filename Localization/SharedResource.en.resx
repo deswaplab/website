@@ -196,4 +196,7 @@
   <data name="LearnMoreLink" xml:space="preserve">
     <value>/app</value>
   </data>
+  <data name="RecommendPrice_Stmt" xml:space="preserve">
+    <value>Recommend a price for me</value>
+  </data>
 </root>

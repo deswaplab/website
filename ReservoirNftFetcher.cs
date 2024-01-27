@@ -1,7 +1,6 @@
 namespace DeswapApp;
 
 using System.Net.Http.Json;
-using System.Numerics;
 using System.Text.Json.Serialization;
 
 public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
@@ -51,7 +50,6 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
             }
         }
 
-        // 变化
         var supportedContracts = TokenPairs.FilterSupportedContracts(chainId);
         var tokens = curTokens
             .Where(item => item.Token is not null && item.Token.Contract is not null)

@@ -1,5 +1,7 @@
 namespace DeswapApp;
 
+using System.Net.Http.Json;
+
 public class TokenPair
 {
     public required string BaseAssetName { get; set; }
@@ -15,6 +17,11 @@ public class TokenPair
     public required int QuoteAssetDecimals { get; set; }
 
     public required string NftAddress { get; set; }
+
+    // 在中心化交易所的符号，用来获取参考价格
+    public string? OkxTickSymbol {get; set;}
+
+    public string? OkxOptUly {get; set;}
 
     public required Network Network { get; set; }
 
@@ -36,6 +43,8 @@ public static class TokenPairs
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
             QuoteAssetName = "USDC",
+            OkxTickSymbol = "ETH-USDC",
+            OkxOptUly = "ETH-USD",
             QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             QuoteAssetDecimals = 6,
             NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
@@ -46,6 +55,8 @@ public static class TokenPairs
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
             QuoteAssetName = "USDC",
+            OkxTickSymbol = "MATIC-USDC",
+            OkxOptUly = "MATIC-USD",
             QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
             QuoteAssetDecimals = 6,
             NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
@@ -58,6 +69,7 @@ public static class TokenPairs
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
             QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
             NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
@@ -68,6 +80,7 @@ public static class TokenPairs
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
             QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
             NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
