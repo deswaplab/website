@@ -199,4 +199,7 @@
   <data name="RecommendPrice_Stmt" xml:space="preserve">
     <value>Recommend a price for me</value>
   </data>
+  <data name="MintAmount" xml:space="preserve">
+    <value>How many tokens to mint</value>
+  </data>
 </root>

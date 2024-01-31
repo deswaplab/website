@@ -170,6 +170,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
             maturityUnix,
             amount
         );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
         return receipt.TransactionHash.ToString();
     }
 

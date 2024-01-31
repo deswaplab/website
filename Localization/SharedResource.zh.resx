@@ -199,4 +199,7 @@
   <data name="RecommendPrice_Stmt" xml:space="preserve">
     <value>为我推荐一个价格</value>
   </data>
+  <data name="MintAmount" xml:space="preserve">
+    <value>代币数量</value>
+  </data>
 </root>

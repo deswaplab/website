@@ -134,6 +134,19 @@
                                     }
                                 </div>
 
+                                <div>
+                                    <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MintAmount"]</label>
+                                    <div class="flex">
+                                        @foreach(var item in AllAmounts)
+                                        {
+                                            <div class="flex items-center me-4">
+                                                <input type="radio" @onchange="@(() => SelectedAmount = item)" checked="@(item.Equals(SelectedAmount))" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">@item x</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
                             </form>
                             <ol class="space-y-4 md:space-y-6">
                                 <li>
@@ -178,6 +191,16 @@
 
     public string QuoteAssetName => SelectedTokenPair is not null ? SelectedTokenPair.QuoteAssetName : "";
 
+    public IList<int> AllAmounts = [1, 10, 100, 500, 1000];
+
+    public int SelectedAmount = 10;
+
+    private void ChangeAmount(int value)
+    {
+        SelectedAmount = value;
+        Logger.LogInformation($"change amount", value);
+    }
+
     private async Task ChangeSelectedTokenPairName(string value)
     {
         Logger.LogInformation($"selected token pair changed: {value}");
@@ -214,7 +237,7 @@
         ResetSteps();
     }
 
-    public bool IsFormValid => SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && IsMaturityDateValid;
+    public bool IsFormValid => SelectedTokenPair is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && IsMaturityDateValid && SelectedAmount >= 1;
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -453,7 +476,7 @@
 
     private async Task Mint()
     {
-        Logger.LogInformation($"mint clicked, maturity: {MaturityDate}");
+        Logger.LogInformation($"mint clicked, maturity: {MaturityDate}, amount: {SelectedAmount}");
         if (!isSupportedNetwork())
         {
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
@@ -467,7 +490,7 @@
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair!.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
-                10,
+                SelectedAmount,
                 SelectedTokenPair!.NftAddress
             );
 
