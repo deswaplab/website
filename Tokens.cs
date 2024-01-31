@@ -47,7 +47,7 @@ public static class TokenPairs
             OkxOptUly = "ETH-USD",
             QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
+            NftAddress = "0xa9Ea60F150bef188FA25988c7da3f32Eb6e1aBD1",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new TokenPair{
@@ -59,7 +59,7 @@ public static class TokenPairs
             OkxOptUly = "MATIC-USD",
             QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x3e6362CC4DF74F529C7Fb70371333FC2eb34bdBC",
+            NftAddress = "0xa9Ea60F150bef188FA25988c7da3f32Eb6e1aBD1",
             Network = SupportedNetworks.GetNetwork(80001)!,
         },
 
@@ -83,7 +83,7 @@ public static class TokenPairs
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
+            NftAddress = "0x1A19012C237D403dC495087a444269CA4c5b9025",
             Network = SupportedNetworks.GetNetwork(80001)!,
         },
     ];
