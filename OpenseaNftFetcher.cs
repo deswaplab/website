@@ -50,11 +50,11 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     ChainId = chainId,
                     Contract = item.Contract!,
                     ImageData = ParseImageSvg(item.MetadataUrl),
-                    MaturityDate = ParseMaturityDate(item.Traits),
-                    OptionsKind = ParseOptionsKind(item.Traits),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.Traits),
-                    QuoteAssetAmount = ParseQuoteAssetAmount(item.Traits),
-                    Price = ParsePrice(item.Traits),
+                    MaturityDate = ParseMaturityDate(item.MetadataUrl),
+                    OptionsKind = ParseOptionsKind(item.MetadataUrl),
+                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl),
+                    QuoteAssetAmount = ParseQuoteAssetAmount(item.MetadataUrl),
+                    Price = ParsePrice(item.MetadataUrl),
                 };
             })
             .ToList();
@@ -78,74 +78,112 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
     {
         [JsonPropertyName("image")]
         public required string Image { get; set; }
+
+        [JsonPropertyName("attributes")]
+        public IList<OpenseaTraits>? Attributes { get; set; }
     }
 
-    private static DateTimeOffset ParseMaturityDate(IList<OpenseaTraits> tokenAttributes)
+    private static DateTimeOffset ParseMaturityDate(string metadataUrl)
     {
-        foreach (var attr in tokenAttributes)
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
         {
-            if (attr.TraitType == "maturityDate" && attr.DisplayType == "date")
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
             {
-                // 此处取到的数据包含小数点，所以要转为decimal
-                var maturityDate = DateTimeOffset.FromUnixTimeSeconds((long)attr.Value.GetDecimal());
-                return maturityDate;
+                if (attr.TraitType == "maturityDate" && attr.DisplayType == "date")
+                {
+                    // 此处取到的数据包含小数点，所以要转为decimal
+                    var maturityDate = DateTimeOffset.FromUnixTimeSeconds((long)attr.Value.GetDecimal());
+                    return maturityDate;
+                }
             }
         }
+        
         throw new Exception("can find maturity date");
     }
 
-    private static OptionsKind ParseOptionsKind(IList<OpenseaTraits> tokenAttributes)
+    private static OptionsKind ParseOptionsKind(string metadataUrl)
     {
-
-        foreach (var attr in tokenAttributes)
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
         {
-            if (attr.TraitType == "optionsKind")
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
             {
-                var s = attr.Value.GetString() ?? "";
-                if (s == "call")
+                if (attr.TraitType == "optionsKind")
                 {
-                    return OptionsKind.CALL;
-                }
-                else if (s == "put")
-                {
-                    return OptionsKind.PUT;
+                    var s = attr.Value.GetString() ?? "";
+                    if (s == "call")
+                    {
+                        return OptionsKind.CALL;
+                    }
+                    else if (s == "put")
+                    {
+                        return OptionsKind.PUT;
+                    }
                 }
             }
         }
         throw new Exception("no options kind found");
     }
 
-    private static decimal ParseBaseAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static decimal ParseBaseAssetAmount(string metadataUrl)
     {
-        foreach (var attr in tokenAttributes)
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
         {
-            if (attr.TraitType == "baseAssetAmount" && attr.DisplayType == "number")
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
             {
-                return attr.Value.GetDecimal();
+                if (attr.TraitType == "baseAssetAmount" && attr.DisplayType == "number")
+                {
+                    return attr.Value.GetDecimal();
+                }
             }
         }
         throw new Exception("no baseAssetAmount found");
     }
 
-    private static decimal ParseQuoteAssetAmount(IList<OpenseaTraits> tokenAttributes)
+    private static decimal ParseQuoteAssetAmount(string metadataUrl)
     {
-        foreach (var attr in tokenAttributes)
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
         {
-            if (attr.TraitType == "quoteAssetAmount" && attr.DisplayType == "number")
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
             {
-                return attr.Value.GetDecimal();
+                if (attr.TraitType == "quoteAssetAmount" && attr.DisplayType == "number")
+                {
+                    return attr.Value.GetDecimal();
+                }
             }
         }
         throw new Exception("no quoteAssetAmount found");
     }
 
-    private static decimal ParsePrice(IList<OpenseaTraits> tokenAttributes)
+    private static decimal ParsePrice(string metadataUrl)
     {
-        foreach (var attr in tokenAttributes)
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
         {
-            if (attr.TraitType == "price" && attr.DisplayType == "number")
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
             {
-                return attr.Value.GetDecimal();
+                if (attr.TraitType == "price" && attr.DisplayType == "number")
+                {
+                    return attr.Value.GetDecimal();
+                }
             }
         }
         throw new Exception("no price found");
@@ -171,9 +209,6 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
 
         [JsonPropertyName("metadata_url")]
         public required string MetadataUrl { get; set; }
-
-        [JsonPropertyName("traits")]
-        public IList<OpenseaTraits> Traits { get; set; } = [];
     }
 
     public class OpenseaTraits

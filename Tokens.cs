@@ -72,7 +72,7 @@ public static class TokenPairs
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0xD10dBe32045aD92aaDDD1f4f5BC241e4ae26609c",
+            NftAddress = "0x1A19012C237D403dC495087a444269CA4c5b9025",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new TokenPair{

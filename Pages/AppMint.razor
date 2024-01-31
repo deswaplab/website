@@ -467,6 +467,7 @@
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair!.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
+                10,
                 SelectedTokenPair!.NftAddress
             );
 

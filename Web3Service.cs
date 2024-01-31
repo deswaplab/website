@@ -43,6 +43,11 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
                 "internalType": "uint256",
                 "name": "maturityDate",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
             }
         ],
         "name": "mint",
@@ -142,7 +147,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     }
 
     // Mint a Options NFT
-    public async Task<string> MintOptions(int optionsKind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, string nftAddress)
+    public async Task<string> MintOptions(int optionsKind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, int amount, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
@@ -151,7 +156,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
             optionsKind,
             baseAssetAmount, 
             quoteAssetAmount, 
-            maturityUnix
+            maturityUnix,
+            amount
         );
         var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
             _metamaskHostProvider.SelectedAccount,
@@ -161,7 +167,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
             optionsKind,
             baseAssetAmount, 
             quoteAssetAmount, 
-            maturityUnix
+            maturityUnix,
+            amount
         );
         return receipt.TransactionHash.ToString();
     }
