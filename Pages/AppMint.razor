@@ -36,22 +36,6 @@
                             </h1>
                             <form class="space-y-4 md:space-y-6">
                                 <div>
-                                    <label for="tokenPairs"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
-                                    <select id="tokenPair"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        @bind:get="SelectedTokenPairName"
-                                        @bind:event="onchange"
-                                        @bind:set="ChangeSelectedTokenPairName"
-                                        >
-                                        <option></option>
-                                        @foreach(var tokenPair in TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
-                                        {
-                                            <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div>
                                     <label for="optionsKind"
                                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Options Kind"]</label>
                                     <select id="optionsKind"
@@ -62,6 +46,23 @@
                                     >
                                         <option value="@OptionsKind.CALL">@Loc["Call"]</option>
                                         <option value="@OptionsKind.PUT">@Loc["Put"]</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="tokenPairs"
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                                    <select id="tokenPair"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        @bind:get="SelectedTokenPairName"
+                                        @bind:event="onchange"
+                                        @bind:set="ChangeSelectedTokenPairName"
+                                        >
+                                        <option></option>
+                                        @foreach(var tokenPair in TokenPairs.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId).Where(item => item.OptionsKind == SelectedOptionsKind))
+                                        {
+                                            <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
+                                        }
                                     </select>
                                 </div>
 
@@ -191,9 +192,9 @@
 
     public string QuoteAssetName => SelectedTokenPair is not null ? SelectedTokenPair.QuoteAssetName : "";
 
-    public IList<int> AllAmounts = [1, 10, 100, 500, 1000];
+    public IList<int> AllAmounts = [100, 1000];
 
-    public int SelectedAmount = 10;
+    public int SelectedAmount = 100;
 
     private void ChangeAmount(int value)
     {
@@ -486,7 +487,6 @@
         int optionsKind = (int)SelectedOptionsKind;
         try {
             var txHash = await _web3Service.MintOptions(
-                optionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedTokenPair!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedTokenPair!.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),

@@ -1,7 +1,5 @@
 namespace DeswapApp;
 
-using System.Net.Http.Json;
-
 public class TokenPair
 {
     public required string BaseAssetName { get; set; }
@@ -18,10 +16,12 @@ public class TokenPair
 
     public required string NftAddress { get; set; }
 
-    // 在中心化交易所的符号，用来获取参考价格
-    public string? OkxTickSymbol {get; set;}
+    public required OptionsKind OptionsKind { get; set; }
 
-    public string? OkxOptUly {get; set;}
+    // 在中心化交易所的符号，用来获取参考价格
+    public string? OkxTickSymbol { get; set; }
+
+    public string? OkxOptUly { get; set; }
 
     public required Network Network { get; set; }
 
@@ -37,33 +37,7 @@ public class TokenPair
 public static class TokenPairs
 {
     public static readonly IList<TokenPair> Inner = [
-        // WETH/USDC
-        new TokenPair{
-            BaseAssetName = "WETH",
-            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
-            BaseAssetDecimals = 18,
-            QuoteAssetName = "USDC",
-            OkxTickSymbol = "ETH-USDC",
-            OkxOptUly = "ETH-USD",
-            QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            QuoteAssetDecimals = 6,
-            NftAddress = "0xa9Ea60F150bef188FA25988c7da3f32Eb6e1aBD1",
-            Network = SupportedNetworks.GetNetwork(11155111)!,
-        },
-        new TokenPair{
-            BaseAssetName = "WMATIC",
-            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
-            BaseAssetDecimals = 18,
-            QuoteAssetName = "USDC",
-            OkxTickSymbol = "MATIC-USDC",
-            OkxOptUly = "MATIC-USD",
-            QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
-            QuoteAssetDecimals = 6,
-            NftAddress = "0xa9Ea60F150bef188FA25988c7da3f32Eb6e1aBD1",
-            Network = SupportedNetworks.GetNetwork(80001)!,
-        },
-
-        // WETH/TUSDC
+        // WETH/TUSDC Call
         new TokenPair{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
@@ -72,9 +46,24 @@ public static class TokenPairs
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x1A19012C237D403dC495087a444269CA4c5b9025",
+            NftAddress = "0xA57d0Caa974caf3a5F508051464E4ac0a69FdA0C",
             Network = SupportedNetworks.GetNetwork(11155111)!,
+            OptionsKind = OptionsKind.CALL,
         },
+        // WETH/TUSDC Put
+        new TokenPair{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x5552dD062df90ED68443A2e3E194e3b814a86C2d",
+            Network = SupportedNetworks.GetNetwork(11155111)!,
+            OptionsKind = OptionsKind.PUT
+        },
+        // mumbai WETH/TUSDC Call
         new TokenPair{
             BaseAssetName = "WMATIC",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
@@ -83,8 +72,22 @@ public static class TokenPairs
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x1A19012C237D403dC495087a444269CA4c5b9025",
+            NftAddress = "0xA57d0Caa974caf3a5F508051464E4ac0a69FdA0C",
             Network = SupportedNetworks.GetNetwork(80001)!,
+            OptionsKind = OptionsKind.CALL
+        },
+        // mumbai WETH/TUSDC Put
+        new TokenPair{
+            BaseAssetName = "WMATIC",
+            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x5552dD062df90ED68443A2e3E194e3b814a86C2d",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+            OptionsKind = OptionsKind.PUT
         },
     ];
 
@@ -140,13 +143,13 @@ public static class SupportedNetworks
             IsTestNet=true
         },
         new Network{
-            Name = "Pylogon Mumbai", 
-            ChainId=80001, 
-            EtherscanHost="https://mumbai.polygonscan.com", 
-            OpenseaHost="https://testnets.opensea.io/assets/mumbai", 
+            Name = "Pylogon Mumbai",
+            ChainId=80001,
+            EtherscanHost="https://mumbai.polygonscan.com",
+            OpenseaHost="https://testnets.opensea.io/assets/mumbai",
             OpenseaApiHost="https://testnets-api.opensea.io/api/v2/chain/mumbai",
-            ReservoirHost="https://api-mumbai.reservoir.tools", 
-            Logo="polygon_logo.svg", 
+            ReservoirHost="https://api-mumbai.reservoir.tools",
+            Logo="polygon_logo.svg",
             IsTestNet=true
         },
 

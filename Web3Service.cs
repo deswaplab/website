@@ -5,7 +5,7 @@ using Nethereum.Metamask;
 
 namespace DeswapApp;
 
-public class Web3Service(MetamaskHostProvider metamaskHostProvider)
+public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3Service> logger)
 {
     private readonly string OptionsABI = """
 [
@@ -24,11 +24,6 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     },
     {
         "inputs": [
-            {
-                "internalType": "enum OptionsNFT.OptionsKind",
-                "name": "kind",
-                "type": "uint8"
-            },
             {
                 "internalType": "uint256",
                 "name": "baseAssetAmount",
@@ -58,7 +53,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
                 "type": "uint256"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -78,6 +73,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
 """;
 
     private readonly MetamaskHostProvider _metamaskHostProvider = metamaskHostProvider;
+
+    private readonly ILogger<Web3Service> _logger = logger;
 
     [Function("balanceOf", "uint256")]
     public class BalanceOfFunction : FunctionMessage
@@ -147,24 +144,27 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider)
     }
 
     // Mint a Options NFT
-    public async Task<string> MintOptions(int optionsKind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, int amount, string nftAddress)
+    public async Task<string> MintOptions(BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, int amount, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
+        var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000"));
         var gas = await callsFunction.EstimateGasAsync(
-            optionsKind,
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
             baseAssetAmount, 
             quoteAssetAmount, 
             maturityUnix,
             amount
         );
+        _logger.LogInformation($"Mint Options, gas={gas}, value={value}");
         var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
             _metamaskHostProvider.SelectedAccount,
             gas,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
             CancellationToken.None,
-            optionsKind,
             baseAssetAmount, 
             quoteAssetAmount, 
             maturityUnix,
