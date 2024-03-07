@@ -7,7 +7,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 {
     private readonly HttpClient _httpClient = httpClient;
 
-    public async Task<IList<UserToken>> GetUserOptionTokens(string userAddress, long chainId)
+    public async Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId)
     {
         var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         if (curNetwork.ReservoirHost is null)
@@ -56,7 +56,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
             .Where(item => supportedContracts.Contains(item.Token!.Contract!.ToLower()))
             .Select(item =>
             {
-                return new UserToken
+                return new UserOptionNFT
                 {
                     TokenId = long.Parse(item.Token!.TokenId!),
                     ChainId = item.Token.ChainId,
@@ -194,5 +194,13 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
         [JsonPropertyName("value")]
         public string? Value { get; set; }
+    }
+
+    // user lottery nfts
+    public async Task<IList<UserLotteryNFT>> GetUserLotteryTokens(string userAddress, long chainId)
+    {
+        // TODO: finish me later
+        await Task.CompletedTask;
+        return [];
     }
 }

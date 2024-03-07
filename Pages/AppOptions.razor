@@ -10,10 +10,10 @@
 @using DeswapApp.Pages
 @using DeswapApp.Localization
 
-@page "/app"
+@page "/app/options"
 
 @layout AppLayout
-@inject ILogger<AppMint> Logger
+@inject ILogger<AppOptions> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject IJSRuntime JS
@@ -22,7 +22,7 @@
 @inject IStringLocalizer<SharedResource> Loc
 @inject PriceService _priceService
 
-<PageTitle>@Loc["Mint"]</PageTitle>
+<PageTitle>@Loc["Options"]</PageTitle>
 
 <section class="bg-gray-50 dark:bg-gray-900">
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -32,7 +32,7 @@
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                @Loc["Mint"]
+                                @Loc["Options"]
                             </h1>
                             <form class="space-y-4 md:space-y-6">
                                 <div>
@@ -165,7 +165,7 @@
                     <SingleToast />
                 </Authorized>
                 <NotAuthorized>
-                    <MyMetamask />
+                    <LoginButton />
                 </NotAuthorized>
             </AuthorizeView>
         </CascadingAuthenticationState>

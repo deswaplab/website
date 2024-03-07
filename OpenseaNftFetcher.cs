@@ -11,7 +11,33 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
 
     private readonly ILogger<OpenseaNftFetcher> _logger = logger;
 
-    public async Task<IList<UserToken>> GetUserOptionTokens(string userAddress, long chainId)
+    public async Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId)
+    {
+        var curTokens = await FetchAllUserTokens(userAddress, chainId);
+
+        var supportedContracts = TokenPairs.FilterSupportedContracts(chainId);
+        var tokens = curTokens
+            .Where(item => supportedContracts.Contains(item.Contract.ToLower()))
+            .Select(item =>
+            {
+                return new UserOptionNFT
+                {
+                    TokenId = long.Parse(item.Identifier),
+                    ChainId = chainId,
+                    Contract = item.Contract!,
+                    ImageData = ParseImageSvg(item.MetadataUrl),
+                    MaturityDate = ParseMaturityDate(item.MetadataUrl, "maturityDate"),
+                    OptionsKind = ParseOptionsKind(item.MetadataUrl),
+                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                    QuoteAssetAmount = ParseQuoteAssetAmount(item.MetadataUrl),
+                    Price = ParsePrice(item.MetadataUrl),
+                };
+            })
+            .ToList();
+        return tokens;
+    }
+
+    private async Task<IList<OpenseaNft>> FetchAllUserTokens(string userAddress, long chainId)
     {
         var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
 
@@ -38,27 +64,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                 break;
             }
         }
-
-        var supportedContracts = TokenPairs.FilterSupportedContracts(chainId);
-        var tokens = curTokens
-            .Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserToken
-                {
-                    TokenId = long.Parse(item.Identifier),
-                    ChainId = chainId,
-                    Contract = item.Contract!,
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    MaturityDate = ParseMaturityDate(item.MetadataUrl),
-                    OptionsKind = ParseOptionsKind(item.MetadataUrl),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl),
-                    QuoteAssetAmount = ParseQuoteAssetAmount(item.MetadataUrl),
-                    Price = ParsePrice(item.MetadataUrl),
-                };
-            })
-            .ToList();
-        return tokens;
+        return curTokens;
     }
 
     private static string ParseImageSvg(string metadataUrl)
@@ -83,7 +89,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         public IList<OpenseaTraits>? Attributes { get; set; }
     }
 
-    private static DateTimeOffset ParseMaturityDate(string metadataUrl)
+    private static DateTimeOffset ParseMaturityDate(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -93,7 +99,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
             foreach (var attr in payload!.Attributes!)
             {
-                if (attr.TraitType == "maturityDate" && attr.DisplayType == "date")
+                if (attr.TraitType == name && attr.DisplayType == "date")
                 {
                     // 此处取到的数据包含小数点，所以要转为decimal
                     var maturityDate = DateTimeOffset.FromUnixTimeSeconds((long)attr.Value.GetDecimal());
@@ -132,7 +138,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no options kind found");
     }
 
-    private static decimal ParseBaseAssetAmount(string metadataUrl)
+    private static decimal ParseBaseAssetAmount(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -142,7 +148,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
             foreach (var attr in payload!.Attributes!)
             {
-                if (attr.TraitType == "baseAssetAmount" && attr.DisplayType == "number")
+                if (attr.TraitType == name && attr.DisplayType == "number")
                 {
                     return attr.Value.GetDecimal();
                 }
@@ -189,6 +195,25 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no price found");
     }
 
+    private static string ParseString(string metadataUrl, string name)
+    {
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
+        {
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
+            {
+                if (attr.TraitType == name)
+                {
+                    return attr.Value.GetString() ?? "";
+                }
+            }
+        }
+        throw new Exception("no price found");
+    }
+
     public class OpenseaTokensResponse
     {
         [JsonPropertyName("nfts")]
@@ -221,5 +246,30 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
 
         [JsonPropertyName("value")]
         public required JsonElement Value { get; set; } // 可能是字符串，也可能是数字，由display_type决定
+    }
+
+    // fetch user lottery nfts
+    public async Task<IList<UserLotteryNFT>> GetUserLotteryTokens(string userAddress, long chainId)
+    {
+        var curTokens = await FetchAllUserTokens(userAddress, chainId);
+        var supportedContracts = LotteryContracts.Inner
+            .Where(p => p.Network.ChainId == chainId)
+            .Select(p => p.NftAddress.ToLower())
+            .ToList();
+        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
+            .Select(item => {
+                return new UserLotteryNFT
+                {
+                    TokenId = long.Parse(item.Identifier),
+                    ChainId = chainId,
+                    Contract = item.Contract!,
+                    Status = ParseString(item.MetadataUrl, "status"), // open|close
+                    ImageData = ParseImageSvg(item.MetadataUrl),
+                    DrawTime = ParseMaturityDate(item.MetadataUrl, "drawTime"),
+                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                };
+            })
+            .ToList();
+        return tokens;
     }
 }

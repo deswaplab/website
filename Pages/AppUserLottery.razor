@@ -6,17 +6,17 @@
 @using DeswapApp.Localization
 
 @inject HttpClient Http
-@inject ILogger<AppUserTokens> Logger
+@inject ILogger<AppUserLottery> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
 @inject INftFetcher _nftFetcher
 @inject IStringLocalizer<SharedResource> Loc
 
-@page "/app/users/me"
+@page "/app/user/lottery"
 @layout AppLayout
 
-<PageTitle>@Loc["My Tokens"]</PageTitle>
+<PageTitle>@Loc["My Lottery NFT"]</PageTitle>
 
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
@@ -50,22 +50,13 @@
                                             @Loc["List"]
                                         </a>
                                     }
-                                    @if (token.Exercisable())
+                                    @if (token.Drawable())
                                     {
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @ExerciseButtonDisabledClass"
-                                            @onclick="async () => await HandleExercise(token)"
-                                            disabled=@ExerciseButtonDisabled
+                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @DrawButtonDisabledClass"
+                                            @onclick="async () => await HandleDraw(token)"
+                                            disabled=@DrawButtonDisabled
                                         >
-                                            @Loc["Exercise_Stmt"]
-                                        </button>
-                                    }
-                                    @if (token.Burnable())
-                                    {
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
-                                            @onclick="async () => await HandleBurn(token.TokenId, token.Contract)"
-                                            disabled=@BurnButtonDisabled
-                                        >
-                                            @Loc["Burn_Stmt"]
+                                            @Loc["Draw_Stmt"]
                                         </button>
                                     }
                                 </div>
@@ -104,7 +95,7 @@
         return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}";
     }
 
-    private IList<UserToken> UserTokens {get; set;} = [];
+    private IList<UserLotteryNFT> UserTokens {get; set;} = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -140,7 +131,7 @@
     {
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
-        UserTokens = await _nftFetcher.GetUserOptionTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
+        UserTokens = await _nftFetcher.GetUserLotteryTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
         Logger.LogInformation($"fetch tokens done, chainId={_metamaskHostProvider.SelectedNetworkChainId}, tokenCount={UserTokens.Count}");
         loadingTokens = false; // 网络请求结束
     }
@@ -151,43 +142,17 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    private bool ExerciseButtonDisabled = false;
+    private bool DrawButtonDisabled = false;
 
-    private string ExerciseButtonDisabledClass => ExerciseButtonDisabled ? "cursor-not-allowed" : "";
+    private string DrawButtonDisabledClass => DrawButtonDisabled ? "cursor-not-allowed" : "";
 
-    private async Task HandleExercise(UserToken token)
+    private async Task HandleDraw(UserLotteryNFT token)
     {
-        Logger.LogInformation($"start handle exercise {token.TokenId}, {token.Contract}");
-        ExerciseButtonDisabled = true;
-        var (payAssetAddress, payAssetAmount) = token.GetPayAsset();
-
-        // 1. Check balance
-        var userPayAssetBalance = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, payAssetAddress);
-        if (userPayAssetBalance < payAssetAmount)
-        {
-            toastService.ShowToast(Loc["InsufficientBalanceToExercise_Stmt"], ToastLevel.Error);
-            ExerciseButtonDisabled = false;
-            return;
-        }
-
-        var userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, token.Contract, payAssetAddress);
-        if (userPayAllowance < payAssetAmount)
-        {
-            // DO approve and wait seconds
-            await _web3Service.Approve(token.Contract, payAssetAmount, payAssetAddress);
-            await Task.Delay(1000);
-            userPayAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, token.Contract, payAssetAddress);
-            if (userPayAllowance < payAssetAmount)
-            {
-                ExerciseButtonDisabled = false;
-                toastService.ShowToast(Loc["InsufficientBalanceAfterApproveToExercise_Stmt"], ToastLevel.Error);
-                return;
-            }
-        }
+        Logger.LogInformation($"start handle draw, ${token.TokenId}");
+        DrawButtonDisabled = true;
         try {
-            var txHash = await _web3Service.ExerciseOptions(token.TokenId, token.Contract);
-            Logger.LogInformation($"exercise finished, tx: {txHash}");
-            toastService.ShowToast($"Token: {token.TokenId} {Loc["ExerciseSuccess_Stmt"]}", ToastLevel.Success);
+            var txHash = await _web3Service.DrawLottery(token.TokenId, token.Contract);
+            toastService.ShowToast($"Token: {token.TokenId} {Loc["DrawSuccess_Stmt"]}", ToastLevel.Success);
             // 从 Tokens 删除当前行权的token，以实现页面刷新
             UserTokens.Remove(UserTokens.First(item => item.TokenId == token.TokenId));
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
@@ -196,32 +161,7 @@
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
         } finally {
-            ExerciseButtonDisabled = false;
-        }
-    }
-
-    private bool BurnButtonDisabled = false;
-
-    private string BurnButtonDisabledClass => BurnButtonDisabled ? "cursor-not-allowed" : "";
-
-    private async Task HandleBurn(long tokenId, string nftContractAddress)
-    {
-        Logger.LogInformation($"handle burn");
-        BurnButtonDisabled = true; // 弹出小狐狸期间禁止点击
-        try {
-            var txHash = await _web3Service.BurnOptions(tokenId, nftContractAddress);
-            Logger.LogInformation($"burn finished, tx: {txHash}");
-            toastService.ShowToast($"Token {tokenId} {Loc["BurnSuccess_Stmt"]}", ToastLevel.Success);
-            UserTokens.Remove(UserTokens.First(item => item.TokenId == tokenId));
-        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
-            Logger.LogInformation("burn failed");
-            Logger.LogError($"{e.ToString()}, {e.Message}");
-            if (e.Message.Contains("User denied transaction signature"))
-            {
-                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
-            }
-        } finally {
-            BurnButtonDisabled = false;
+            DrawButtonDisabled = false;
         }
     }
 }

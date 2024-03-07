@@ -154,6 +154,9 @@
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>Exercise</value>
   </data>
+  <data name="Draw_Stmt" xml:space="preserve">
+    <value>Draw</value>
+  </data>
   <data name="Burn_Stmt" xml:space="preserve">
     <value>Burn</value>
   </data>
@@ -163,14 +166,20 @@
   <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
     <value>after approve still insufficient balance to exercise</value>
   </data>
-  <data name="My Tokens" xml:space="preserve">
-    <value>My Tokens</value>
+  <data name="My Options NFT" xml:space="preserve">
+    <value>My Options NFT</value>
+  </data>
+  <data name="My Lottery NFT" xml:space="preserve">
+    <value>My Lottery NFT</value>
   </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>exercised successfully</value>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>burned successfully</value>
+  </data>
+  <data name="DrawSuccess_Stmt" xml:space="preserve">
+    <value>drawed successfully</value>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>Deswap is the first Options as NFT decenterlized trading platform</value>
@@ -201,5 +210,8 @@
   </data>
   <data name="MintAmount" xml:space="preserve">
     <value>How many tokens to mint</value>
+  </data>
+  <data name="Lottery" xml:space="preserve">
+    <value>Lottery</value>
   </data>
 </root>

@@ -106,6 +106,47 @@ public static class TokenPairs
     }
 }
 
+public static class LotteryContracts
+{
+    public static readonly IList<LotteryContract> Inner = [
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x062056aC6249DE97483Eb0800fc8a28E977c3754",
+            Network = SupportedNetworks.GetNetwork(11155111)!,
+        },
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x062056aC6249DE97483Eb0800fc8a28E977c3754",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+        }
+    ];
+}
+
+public class LotteryContract
+{
+    public required string BaseAssetName { get; set; }
+
+    public required string BaseAssetAddress { get; set; }
+
+    public required int BaseAssetDecimals { get; set; }
+
+    public required string NftAddress { get; set; }
+
+    public required Network Network { get; set; }
+
+    public string Name => "Lottery NFT " + BaseAssetName;
+
+    // Like: https://sepolia.etherscan.io/token/0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9?a=0x7e727520B29773e7F23a8665649197aAf064CeF1
+    public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
+    {
+        return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
+    }
+}
+
 public class Network
 {
     public required string Name { get; set; }

@@ -5,10 +5,12 @@ namespace DeswapApp;
 
 public interface INftFetcher
 {
-    Task<IList<UserToken>> GetUserOptionTokens(string userAddress, long chainId);
+    Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId);
+
+    Task<IList<UserLotteryNFT>> GetUserLotteryTokens(string userAddress, long chainId);
 }
 
-public class UserToken
+public class UserOptionNFT
 {
     public long TokenId { get; set; }
 
@@ -22,11 +24,11 @@ public class UserToken
 
     public OptionsKind OptionsKind { get; set; }
 
-    public Decimal BaseAssetAmount { get; set; }
+    public decimal BaseAssetAmount { get; set; }
 
-    public Decimal QuoteAssetAmount { get; set; }
+    public decimal QuoteAssetAmount { get; set; }
 
-    public Decimal Price { get; set; }
+    public decimal Price { get; set; }
 
     public bool Listable()
     {
@@ -76,5 +78,40 @@ public class UserToken
             return (tokenPair.BaseAssetAddress, Web3.Convert.ToWei(BaseAssetAmount, tokenPair.BaseAssetDecimals));
         }
         throw new Exception("invalid token");
+    }
+}
+
+public class UserLotteryNFT
+{
+    public long TokenId { get; set; }
+
+    public long ChainId { get; set; }
+
+    public required string Contract { get; set; }
+
+    public required string Status { get; set; }
+
+    public required string ImageData { get; set; }
+
+    public DateTimeOffset DrawTime { get; set; }
+
+    public decimal BaseAssetAmount { get; set; }
+
+    public bool Listable()
+    {
+        if (Status == "open")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool Drawable()
+    {
+        if (DateTime.Now > DrawTime)
+        {
+            return true;
+        }
+        return false;
     }
 }

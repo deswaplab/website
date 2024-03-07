@@ -154,6 +154,9 @@
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>行权</value>
   </data>
+  <data name="Draw_Stmt" xml:space="preserve">
+    <value>开奖</value>
+  </data>
   <data name="Burn_Stmt" xml:space="preserve">
     <value>销毁</value>
   </data>
@@ -163,14 +166,20 @@
   <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
     <value>授权后余额仍旧不足，无法行权</value>
   </data>
-  <data name="My Tokens" xml:space="preserve">
-    <value>我的代币</value>
+  <data name="My Options NFT" xml:space="preserve">
+    <value>我的期权NFT</value>
+  </data>
+  <data name="My Lottery NFT" xml:space="preserve">
+    <value>我的彩票NFT</value>
   </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>成功行权</value>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>成功销毁</value>
+  </data>
+  <data name="DrawSuccess_Stmt" xml:space="preserve">
+    <value>开奖成功</value>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>Deswap是第一个去中心化的期权即NFT交易平台</value>
@@ -201,5 +210,8 @@
   </data>
   <data name="MintAmount" xml:space="preserve">
     <value>代币数量</value>
+  </data>
+  <data name="Lottery" xml:space="preserve">
+    <value>彩票</value>
   </data>
 </root>
