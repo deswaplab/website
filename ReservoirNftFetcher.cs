@@ -203,4 +203,12 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
         await Task.CompletedTask;
         return [];
     }
+
+    // fetch user redEnvelope nfts
+    public async Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId)
+    {
+        // TODO: finish me later
+        await Task.CompletedTask;
+        return [];
+    }
 }

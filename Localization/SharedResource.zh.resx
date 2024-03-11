@@ -151,6 +151,9 @@
   <data name="List_Stmt" xml:space="preserve">
     <value>挂单</value>
   </data>
+  <data name="Open_Stmt" xml:space="preserve">
+    <value>拆开</value>
+  </data>
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>行权</value>
   </data>
@@ -172,14 +175,17 @@
   <data name="My Lottery NFT" xml:space="preserve">
     <value>我的彩票NFT</value>
   </data>
+  <data name="My RedEnvelope NFT" xml:space="preserve">
+    <value>我的红包NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>成功行权</value>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>成功销毁</value>
   </data>
-  <data name="DrawSuccess_Stmt" xml:space="preserve">
-    <value>开奖成功</value>
+  <data name="MintSuccess_Stmt" xml:space="preserve">
+    <value>铸造成功</value>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>Deswap是第一个去中心化的期权即NFT交易平台</value>
@@ -209,9 +215,15 @@
     <value>为我推荐一个价格</value>
   </data>
   <data name="MintAmount" xml:space="preserve">
-    <value>代币数量</value>
+    <value>份数</value>
   </data>
   <data name="Lottery" xml:space="preserve">
     <value>彩票</value>
+  </data>
+  <data name="RedEnvelope" xml:space="preserve">
+    <value>红包</value>
+  </data>
+  <data name="RedEnvelope Kind" xml:space="preserve">
+    <value>红包类型</value>
   </data>
 </root>

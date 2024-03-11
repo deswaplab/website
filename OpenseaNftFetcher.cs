@@ -272,4 +272,28 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             .ToList();
         return tokens;
     }
+
+    // fetch user red envelope nfts
+    public async Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId)
+    {
+        var curTokens = await FetchAllUserTokens(userAddress, chainId);
+        var supportedContracts = RedEnvelopeContracts.Inner
+            .Where(p => p.Network.ChainId == chainId)
+            .Select(p => p.NftAddress.ToLower())
+            .ToList();
+        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
+            .Select(item => {
+                return new UserRedEnvelopeNFT
+                {
+                    TokenId = long.Parse(item.Identifier),
+                    ChainId = chainId,
+                    Contract = item.Contract!,
+                    Status = ParseString(item.MetadataUrl, "status"), // open|close
+                    ImageData = ParseImageSvg(item.MetadataUrl),
+                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                };
+            })
+            .ToList();
+        return tokens;
+    }
 }

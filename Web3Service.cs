@@ -79,6 +79,13 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 ]
 """;
 
+    private readonly string RedEnvelopeABI = """
+[
+    {"type":"function","name":"mint","inputs":[{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"kind","type":"uint8","internalType":"enum RedEnvelopeNFT.RedEnvelopeKind"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"open","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"}
+]
+""";
+
     private readonly MetamaskHostProvider _metamaskHostProvider = metamaskHostProvider;
 
     private readonly ILogger<Web3Service> _logger = logger;
@@ -265,4 +272,57 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         );
         return receipt.TransactionHash.ToString();
     }
+
+    // mint a red envelope
+    public async Task<string> MintRedEnvelope(BigInteger baseAssetAmount, int amount, RedEnvelopeKind kind, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RedEnvelopeABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
+            baseAssetAmount, 
+            amount,
+            kind
+        );
+        _logger.LogInformation("Mint RedEnvelope, gas={}, value={}", gas, value);
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            value,
+            CancellationToken.None,
+            baseAssetAmount, 
+            amount,
+            kind
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> OpenRedEnvelope(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RedEnvelopeABI, nftAddress);
+        var callsFunction = contract.GetFunction("open");
+        var gas = await callsFunction.EstimateGasAsync(
+            tokenId
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            tokenId
+        );
+        return receipt.TransactionHash.ToString();
+    }
+}
+
+public enum RedEnvelopeKind
+{
+    Fixed = 0,
+    Random = 1,
 }

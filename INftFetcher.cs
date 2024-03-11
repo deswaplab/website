@@ -8,6 +8,9 @@ public interface INftFetcher
     Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId);
 
     Task<IList<UserLotteryNFT>> GetUserLotteryTokens(string userAddress, long chainId);
+
+    Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId);
+
 }
 
 public class UserOptionNFT
@@ -114,4 +117,19 @@ public class UserLotteryNFT
         }
         return false;
     }
+}
+
+public class UserRedEnvelopeNFT
+{
+    public long TokenId { get; set; }
+
+    public long ChainId { get; set; }
+
+    public required string Contract { get; set; }
+
+    public required string Status { get; set; }
+
+    public required string ImageData { get; set; }
+
+    public decimal BaseAssetAmount { get; set; }
 }

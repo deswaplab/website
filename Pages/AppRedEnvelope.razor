@@ -10,7 +10,7 @@
 @using DeswapApp.Pages
 @using DeswapApp.Localization
 
-@page "/app/lottery"
+@page "/app/redenvelope"
 
 @layout AppLayout
 @inject ILogger<AppLottery> Logger
@@ -21,7 +21,7 @@
 @inject Web3Service _web3Service
 @inject IStringLocalizer<SharedResource> Loc
 @inject PriceService _priceService
-<PageTitle>@Loc["Lottery"]</PageTitle>
+<PageTitle>@Loc["RedEnvelope"]</PageTitle>
 
 <section class="bg-gray-50 dark:bg-gray-900">
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -31,14 +31,12 @@
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                @Loc["Lottery"]
+                                @Loc["RedEnvelope"]
                             </h1>
                             <form class="space-y-4 md:space-y-6">
                                 <div>
-                                    <label for="lotteryContracts"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
-                                    <select id="lotteryContracts"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         @bind:get="SelectedLotteryContractName"
                                         @bind:event="onchange"
                                         @bind:set="ChangeSelectedLotteryContractName"
@@ -50,22 +48,14 @@
                                         }
                                     </select>
                                 </div>
-                                <div>
-                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
-                                    <input id="maturityDate" type="date" 
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                        placeholder="Select date"
-                                        @bind-value:get="MaturityDate"
-                                        @bind-value:set="ChangeMaturityDate"
-                                        @bind-value:format="yyyy-MM-dd"
-                                    >
-                                </div>
 
                                 <div>
                                     <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                        <span>
-                                            <b>WETH</b>
-                                        </span>
+                                        @if (SelectedLotteryContract is not null) {
+                                            <span>@SelectedLotteryContract.BaseAssetName</span>
+                                        } else {
+                                            <span>Asset</span>
+                                        }
                                         <span>
                                             @if(UserBaseAssetBalance is not null) {
                                                 <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedLotteryContract!.GetEtherScanTokenBalanceUrl(@SelectedLotteryContract.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
@@ -86,12 +76,21 @@
 
                                 <div>
                                     <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MintAmount"]</label>
+                                    <input type="number" name="amount"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        required @bind-value="InputedAmount"
+                                        min="1" max="1000" step="1"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="kind" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["RedEnvelope Kind"]</label>
                                     <div class="flex">
-                                        @foreach(var item in AllAmounts)
+                                        @foreach(var item in AllKinds)
                                         {
                                             <div class="flex items-center me-4">
-                                                <input type="radio" @onchange="@(() => SelectedAmount = item)" checked="@(item.Equals(SelectedAmount))" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">@item x</label>
+                                                <input type="radio" @onchange="@(() => SelectedKind = item)" checked="@(item.Equals(SelectedKind))" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">@item</label>
                                             </div>
                                         }
                                     </div>
@@ -145,13 +144,13 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    public IList<LotteryContract> AllLotteryContracts => LotteryContracts.Inner
+    public IList<RedEnvelopeContract> AllLotteryContracts => RedEnvelopeContracts.Inner
         .Where(p => p.Network.ChainId == _metamaskHostProvider.SelectedNetworkChainId)
         .ToList();
 
     public IList<int> AllAmounts = [100, 1000];
 
-    public int SelectedAmount = 100;
+    public int InputedAmount = 100;
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -174,7 +173,7 @@
         ResetSteps();
     }
 
-    public LotteryContract? SelectedLotteryContract {get; set;} = null;
+    public RedEnvelopeContract? SelectedLotteryContract {get; set;} = null;
 
     public string SelectedLotteryContractName {get; set;} = "";
 
@@ -190,8 +189,11 @@
 
     public decimal? UserBaseAssetBalance {get; set;}
 
+    public bool IsFormValid => SelectedLotteryContract is not null && InputedBaseAssetAmount > 0 && InputedAmount >= 1;
 
-    public bool IsFormValid => SelectedLotteryContract is not null && InputedBaseAssetAmount > 0 && IsMaturityDateValid && SelectedAmount >= 1;
+    public IList<RedEnvelopeKind> AllKinds = [RedEnvelopeKind.Fixed, RedEnvelopeKind.Random];
+
+    public RedEnvelopeKind SelectedKind = RedEnvelopeKind.Fixed;
 
     public MintProgressButton.Progress[] Steps = [
         MintProgressButton.Progress.NotStarted,
@@ -225,24 +227,16 @@
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
-        // TODO: 
-        Logger.LogInformation($"check allowance, {MaturityDate}, {InputedBaseAssetAmount}, {SelectedLotteryContract!.NftAddress}");
         if (!isSupportedNetwork())
         {
             toastService.ShowToast(@Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
-            return;
-        }
-        if (!IsMaturityDateValid)
-        {
-            var minDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-            toastService.ShowToast($"{Loc["MaturityTooEarly_Stmt"]} {minDate}", ToastLevel.Error);
             return;
         }
         Steps[0] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
 
         if (InputedBaseAssetAmount <= UserBaseAssetBalance)
         {
-            Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedLotteryContract.NftAddress}, {SelectedLotteryContract.BaseAssetAddress}");
+            Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedLotteryContract!.NftAddress}, {SelectedLotteryContract.BaseAssetAddress}");
             var baseAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedLotteryContract.NftAddress, SelectedLotteryContract.BaseAssetAddress);
             var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedLotteryContract.BaseAssetDecimals);
             Logger.LogInformation($"weth allowance={baseAssetAllowance}");
@@ -263,7 +257,6 @@
 
     private async Task Approve()
     {
-        // TODO: 
         Logger.LogInformation("Approve");   
         if (!isSupportedNetwork())
         {
@@ -313,10 +306,10 @@
         }
         Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var txHash = await _web3Service.MintLottery(
+            var txHash = await _web3Service.MintRedEnvelope(
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedLotteryContract!.BaseAssetDecimals), 
-                new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
-                SelectedAmount,
+                InputedAmount,
+                SelectedKind,
                 SelectedLotteryContract!.NftAddress
             );
 
@@ -331,15 +324,5 @@
             }
             Steps[2] = MintProgressButton.Progress.ToStart;
         }
-    }
-
-    public DateOnly MaturityDate {get; set;} = DateOnly.FromDateTime(DateTime.Now).AddDays(3);
-
-    public bool IsMaturityDateValid => MaturityDate >= DateOnly.FromDateTime(DateTime.Now.AddDays(1));
-
-    private void ChangeMaturityDate(DateOnly value)
-    {
-        MaturityDate = value;
-        ResetSteps();
     }
 }

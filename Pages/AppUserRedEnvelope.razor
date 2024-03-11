@@ -6,17 +6,17 @@
 @using DeswapApp.Localization
 
 @inject HttpClient Http
-@inject ILogger<AppUserLottery> Logger
+@inject ILogger<AppUserRedEnvelope> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
 @inject INftFetcher _nftFetcher
 @inject IStringLocalizer<SharedResource> Loc
 
-@page "/app/user/lottery"
+@page "/app/user/redenvelope"
 @layout AppLayout
 
-<PageTitle>@Loc["My Lottery NFT"]</PageTitle>
+<PageTitle>@Loc["My RedEnvelope NFT"]</PageTitle>
 
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
@@ -44,21 +44,15 @@
                                     <img class="rounded-t-lg" src="@token.ImageData" alt="" />
                                 </a>
                                 <div class="flex flex-row items-center gap-2 p-5">
-                                    @if (token.Listable())
-                                    {
-                                        <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                            @Loc["List_Stmt"]
-                                        </a>
-                                    }
-                                    @if (token.Drawable())
-                                    {
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @DrawButtonDisabledClass"
-                                            @onclick="async () => await HandleDraw(token)"
-                                            disabled=@DrawButtonDisabled
-                                        >
-                                            @Loc["Draw_Stmt"]
-                                        </button>
-                                    }
+                                    <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                        @Loc["List_Stmt"]
+                                    </a>
+                                    <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @OpenButtonDisabledClass"
+                                        @onclick="async () => await HandleOpen(token)"
+                                        disabled=@OpenButtonDisabled
+                                    >
+                                        @Loc["Open_Stmt"]
+                                    </button>
                                 </div>
                             </div>
                         }
@@ -95,7 +89,7 @@
         return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}";
     }
 
-    private IList<UserLotteryNFT> UserTokens {get; set;} = [];
+    private IList<UserRedEnvelopeNFT> UserTokens {get; set;} = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -131,7 +125,7 @@
     {
         Logger.LogInformation($"fetch tokens, chainId={_metamaskHostProvider.SelectedNetworkChainId}");
         loadingTokens = true;
-        UserTokens = await _nftFetcher.GetUserLotteryTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
+        UserTokens = await _nftFetcher.GetUserRedEnvelopeTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
         Logger.LogInformation($"fetch tokens done, chainId={_metamaskHostProvider.SelectedNetworkChainId}, tokenCount={UserTokens.Count}");
         loadingTokens = false; // 网络请求结束
     }
@@ -142,16 +136,15 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    private bool DrawButtonDisabled = false;
+    private bool OpenButtonDisabled = false;
 
-    private string DrawButtonDisabledClass => DrawButtonDisabled ? "cursor-not-allowed" : "";
+    private string OpenButtonDisabledClass => OpenButtonDisabled ? "cursor-not-allowed" : "";
 
-    private async Task HandleDraw(UserLotteryNFT token)
+    private async Task HandleOpen(UserRedEnvelopeNFT token)
     {
-        Logger.LogInformation($"start handle draw, ${token.TokenId}");
-        DrawButtonDisabled = true;
+        OpenButtonDisabled = true;
         try {
-            var txHash = await _web3Service.DrawLottery(token.TokenId, token.Contract);
+            var txHash = await _web3Service.OpenRedEnvelope(token.TokenId, token.Contract);
             toastService.ShowToast($"Token: {token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
             // 从 Tokens 删除当前行权的token，以实现页面刷新
             UserTokens.Remove(UserTokens.First(item => item.TokenId == token.TokenId));
@@ -161,7 +154,7 @@
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
         } finally {
-            DrawButtonDisabled = false;
+            OpenButtonDisabled = false;
         }
     }
 }

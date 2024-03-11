@@ -151,6 +151,9 @@
   <data name="List_Stmt" xml:space="preserve">
     <value>List</value>
   </data>
+  <data name="Open_Stmt" xml:space="preserve">
+    <value>Open</value>
+  </data>
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>Exercise</value>
   </data>
@@ -172,14 +175,17 @@
   <data name="My Lottery NFT" xml:space="preserve">
     <value>My Lottery NFT</value>
   </data>
+  <data name="My RedEnvelope NFT" xml:space="preserve">
+    <value>My RedEnvelope NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>exercised successfully</value>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>burned successfully</value>
   </data>
-  <data name="DrawSuccess_Stmt" xml:space="preserve">
-    <value>drawed successfully</value>
+  <data name="MintSuccess_Stmt" xml:space="preserve">
+    <value>mint successfully</value>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>Deswap is the first Options as NFT decenterlized trading platform</value>
@@ -209,9 +215,15 @@
     <value>Recommend a price for me</value>
   </data>
   <data name="MintAmount" xml:space="preserve">
-    <value>How many tokens to mint</value>
+    <value>Shares to mint</value>
   </data>
   <data name="Lottery" xml:space="preserve">
     <value>Lottery</value>
+  </data>
+  <data name="RedEnvelope" xml:space="preserve">
+    <value>RedEnvelope</value>
+  </data>
+  <data name="RedEnvelope Kind" xml:space="preserve">
+    <value>RedEnvelope Kind</value>
   </data>
 </root>
