@@ -86,6 +86,14 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 ]
 """;
 
+    private readonly string RouletteABI = """
+[
+    {"type":"function","name":"bet","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"mint","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"openTime","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"open","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"nonpayable"}
+]
+""";
+
     private readonly MetamaskHostProvider _metamaskHostProvider = metamaskHostProvider;
 
     private readonly ILogger<Web3Service> _logger = logger;
@@ -317,6 +325,79 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             CancellationToken.None,
             tokenId
         );
+        return receipt.TransactionHash.ToString();
+    }
+
+    // roulette
+    public async Task<string> MintRoulette(int amount, long openTime, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
+            amount,
+            openTime
+        );
+        _logger.LogInformation("Mint Roulette, gas={}, value={}", gas, value);
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            value,
+            CancellationToken.None,
+            amount,
+            openTime
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> BetRoulette(BigInteger baseAssetAmount, long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
+        var callsFunction = contract.GetFunction("bet");
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            tokenId,
+            baseAssetAmount
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            tokenId,
+            baseAssetAmount
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> OpenRoulette(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
+        var callsFunction = contract.GetFunction("open");
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            tokenId
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            CancellationToken.None,
+            tokenId
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
         return receipt.TransactionHash.ToString();
     }
 }

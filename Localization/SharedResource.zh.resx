@@ -178,6 +178,9 @@
   <data name="My RedEnvelope NFT" xml:space="preserve">
     <value>我的红包NFT</value>
   </data>
+  <data name="My Roulette NFT" xml:space="preserve">
+    <value>我的轮盘NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>成功行权</value>
   </data>
@@ -225,5 +228,14 @@
   </data>
   <data name="RedEnvelope Kind" xml:space="preserve">
     <value>红包类型</value>
+  </data>
+  <data name="Bet_Stmt" xml:space="preserve">
+    <value>下注</value>
+  </data>
+  <data name="Roulette" xml:space="preserve">
+    <value>轮盘</value>
+  </data>
+  <data name="TxSuccess_Stmt" xml:space="preserve">
+    <value>交易成功</value>
   </data>
 </root>

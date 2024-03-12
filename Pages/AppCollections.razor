@@ -62,6 +62,42 @@
                 </td>
             </tr>
             }
+
+            @foreach(var collection in redEnvelopeCollections)
+            {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                </th>
+                <td class="px-6 py-4">
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                </td>
+                <td class="px-6 py-4">
+                    @Loc["RedEnvelope"]
+                </td>
+                <td class="px-6 py-4">
+                    @collection.Network.Name
+                </td>
+            </tr>
+            }
+
+            @foreach(var collection in rouletteContracts)
+            {
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                </th>
+                <td class="px-6 py-4">
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                </td>
+                <td class="px-6 py-4">
+                    @Loc["Roulette"]
+                </td>
+                <td class="px-6 py-4">
+                    @collection.Network.Name
+                </td>
+            </tr>
+            }
         </tbody>
     </table>
 </div>
@@ -71,4 +107,8 @@
     public IList<TokenPair> collections {get; set;} = TokenPairs.Inner;
 
     public IList<LotteryContract> lotteryCollections {get; set;} = LotteryContracts.Inner;
+
+    public IList<RedEnvelopeContract> redEnvelopeCollections {get; set;} = RedEnvelopeContracts.Inner;
+
+    public IList<RouletteContract> rouletteContracts {get; set;} = RouletteContracts.Inner;
 }

@@ -7,6 +7,13 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 {
     private readonly HttpClient _httpClient = httpClient;
 
+    public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
+    {
+        // TODO: do api call
+        await Task.CompletedTask;
+    }
+
+
     public async Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId)
     {
         var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
@@ -206,6 +213,13 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     // fetch user redEnvelope nfts
     public async Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId)
+    {
+        // TODO: finish me later
+        await Task.CompletedTask;
+        return [];
+    }
+
+    public async Task<IList<UserRouletteNFT>> GetUserRouletteTokens(string userAddress, long chainId)
     {
         // TODO: finish me later
         await Task.CompletedTask;

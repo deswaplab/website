@@ -11,6 +11,19 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
 
     private readonly ILogger<OpenseaNftFetcher> _logger = logger;
 
+    // Doc: https://docs.opensea.io/reference/refresh_nft
+    public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
+    {
+        // https://api.opensea.io/api/v2/chain/sepolia/contract/address/nfts/0/refresh
+        var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        string url = $"{curNetwork.OpenseaApiHost}/contract/{contractAddress}/nfts/{tokenId}/refresh";
+        if (!_httpClient.DefaultRequestHeaders.Contains("x-api-key"))
+        {
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", "25ad74a6d36042cfa5bb92c9980f9519");
+        }
+        await _httpClient.PostAsync(url, null);
+    }
+
     public async Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId)
     {
         var curTokens = await FetchAllUserTokens(userAddress, chainId);
@@ -291,6 +304,31 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     Status = ParseString(item.MetadataUrl, "status"), // open|close
                     ImageData = ParseImageSvg(item.MetadataUrl),
                     BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                };
+            })
+            .ToList();
+        return tokens;
+    }
+
+    // fetch user roulette
+    public async Task<IList<UserRouletteNFT>> GetUserRouletteTokens(string userAddress, long chainId)
+    {
+        var curTokens = await FetchAllUserTokens(userAddress, chainId);
+        var supportedContracts = RouletteContracts.Inner
+            .Where(p => p.Network.ChainId == chainId)
+            .Select(p => p.NftAddress.ToLower())
+            .ToList();
+        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
+            .Select(item => {
+                return new UserRouletteNFT
+                {
+                    TokenId = long.Parse(item.Identifier),
+                    ChainId = chainId,
+                    Contract = item.Contract!,
+                    ImageData = ParseImageSvg(item.MetadataUrl),
+                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                    OpenTime = ParseMaturityDate(item.MetadataUrl, "openTime"),
+                    Writer = ParseString(item.MetadataUrl, "writer"),
                 };
             })
             .ToList();

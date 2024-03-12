@@ -178,6 +178,9 @@
   <data name="My RedEnvelope NFT" xml:space="preserve">
     <value>My RedEnvelope NFT</value>
   </data>
+  <data name="My Roulette NFT" xml:space="preserve">
+    <value>My Roulette NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>exercised successfully</value>
   </data>
@@ -225,5 +228,14 @@
   </data>
   <data name="RedEnvelope Kind" xml:space="preserve">
     <value>RedEnvelope Kind</value>
+  </data>
+  <data name="Bet_Stmt" xml:space="preserve">
+    <value>Bet</value>
+  </data>
+  <data name="Roulette" xml:space="preserve">
+    <value>Roulette</value>
+  </data>
+  <data name="TxSuccess_Stmt" xml:space="preserve">
+    <value>Tx Success</value>
   </data>
 </root>
