@@ -1,4 +1,4 @@
-namespace DeswapApp.Localization;
+namespace DeswapApp;
 
 public class SharedResource
 {

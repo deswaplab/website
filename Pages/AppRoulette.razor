@@ -1,15 +1,3 @@
-@using Nethereum.Web3
-@using Nethereum.Contracts.CQS
-@using Nethereum.Util
-@using Nethereum.Web3.Accounts
-@using Nethereum.Hex.HexConvertors.Extensions
-@using Nethereum.Contracts
-@using Nethereum.Contracts.Extensions
-@using System.Numerics
-@using System.Security.Claims
-@using DeswapApp.Pages
-@using DeswapApp.Localization
-
 @page "/app/roulette"
 
 @layout AppLayout
@@ -37,12 +25,12 @@
                                 <div>
                                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
                                     <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        @bind:get="SelectedLotteryContractName"
+                                        @bind:get="SelectedContractName"
                                         @bind:event="onchange"
-                                        @bind:set="ChangeSelectedLotteryContractName"
+                                        @bind:set="ChangeSelectedContractName"
                                         >
                                         <option></option>
-                                        @foreach(var contract in AllLotteryContracts)
+                                        @foreach(var contract in AllContracts)
                                         {
                                             <option value="@contract.Name">@contract.Name</option>
                                         }
@@ -87,7 +75,6 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
-        // 通知到这个组件更新状态
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -102,28 +89,28 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    public IList<RouletteContract> AllLotteryContracts => RouletteContracts.Inner
+    public IList<RouletteContract> AllContracts => RouletteContracts.Inner
         .Where(p => p.Network.ChainId == _metamaskHostProvider.SelectedNetworkChainId)
         .ToList();
 
-    public RouletteContract? SelectedLotteryContract {get; set;} = null;
+    public RouletteContract? SelectedContract {get; set;} = null;
 
-    public string SelectedLotteryContractName {get; set;} = "";
+    public string SelectedContractName {get; set;} = "";
 
-    public async Task ChangeSelectedLotteryContractName(string value)
+    public async Task ChangeSelectedContractName(string value)
     {
-        SelectedLotteryContractName = value;
-        SelectedLotteryContract = AllLotteryContracts.Where(p => p.Name == value).First();
+        SelectedContractName = value;
+        SelectedContract = AllContracts.Where(p => p.Name == value).First();
 
-        var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedLotteryContract.BaseAssetAddress);
-        UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedLotteryContract.BaseAssetDecimals);
+        var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.BaseAssetAddress);
+        UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedContract.BaseAssetDecimals);
         Logger.LogInformation($"get balance: {UserBaseAssetBalance}");
         ResetSteps();
     }
 
     public decimal? UserBaseAssetBalance {get; set;}
 
-    public bool IsFormValid => SelectedLotteryContract is not null;
+    public bool IsFormValid => SelectedContract is not null;
 
     public DateOnly MaturityDate {get; set;} = DateOnly.FromDateTime(DateTime.Now).AddMonths(3);
 
@@ -173,7 +160,7 @@
             var txHash = await _web3Service.MintRoulette(
                 1000,
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
-                SelectedLotteryContract!.NftAddress
+                SelectedContract!.NftAddress
             );
             Steps[0] = MintProgressButton.Progress.Finished;
 

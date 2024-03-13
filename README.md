@@ -25,3 +25,6 @@ dotnet watch
 - [ ] 重新规划产品组织，加上新的合约介绍
 - [ ] options回归erc721
 - [ ] 手动触发metadata更新
+- [ ] 公共代码抽象
+- [ ] gitbook 文档
+- [ ] 不要在每个页面都监听metamask的事件，统一操作

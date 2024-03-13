@@ -21,7 +21,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
         {
             throw new Exception($"reservoir doesnt support chain {chainId}");
         }
-        var supportedTokenPairs = TokenPairs.FilterByChainId(chainId);
+        var supportedTokenPairs = OptionsContracts.FilterByChainId(chainId);
         if (supportedTokenPairs.Count == 0)
         {
             throw new Exception($"no supported token pairs for chain {chainId}");
@@ -57,7 +57,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
             }
         }
 
-        var supportedContracts = TokenPairs.FilterSupportedContracts(chainId);
+        var supportedContracts = OptionsContracts.FilterSupportedContracts(chainId);
         var tokens = curTokens
             .Where(item => item.Token is not null && item.Token.Contract is not null)
             .Where(item => supportedContracts.Contains(item.Token!.Contract!.ToLower()))

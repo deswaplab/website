@@ -1,7 +1,7 @@
+namespace DeswapApp;
+
 using System.Numerics;
 using Nethereum.Web3;
-
-namespace DeswapApp;
 
 public interface INftFetcher
 {
@@ -72,7 +72,7 @@ public class UserOptionNFT
 
     public (string, BigInteger) GetPayAsset()
     {
-        var tokenPair = TokenPairs.FilterByChainId(ChainId)
+        var tokenPair = OptionsContracts.FilterByChainId(ChainId)
             .Where(item => item.NftAddress.Equals(Contract, StringComparison.CurrentCultureIgnoreCase))
             .First();
         if (OptionsKind == OptionsKind.CALL)

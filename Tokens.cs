@@ -1,6 +1,6 @@
 namespace DeswapApp;
 
-public class TokenPair
+public class OptionsContract
 {
     public required string BaseAssetName { get; set; }
 
@@ -34,11 +34,11 @@ public class TokenPair
     public string Name => BaseAssetName + "/" + QuoteAssetName;
 }
 
-public static class TokenPairs
+public static class OptionsContracts
 {
-    public static readonly IList<TokenPair> Inner = [
+    public static readonly IList<OptionsContract> Inner = [
         // WETH/TUSDC Call
-        new TokenPair{
+        new OptionsContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
@@ -51,7 +51,7 @@ public static class TokenPairs
             OptionsKind = OptionsKind.CALL,
         },
         // WETH/TUSDC Put
-        new TokenPair{
+        new OptionsContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
@@ -64,7 +64,7 @@ public static class TokenPairs
             OptionsKind = OptionsKind.PUT
         },
         // mumbai WETH/TUSDC Call
-        new TokenPair{
+        new OptionsContract{
             BaseAssetName = "WMATIC",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
@@ -77,7 +77,7 @@ public static class TokenPairs
             OptionsKind = OptionsKind.CALL
         },
         // mumbai WETH/TUSDC Put
-        new TokenPair{
+        new OptionsContract{
             BaseAssetName = "WMATIC",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
@@ -91,7 +91,7 @@ public static class TokenPairs
         },
     ];
 
-    public static IList<TokenPair> FilterByChainId(long chainId)
+    public static IList<OptionsContract> FilterByChainId(long chainId)
     {
         return Inner.Where(item => item.Network.ChainId == chainId).ToList();
     }

@@ -1,5 +1,3 @@
-@using DeswapApp.Localization
-
 @inject IStringLocalizer<SharedResource> Loc
 
 @page "/app/collections"
@@ -28,7 +26,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach(var collection in collections)
+            @foreach(var collection in optionsCollections)
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -81,7 +79,7 @@
             </tr>
             }
 
-            @foreach(var collection in rouletteContracts)
+            @foreach(var collection in rouletteCollections)
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -104,11 +102,11 @@
 </section>
 
 @code {
-    public IList<TokenPair> collections {get; set;} = TokenPairs.Inner;
+    public IList<OptionsContract> optionsCollections {get; set;} = OptionsContracts.Inner;
 
     public IList<LotteryContract> lotteryCollections {get; set;} = LotteryContracts.Inner;
 
     public IList<RedEnvelopeContract> redEnvelopeCollections {get; set;} = RedEnvelopeContracts.Inner;
 
-    public IList<RouletteContract> rouletteContracts {get; set;} = RouletteContracts.Inner;
+    public IList<RouletteContract> rouletteCollections {get; set;} = RouletteContracts.Inner;
 }

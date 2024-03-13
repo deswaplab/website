@@ -28,7 +28,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
     {
         var curTokens = await FetchAllUserTokens(userAddress, chainId);
 
-        var supportedContracts = TokenPairs.FilterSupportedContracts(chainId);
+        var supportedContracts = OptionsContracts.FilterSupportedContracts(chainId);
         var tokens = curTokens
             .Where(item => supportedContracts.Contains(item.Contract.ToLower()))
             .Select(item =>
