@@ -83,7 +83,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     private static DateTimeOffset ParseMaturityDate(IList<ReservoirTokenAttribute> tokenAttributes)
     {
-        foreach(var attr in tokenAttributes)
+        foreach (var attr in tokenAttributes)
         {
             if (attr.Key == "maturityDate" && attr.Value is not null)
             {
@@ -96,14 +96,15 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     private static OptionsKind ParseOptionsKind(IList<ReservoirTokenAttribute> tokenAttributes)
     {
-        foreach(var attr in tokenAttributes)
+        foreach (var attr in tokenAttributes)
         {
             if (attr.Key == "optionsKind" && attr.Value is not null)
             {
                 if (attr.Value == "call")
                 {
                     return OptionsKind.CALL;
-                } else if (attr.Value == "put")
+                }
+                else if (attr.Value == "put")
                 {
                     return OptionsKind.PUT;
                 }
@@ -114,7 +115,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     private static decimal ParseBaseAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
     {
-        foreach(var attr in tokenAttributes)
+        foreach (var attr in tokenAttributes)
         {
             if (attr.Key == "baseAssetAmount" && attr.Value is not null)
             {
@@ -126,7 +127,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     private static decimal ParseQuoteAssetAmount(IList<ReservoirTokenAttribute> tokenAttributes)
     {
-        foreach(var attr in tokenAttributes)
+        foreach (var attr in tokenAttributes)
         {
             if (attr.Key == "quoteAssetAmount" && attr.Value is not null)
             {
@@ -138,7 +139,7 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
 
     private static decimal ParsePrice(IList<ReservoirTokenAttribute> tokenAttributes)
     {
-        foreach(var attr in tokenAttributes)
+        foreach (var attr in tokenAttributes)
         {
             if (attr.Key == "price" && attr.Value is not null)
             {

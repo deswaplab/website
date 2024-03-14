@@ -40,13 +40,13 @@ public class ToastService : IDisposable
     private void SetCountdown()
     {
         if (Countdown != null) return;
-        
+
         Countdown = new Timer(5000);
         Countdown.Elapsed += HideToast;
         Countdown.AutoReset = false;
     }
 
-    private void HideToast(object? source, ElapsedEventArgs args) 
+    private void HideToast(object? source, ElapsedEventArgs args)
         => OnHide?.Invoke();
 
     public void Dispose()

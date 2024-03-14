@@ -190,6 +190,8 @@
     {
         IsShowModal = true;
         CurToken = token;
+        // TODO: fetchuser balance here.
+        // TODO: refresh metadata other where.
     }
 
     private void CloseModal()
@@ -249,6 +251,9 @@
                 token.Contract
             );
             toastService.ShowToast($"Token: {token.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
+
+            await Task.Delay(1000);
+            await _nftFetcher.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
@@ -256,8 +261,5 @@
             }
         }
         OpenButtonDisabled = false;
-
-        await Task.Delay(1000);
-        await _nftFetcher.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
     }
 }

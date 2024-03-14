@@ -1,12 +1,14 @@
 namespace DeswapApp;
 
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher> logger) : INftFetcher
 {
+    private readonly string _openseaApiKey = "25ad74a6d36042cfa5bb92c9980f9519";
+
     private readonly HttpClient _httpClient = httpClient;
 
     private readonly ILogger<OpenseaNftFetcher> _logger = logger;
@@ -19,7 +21,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         string url = $"{curNetwork.OpenseaApiHost}/contract/{contractAddress}/nfts/{tokenId}/refresh";
         if (!_httpClient.DefaultRequestHeaders.Contains("x-api-key"))
         {
-            _httpClient.DefaultRequestHeaders.Add("x-api-key", "25ad74a6d36042cfa5bb92c9980f9519");
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", _openseaApiKey);
         }
         await _httpClient.PostAsync(url, null);
     }
@@ -64,7 +66,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             {
                 url += $"&next={next}";
             }
-            _httpClient.DefaultRequestHeaders.Add("x-api-key", "25ad74a6d36042cfa5bb92c9980f9519");
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", _openseaApiKey);
             var tokensResponse = await _httpClient.GetFromJsonAsync<OpenseaTokensResponse>(url);
             curTokens = [.. curTokens, .. tokensResponse!.Nfts];
             if (tokensResponse.Next is not null)
@@ -77,6 +79,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                 break;
             }
         }
+        _logger.LogInformation("fetch user tokens, user: {}, chainId: {}, count: {}", userAddress, chainId, curTokens.Count);
         return curTokens;
     }
 
@@ -120,7 +123,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                 }
             }
         }
-        
+
         throw new Exception("can find maturity date");
     }
 
@@ -270,7 +273,8 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             .Select(p => p.NftAddress.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item => {
+            .Select(item =>
+            {
                 return new UserLotteryNFT
                 {
                     TokenId = long.Parse(item.Identifier),
@@ -295,7 +299,8 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             .Select(p => p.NftAddress.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item => {
+            .Select(item =>
+            {
                 return new UserRedEnvelopeNFT
                 {
                     TokenId = long.Parse(item.Identifier),
@@ -319,7 +324,8 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             .Select(p => p.NftAddress.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item => {
+            .Select(item =>
+            {
                 return new UserRouletteNFT
                 {
                     TokenId = long.Parse(item.Identifier),

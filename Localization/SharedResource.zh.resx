@@ -1,5 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -191,13 +250,10 @@
     <value>铸造成功</value>
   </data>
   <data name="Slogan" xml:space="preserve">
-    <value>Deswap 让Web3 更容易访问</value>
+    <value>Deswap 让Web3 更有趣</value>
   </data>
   <data name="SloganDetail" xml:space="preserve">
-    <value>Deswap 是一系列创新的NFT集合，在这里你可以像交易NFT一样交易期权，购买彩票，给朋友们发红包，我们没有复杂的玩法，希望这里是你迈向Web3世界的第一站</value>
-  </data>
-  <data name="Learn more" xml:space="preserve">
-    <value>了解更多</value>
+    <value>我们将一系列Web2资产如期权，彩票，红包等做成NFT，因为这些底层资产的价值，使得NFT也有了价值，用户以NFT的形式进行交易。</value>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
     <value>连接钱包</value>
@@ -210,9 +266,6 @@
   </data>
   <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
     <value>余额不足？去uniswap或者binance充值一点到钱包里</value>
-  </data>
-  <data name="LearnMoreLink" xml:space="preserve">
-    <value>https://medium.com/@xcaptain/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E5%BB%BAdeswap-8961a6d68bc9</value>
   </data>
   <data name="RecommendPrice_Stmt" xml:space="preserve">
     <value>为我推荐一个价格</value>
@@ -237,5 +290,17 @@
   </data>
   <data name="TxSuccess_Stmt" xml:space="preserve">
     <value>交易成功</value>
+  </data>
+  <data name="Lottery_Intro" xml:space="preserve">
+    <value>你存入一定资产就能获得一个彩票NFT，买家在NFT市场买到兑奖权后，就能在开奖日后进行开奖，最终有一个幸运儿能获得你存入的资产</value>
+  </data>
+  <data name="Options_Intro" xml:space="preserve">
+    <value>你即将要铸造一个期权NFT，此NFT的拥有者在到期日之前转入指定金额的行权资产就能获得你立约时转入的标的资产金额</value>
+  </data>
+  <data name="RedEnvelope_Intro" xml:space="preserve">
+    <value>你将传入一定的资产，得到一个红包NFT，随后你可以将此红包NFT的主页发到你的社区里，让成员们来试试手气，红包的规则是一个地址只能领取一次，因此如果同一个地址反复领取将会失败，opensea支持0售价挂单，快来试试吧</value>
+  </data>
+  <data name="Roulette_Intro" xml:space="preserve">
+    <value>你将发行你自己的轮盘NFT，拥有此NFT的地址就有了下注权，下注后消耗下注权，累积奖池，你开奖后，有一位幸运玩家能赢走奖池里的资金</value>
   </data>
 </root>

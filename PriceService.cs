@@ -63,7 +63,7 @@ public class PriceService(HttpClient httpClient, ILogger<PriceService> logger)
                 }
             }
         }
-        
+
         return SimplePrice(curPrice, kind);
     }
 
@@ -87,7 +87,7 @@ class OkxTickData
 class OkxTickResponse
 {
     [JsonPropertyName("data")]
-    public IList<OkxTickData> Data {get; set;} = [];
+    public IList<OkxTickData> Data { get; set; } = [];
 }
 
 // {
@@ -125,5 +125,5 @@ class OkxOptData
 class OkxOptResponse
 {
     [JsonPropertyName("data")]
-    public IList<OkxOptData> Data {get; set;} = [];
+    public IList<OkxOptData> Data { get; set; } = [];
 }

@@ -22,12 +22,13 @@
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                                 @Loc["Options"]
                             </h1>
+
+                            <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["Options_Intro"]</p>
+
                             <form class="space-y-4 md:space-y-6">
                                 <div>
-                                    <label for="optionsKind"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Options Kind"]</label>
-                                    <select id="optionsKind"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Options Kind"]</label>
+                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         @bind:get="SelectedOptionsKind"
                                         @bind:event="onchange"
                                         @bind:set="ChangeOptionsKind"
@@ -38,25 +39,23 @@
                                 </div>
 
                                 <div>
-                                    <label for="tokenPairs"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
-                                    <select id="tokenPair"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         @bind:get="SelectedContractName"
                                         @bind:event="onchange"
                                         @bind:set="ChangeSelectedContractName"
                                         >
                                         <option></option>
-                                        @foreach(var tokenPair in OptionsContracts.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId).Where(item => item.OptionsKind == SelectedOptionsKind))
+                                        @foreach(var tokenPair in OptionsContracts.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
                                         {
-                                            <option value="@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName">@tokenPair.BaseAssetName/@tokenPair.QuoteAssetName</option>
+                                            <option value="@tokenPair.Name">@tokenPair.Name</option>
                                         }
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
-                                    <input id="maturityDate" type="date" 
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
+                                    <input type="date" 
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                                         placeholder="Select date"
                                         @bind-value:get="MaturityDate"
@@ -66,7 +65,7 @@
                                 </div>
 
                                 <div>
-                                    <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
                                         <span>
                                             <b>@BaseAssetAction @BaseAssetName</b>
                                         </span>
@@ -75,9 +74,8 @@
                                                 <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedContract!.GetEtherScanTokenBalanceUrl(SelectedContract.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
                                             }
                                         </span>
-                                        
                                     </label>
-                                    <input type="number" name="baseAssetAmount" id="baseAssetAmount"
+                                    <input type="number"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         required @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
                                         min="0.001" max="10000000" step="0.001"
@@ -94,8 +92,7 @@
                                     }
                                 </div>
                                 <div>
-                                    <label for="quoteAsset"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
                                         <span>
                                             <b>@QuoteAssetAction @QuoteAssetName</b>
                                         </span>
@@ -106,7 +103,7 @@
                                         </span>
                                         
                                     </label>
-                                    <input type="number" name="quoteAsset" id="quoteAsset"
+                                    <input type="number"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         required @bind-value:get="InputedQuoteAssetAmount" @bind-value:set="SetInputedQuoteAssetAmount"
                                         min="1" max="10000000" step="1"
@@ -121,19 +118,6 @@
                                             <a @onclick="RecommendPrice" class="font-medium text-blue-600 hover:underline dark:text-blue-500">@Loc["RecommendPrice_Stmt"]</a>
                                         </p>
                                     }
-                                </div>
-
-                                <div>
-                                    <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MintAmount"]</label>
-                                    <div class="flex">
-                                        @foreach(var item in AllAmounts)
-                                        {
-                                            <div class="flex items-center me-4">
-                                                <input type="radio" @onchange="@(() => SelectedAmount = item)" checked="@(item.Equals(SelectedAmount))" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                                <label for="inline-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">@item x</label>
-                                            </div>
-                                        }
-                                    </div>
                                 </div>
 
                             </form>
@@ -202,26 +186,15 @@
 
     public string QuoteAssetName => SelectedContract is not null ? SelectedContract.QuoteAssetName : "";
 
-    public IList<int> AllAmounts = [100, 1000];
-
-    public int SelectedAmount = 100;
-
-    private void ChangeAmount(int value)
-    {
-        SelectedAmount = value;
-        Logger.LogInformation($"change amount", value);
-    }
-
     private async Task ChangeSelectedContractName(string value)
     {
         Logger.LogInformation($"selected token pair changed: {value}");
         SelectedContract = OptionsContracts.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId)
-            .Where(item => item.BaseAssetName + "/" + item.QuoteAssetName == value)
+            .Where(item => item.Name == value)
             .FirstOrDefault();
         if (SelectedContract is not null)
         {
-            SelectedContractName = SelectedContract.BaseAssetName + "/" + SelectedContract.QuoteAssetName;
-            Logger.LogInformation($"SelectedTokenPairName: {SelectedContractName}");
+            SelectedContractName = value;
 
             var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.BaseAssetAddress);
             UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedContract.BaseAssetDecimals);
@@ -248,7 +221,7 @@
         ResetSteps();
     }
 
-    public bool IsFormValid => SelectedContract is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && IsMaturityDateValid && SelectedAmount >= 1;
+    public bool IsFormValid => SelectedContract is not null && InputedBaseAssetAmount > 0 && InputedQuoteAssetAmount > 0 && IsMaturityDateValid;
 
     public decimal InputedBaseAssetAmount {get; set;} = 0m;
 
@@ -487,20 +460,19 @@
 
     private async Task Mint()
     {
-        Logger.LogInformation($"mint clicked, maturity: {MaturityDate}, amount: {SelectedAmount}");
+        Logger.LogInformation($"mint clicked, maturity: {MaturityDate}, optionsKind: {SelectedOptionsKind}");
         if (!isSupportedNetwork())
         {
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
             return;
         }
         Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
-        int optionsKind = (int)SelectedOptionsKind;
         try {
             var txHash = await _web3Service.MintOptions(
+                SelectedOptionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract!.QuoteAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
-                SelectedAmount,
                 SelectedContract!.NftAddress
             );
 

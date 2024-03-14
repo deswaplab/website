@@ -1,7 +1,7 @@
-using System.Numerics;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Nethereum.Metamask;
+using System.Numerics;
 
 namespace DeswapApp;
 
@@ -9,66 +9,9 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 {
     private readonly string OptionsABI = """
 [
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "burn",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "baseAssetAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "quoteAssetAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "maturityDate",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "mint",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "exercise",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
+    {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"mint","inputs":[{"name":"kind","type":"uint8","internalType":"enum OptionsNFT.OptionsKind"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAmount","type":"uint256","internalType":"uint256"},{"name":"maturityDate","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"exercise","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
 ]
 """;
 
@@ -166,7 +109,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // Mint a Options NFT
-    public async Task<string> MintOptions(BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, int amount, string nftAddress)
+    public async Task<string> MintOptions(OptionsKind kind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
@@ -176,10 +119,10 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             _metamaskHostProvider.SelectedAccount,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             value,
-            baseAssetAmount, 
-            quoteAssetAmount, 
-            maturityUnix,
-            amount
+            kind,
+            baseAssetAmount,
+            quoteAssetAmount,
+            maturityUnix
         );
         _logger.LogInformation($"Mint Options, gas={gas}, value={value}");
         var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
@@ -187,10 +130,10 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             gas,
             value,
             CancellationToken.None,
-            baseAssetAmount, 
-            quoteAssetAmount, 
-            maturityUnix,
-            amount
+            kind,
+            baseAssetAmount,
+            quoteAssetAmount,
+            maturityUnix
         );
         // TODO: 返回tokenId，添加一个跳转去交易的链接
         return receipt.TransactionHash.ToString();
@@ -245,7 +188,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             _metamaskHostProvider.SelectedAccount,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             value,
-            baseAssetAmount, 
+            baseAssetAmount,
             maturityUnix,
             amount
         );
@@ -255,7 +198,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             gas,
             value,
             CancellationToken.None,
-            baseAssetAmount, 
+            baseAssetAmount,
             maturityUnix,
             amount
         );
@@ -292,7 +235,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             _metamaskHostProvider.SelectedAccount,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             value,
-            baseAssetAmount, 
+            baseAssetAmount,
             amount,
             kind
         );
@@ -302,7 +245,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             gas,
             value,
             CancellationToken.None,
-            baseAssetAmount, 
+            baseAssetAmount,
             amount,
             kind
         );

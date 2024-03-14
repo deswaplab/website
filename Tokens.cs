@@ -16,8 +16,6 @@ public class OptionsContract
 
     public required string NftAddress { get; set; }
 
-    public required OptionsKind OptionsKind { get; set; }
-
     // 在中心化交易所的符号，用来获取参考价格
     public string? OkxTickSymbol { get; set; }
 
@@ -31,13 +29,13 @@ public class OptionsContract
         return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
     }
 
-    public string Name => BaseAssetName + "/" + QuoteAssetName;
+    public string Name => "Options NFT " + BaseAssetName + "/" + QuoteAssetName;
 }
 
 public static class OptionsContracts
 {
     public static readonly IList<OptionsContract> Inner = [
-        // WETH/TUSDC Call
+        // WETH/TUSDC sepolia
         new OptionsContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
@@ -46,24 +44,22 @@ public static class OptionsContracts
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0xA57d0Caa974caf3a5F508051464E4ac0a69FdA0C",
+            NftAddress = "0x2556dfFB5a692cfBfABdD5DC2FB71A7502099c1F",
             Network = SupportedNetworks.GetNetwork(11155111)!,
-            OptionsKind = OptionsKind.CALL,
         },
-        // WETH/TUSDC Put
+        // WETH/USDC sepolia
         new OptionsContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
-            QuoteAssetName = "TUSDC",
+            QuoteAssetName = "USDC",
             OkxTickSymbol = null,
-            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x5552dD062df90ED68443A2e3E194e3b814a86C2d",
+            NftAddress = "0x17d7A375E32D986d6e2A367293abD07D7Bac7f94",
             Network = SupportedNetworks.GetNetwork(11155111)!,
-            OptionsKind = OptionsKind.PUT
         },
-        // mumbai WETH/TUSDC Call
+        // mumbai WETH/TUSDC
         new OptionsContract{
             BaseAssetName = "WMATIC",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
@@ -72,22 +68,20 @@ public static class OptionsContracts
             OkxTickSymbol = null,
             QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
             QuoteAssetDecimals = 6,
-            NftAddress = "0xA57d0Caa974caf3a5F508051464E4ac0a69FdA0C",
+            NftAddress = "0x2556dfFB5a692cfBfABdD5DC2FB71A7502099c1F",
             Network = SupportedNetworks.GetNetwork(80001)!,
-            OptionsKind = OptionsKind.CALL
         },
-        // mumbai WETH/TUSDC Put
+        // mumbai WETH/USDC
         new OptionsContract{
             BaseAssetName = "WMATIC",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
-            QuoteAssetName = "TUSDC",
+            QuoteAssetName = "USDC",
             OkxTickSymbol = null,
-            QuoteAssetAddress = "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5",
+            QuoteAssetAddress = "0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97",
             QuoteAssetDecimals = 6,
-            NftAddress = "0x5552dD062df90ED68443A2e3E194e3b814a86C2d",
+            NftAddress = "0x17d7A375E32D986d6e2A367293abD07D7Bac7f94",
             Network = SupportedNetworks.GetNetwork(80001)!,
-            OptionsKind = OptionsKind.PUT
         },
     ];
 
@@ -113,14 +107,14 @@ public static class LotteryContracts
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
-            NftAddress = "0x062056aC6249DE97483Eb0800fc8a28E977c3754",
+            NftAddress = "0x59a84350f5b9071787623f3E0AC23c5768c98BA2",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new LotteryContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
-            NftAddress = "0x062056aC6249DE97483Eb0800fc8a28E977c3754",
+            NftAddress = "0x59a84350f5b9071787623f3E0AC23c5768c98BA2",
             Network = SupportedNetworks.GetNetwork(80001)!,
         }
     ];
@@ -140,7 +134,6 @@ public class LotteryContract
 
     public string Name => "Lottery NFT " + BaseAssetName;
 
-    // Like: https://sepolia.etherscan.io/token/0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9?a=0x7e727520B29773e7F23a8665649197aAf064CeF1
     public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
     {
         return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
@@ -154,14 +147,14 @@ public static class RedEnvelopeContracts
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
-            NftAddress = "0x74e3199174ec457c8D237F36cB4DC9F60bF66208",
+            NftAddress = "0x9fB56828d10927cf8DbAe9585586C79E14365ecC",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new RedEnvelopeContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
-            NftAddress = "0x74e3199174ec457c8D237F36cB4DC9F60bF66208",
+            NftAddress = "0x9fB56828d10927cf8DbAe9585586C79E14365ecC",
             Network = SupportedNetworks.GetNetwork(80001)!,
         }
     ];
@@ -181,7 +174,6 @@ public class RedEnvelopeContract
 
     public string Name => "RedEnvelope NFT " + BaseAssetName;
 
-    // Like: https://sepolia.etherscan.io/token/0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9?a=0x7e727520B29773e7F23a8665649197aAf064CeF1
     public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
     {
         return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
@@ -195,14 +187,14 @@ public static class RouletteContracts
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
-            NftAddress = "0xcF466878834E5e073e6B4De4Ca81302691ca38B6",
+            NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
             Network = SupportedNetworks.GetNetwork(11155111)!,
         },
         new RouletteContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
-            NftAddress = "0xcF466878834E5e073e6B4De4Ca81302691ca38B6",
+            NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
             Network = SupportedNetworks.GetNetwork(80001)!,
         }
     ];
@@ -222,7 +214,6 @@ public class RouletteContract
 
     public string Name => "Roulette NFT " + BaseAssetName;
 
-    // Like: https://sepolia.etherscan.io/token/0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9?a=0x7e727520B29773e7F23a8665649197aAf064CeF1
     public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
     {
         return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;

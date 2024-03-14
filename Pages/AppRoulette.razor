@@ -21,6 +21,9 @@
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                                 @Loc["Roulette"]
                             </h1>
+
+                            <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["Roulette_Intro"]</p>
+
                             <form class="space-y-4 md:space-y-6">
                                 <div>
                                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
@@ -38,8 +41,8 @@
                                 </div>
 
                                 <div>
-                                    <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
-                                    <input id="maturityDate" type="date" 
+                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
+                                    <input type="date" 
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                                         placeholder="Select date"
                                         @bind-value:get="MaturityDate"
@@ -93,22 +96,17 @@
         .Where(p => p.Network.ChainId == _metamaskHostProvider.SelectedNetworkChainId)
         .ToList();
 
-    public RouletteContract? SelectedContract {get; set;} = null;
+    public RouletteContract? SelectedContract { get; set; } = null;
 
     public string SelectedContractName {get; set;} = "";
 
-    public async Task ChangeSelectedContractName(string value)
+    public void ChangeSelectedContractName(string? value)
     {
-        SelectedContractName = value;
-        SelectedContract = AllContracts.Where(p => p.Name == value).First();
+        SelectedContractName = value ?? "";
+        SelectedContract = AllContracts.Where(p => p.Name == value).FirstOrDefault();
 
-        var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.BaseAssetAddress);
-        UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedContract.BaseAssetDecimals);
-        Logger.LogInformation($"get balance: {UserBaseAssetBalance}");
         ResetSteps();
     }
-
-    public decimal? UserBaseAssetBalance {get; set;}
 
     public bool IsFormValid => SelectedContract is not null;
 

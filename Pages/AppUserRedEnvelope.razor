@@ -141,6 +141,11 @@
             toastService.ShowToast($"Token: {token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
             // 从 Tokens 删除当前行权的token，以实现页面刷新
             UserTokens.Remove(UserTokens.First(item => item.TokenId == token.TokenId));
+
+            // 刷新元数据
+            await Task.Delay(1000);
+            await _nftFetcher.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
+
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {

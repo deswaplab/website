@@ -1,7 +1,7 @@
 namespace DeswapApp;
 
-using System.Numerics;
 using Nethereum.Web3;
+using System.Numerics;
 
 public interface INftFetcher
 {
@@ -158,7 +158,9 @@ public class UserRouletteNFT
         if (DateTime.Now > OpenTime)
         {
             return true;
-        } else if (userAddress.Equals(Writer, StringComparison.CurrentCultureIgnoreCase)) {
+        }
+        else if (userAddress.Equals(Writer, StringComparison.CurrentCultureIgnoreCase))
+        {
             return true;
         }
         return false;
