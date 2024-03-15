@@ -303,4 +303,70 @@
   <data name="Roulette_Intro" xml:space="preserve">
     <value>你将发行你自己的轮盘NFT，拥有此NFT的地址就有了下注权，下注后消耗下注权，累积奖池，你开奖后，有一位幸运玩家能赢走奖池里的资金</value>
   </data>
+  <data name="Cta1_Header" xml:space="preserve">
+    <value>发行你的期权NFT</value>
+  </data>
+  <data name="Cta1_Intro" xml:space="preserve">
+    <value>如果你对金融感兴趣，想要自己坐庄发行自己的期权，来试试我们的期权NFT产品，支持多种资产，操作简单，安全性有保证</value>
+  </data>
+  <data name="Cta2_Header" xml:space="preserve">
+    <value>发行和交易彩票</value>
+  </data>
+  <data name="Cta2_Intro" xml:space="preserve">
+    <value>在现实生活中只有大公司能发行彩票，普通人只能购买，在web3世界，通过我们的彩票NFT，任何人都能发行和销售彩票，如果你擅长经营，可以把这当作一个事业，在链上获利</value>
+  </data>
+  <data name="Cta3_Header" xml:space="preserve">
+    <value>发红包或者空投奖励</value>
+  </data>
+  <data name="Cta3_Intro" xml:space="preserve">
+    <value>如果你是中国人，你一定对红包不陌生，我们这个红包NFT是web3世界的微信红包，你将红包创建好后，将opensea的链接发到任何地方，就可以等用户来抢红包，你的社区也将得到活跃</value>
+  </data>
+  <data name="Cta4_Header" xml:space="preserve">
+    <value>玩玩轮盘</value>
+  </data>
+  <data name="Cta4_Intro" xml:space="preserve">
+    <value>声明一下，玩法有点类似赌博，但实际上不是，你可以mint出你自己的轮盘NFT，然后当作下注的凭证进行售卖，此NFT凭证的拥有者可以进行下注累积资金池，最后由这个token的铸造者进行开奖，所有下注的用户都有机会瓜分奖池</value>
+  </data>
+  <data name="FAQ_A1" xml:space="preserve">
+    <value>我们会发行会员身份NFT，拥有此身份的人可以免服务费交易，未来我们发行治理代币的时候也能获得空投</value>
+  </data>
+  <data name="FAQ_A2" xml:space="preserve">
+    <value>目前还没有具体的时间计划，等我们发售完身份NFT后再看</value>
+  </data>
+  <data name="FAQ_A3" xml:space="preserve">
+    <value>红包合约设计是一个地址只能领一个红包，如果多买多开会报错，请检查你这个地址是否已经领取过了</value>
+  </data>
+  <data name="FAQ_Q1" xml:space="preserve">
+    <value>Deswap会员系统会是怎样的？</value>
+  </data>
+  <data name="FAQ_Q2" xml:space="preserve">
+    <value>何时会发布DAO</value>
+  </data>
+  <data name="FAQ_Q3" xml:space="preserve">
+    <value>我没法抢红包</value>
+  </data>
+  <data name="Feature1_Header" xml:space="preserve">
+    <value>民主化</value>
+  </data>
+  <data name="Feature1_Intro" xml:space="preserve">
+    <value>在web2世界，普通人几乎不可能运行一个股票交易所或者是彩票公司，但是web3给了普通人这个机会，你可以发行自己的期权，自己的彩票，然后获利，我相信web3是实现金融民主化的唯一方式</value>
+  </data>
+  <data name="Feature2_Header" xml:space="preserve">
+    <value>隐私性</value>
+  </data>
+  <data name="Feature2_Intro" xml:space="preserve">
+    <value>我们不追踪你的邮箱，不需要你注册账号，你可以完全匿名地进行交易</value>
+  </data>
+  <data name="Feature3_Header" xml:space="preserve">
+    <value>DAO</value>
+  </data>
+  <data name="Feature3_Intro" xml:space="preserve">
+    <value>我们是一个DAO，没人拥有这个组织，因此也没人能摧毁这个组织，只要区块链存在，只要NFT存在，我们将一直存在</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>特点</value>
+  </data>
+  <data name="Governor_Intro" xml:space="preserve">
+    <value>目前Deswap是我的个人项目，我独自设计并且编写代码实现，但是我希望未来能做成一个社区，如果有人愿意合作的话请联系我 </value>
+  </data>
 </root>

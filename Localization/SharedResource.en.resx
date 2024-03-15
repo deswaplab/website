@@ -303,4 +303,73 @@
   <data name="Roulette_Intro" xml:space="preserve">
     <value>You will issue your own roulette NFT. The address that owns this NFT will have the right to place bets. After placing the bet, the right to place bets will be consumed and the prize pool will accumulate. After you draw the prize, a lucky player will win the funds in the prize pool.</value>
   </data>
+  <data name="Cta1_Header" xml:space="preserve">
+    <value>Mint your Options NFT</value>
+  </data>
+  <data name="Cta1_Intro" xml:space="preserve">
+    <value>Interested in trading? try our Options NFT, you trade NFT as Options, no centerilized account needed.</value>
+  </data>
+  <data name="Cta2_Header" xml:space="preserve">
+    <value>Trade Lottery</value>
+  </data>
+  <data name="Cta2_Intro" xml:space="preserve">
+    <value>In realworld, only the company can issue a lottery, normal users can only buy lottery, but in web3 world, you mint a NFT, deposit some money in it, then you can sell it on NFT markets, you define the sell price, NFT owners can draw the lottery and only one lucky guy can win the prize.</value>
+  </data>
+  <data name="Cta3_Header" xml:space="preserve">
+    <value>Send Red Envelope to your friends</value>
+  </data>
+  <data name="Cta3_Intro" xml:space="preserve">
+    <value>If you run a community, or just want to give some lucky money to your friends, try using our RedEnvelope NFT, the NFT holders have the right to open the red envelope and get the underlying money</value>
+  </data>
+  <data name="Cta4_Header" xml:space="preserve">
+    <value>Play Roulette game</value>
+  </data>
+  <data name="Cta4_Intro" xml:space="preserve">
+    <value>People who mint the NFT is the owner of the table, he then sell it in NFT markets, people who bought the NFT has the right to bet some money in, then the owner can finish this round and choose a winner randomly and win the prize, it looks like a gamble but it actually not and I don't want it to be, just hope people can get fun.</value>
+  </data>
+  <data name="FAQ_A1" xml:space="preserve">
+    <value>I want to create a membership NFT collection on opensea, people who own the membership NFT can use Deswap without fees, currently all the mint operation at Deswap
+costs 0.001 ether, so become a member would save a lot, never the less the NFT would become more valuable in the future the community becomes larger.</value>
+  </data>
+  <data name="FAQ_A2" xml:space="preserve">
+    <value>No particular time now, I want to launch the membership NFT first, then deploy the DAO contract and then airdrop some governor tokens to some of the membership NFT owners.</value>
+  </data>
+  <data name="FAQ_A3" xml:space="preserve">
+    <value>The red envelope NFT is designed that every address can only buy once and open once, if you choose to buy more than 1, you would see errors.</value>
+  </data>
+  <data name="FAQ_Q1" xml:space="preserve">
+    <value>What would the Deswap membership be like?</value>
+  </data>
+  <data name="FAQ_Q2" xml:space="preserve">
+    <value>When will you launch the DAO?</value>
+  </data>
+  <data name="FAQ_Q3" xml:space="preserve">
+    <value>I can't buy red envelope NFT</value>
+  </data>
+  <data name="Feature1_Header" xml:space="preserve">
+    <value>Democratization</value>
+  </data>
+  <data name="Feature1_Intro" xml:space="preserve">
+    <value>In Web2 world, it's almost impossible for a normal person the run a options exchange or a lottery company, but in Web3 world, with the help of Deswap, you can do these with little cost. If you are good enough, you can get rich. I believe democracy will eventually defeat autocracy.</value>
+  </data>
+  <data name="Feature2_Header" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="Feature2_Intro" xml:space="preserve">
+    <value>We don't track your privacy, we don't need your account, your email, your phone number... As long as you have a web3 wallet installed, you can get started.</value>
+  </data>
+  <data name="Feature3_Header" xml:space="preserve">
+    <value>DAO</value>
+  </data>
+  <data name="Feature3_Intro" xml:space="preserve">
+    <value>We are a DAO, no one owns the platform, and no one can destroy it. With more people using it, our community will become better.</value>
+  </data>
+  <data name="Features" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="Governor_Intro" xml:space="preserve">
+    <value>Currently Deswap is my personal side project, I designed the website, wrote the code,
+I'm planning to build a DAO to governor the platform in the future. Anyone want to corporate
+can contact me</value>
+  </data>
 </root>
