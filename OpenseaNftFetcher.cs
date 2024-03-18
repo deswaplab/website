@@ -43,8 +43,8 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     ImageData = ParseImageSvg(item.MetadataUrl),
                     MaturityDate = ParseMaturityDate(item.MetadataUrl, "maturityDate"),
                     OptionsKind = ParseOptionsKind(item.MetadataUrl),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
-                    QuoteAssetAmount = ParseQuoteAssetAmount(item.MetadataUrl),
+                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
+                    QuoteAssetAmount = ParseAmount(item.MetadataUrl, "quoteAssetAmount"),
                     Price = ParsePrice(item.MetadataUrl),
                 };
             })
@@ -154,7 +154,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
         throw new Exception("no options kind found");
     }
 
-    private static decimal ParseBaseAssetAmount(string metadataUrl, string name)
+    private static decimal ParseAmount(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -171,25 +171,6 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
             }
         }
         throw new Exception("no baseAssetAmount found");
-    }
-
-    private static decimal ParseQuoteAssetAmount(string metadataUrl)
-    {
-        string head = "data:application/json;base64,";
-        if (metadataUrl.StartsWith(head))
-        {
-            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
-            var json = Encoding.UTF8.GetString(blob);
-            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
-            foreach (var attr in payload!.Attributes!)
-            {
-                if (attr.TraitType == "quoteAssetAmount" && attr.DisplayType == "number")
-                {
-                    return attr.Value.GetDecimal();
-                }
-            }
-        }
-        throw new Exception("no quoteAssetAmount found");
     }
 
     private static decimal ParsePrice(string metadataUrl)
@@ -283,7 +264,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     Status = ParseString(item.MetadataUrl, "status"), // open|close
                     ImageData = ParseImageSvg(item.MetadataUrl),
                     DrawTime = ParseMaturityDate(item.MetadataUrl, "drawTime"),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
                 };
             })
             .ToList();
@@ -308,7 +289,7 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     Contract = item.Contract!,
                     Status = ParseString(item.MetadataUrl, "status"), // open|close
                     ImageData = ParseImageSvg(item.MetadataUrl),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
                 };
             })
             .ToList();
@@ -332,8 +313,32 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
                     ChainId = chainId,
                     Contract = item.Contract!,
                     ImageData = ParseImageSvg(item.MetadataUrl),
-                    BaseAssetAmount = ParseBaseAssetAmount(item.MetadataUrl, "baseAssetAmount"),
+                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
                     OpenTime = ParseMaturityDate(item.MetadataUrl, "openTime"),
+                    Writer = ParseString(item.MetadataUrl, "writer"),
+                };
+            })
+            .ToList();
+        return tokens;
+    }
+
+    public async Task<IList<UserBlackJackNFT>> GetUserBlackJackTokens(string userAddress, long chainId)
+    {
+        var curTokens = await FetchAllUserTokens(userAddress, chainId);
+        var supportedContracts = BlackJackContracts.Inner
+            .Where(p => p.Network.ChainId == chainId)
+            .Select(p => p.NftAddress.ToLower())
+            .ToList();
+        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
+            .Select(item =>
+            {
+                return new UserBlackJackNFT
+                {
+                    TokenId = long.Parse(item.Identifier),
+                    ChainId = chainId,
+                    Contract = item.Contract!,
+                    ImageData = ParseImageSvg(item.MetadataUrl),
+                    DealerBalance = ParseAmount(item.MetadataUrl, "dealerBalance"),
                     Writer = ParseString(item.MetadataUrl, "writer"),
                 };
             })

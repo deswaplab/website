@@ -37,6 +37,35 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 ]
 """;
 
+    private readonly string BlackJackABI = """
+[
+    {"type":"function","name":"mint","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"deposit","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"withdraw","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"PlaceBet","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"bet","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"Split","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"Stand","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"StartNewGame","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"bet","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"Hit","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"Insurance","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"DoubleDown","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"GetGame","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"user","type":"address","internalType":"address"}],
+    "outputs":[{"name":"game","type":"tuple","internalType":"struct BlackJackNFT.Game","components":[{"name":"Id","type":"uint256","internalType":"uint256"},
+        {"name":"Player","type":"address","internalType":"address"},{"name":"SafeBalance","type":"uint256","internalType":"uint256"},
+        {"name":"OriginalBalance","type":"uint256","internalType":"uint256"},{"name":"SplitCounter","type":"uint256","internalType":"uint256"},
+        {"name":"GamesPlayed","type":"uint256","internalType":"uint256"},{"name":"PlayerBet","type":"uint256","internalType":"uint256"},
+        {"name":"InsuranceBet","type":"uint256","internalType":"uint256"},{"name":"PlayerCard1","type":"uint256","internalType":"uint256"},
+        {"name":"PlayerCard2","type":"uint256","internalType":"uint256"},{"name":"PlayerNewCard","type":"uint256","internalType":"uint256"},
+        {"name":"PlayerCardTotal","type":"uint256","internalType":"uint256"},{"name":"PlayerSplitTotal","type":"uint256","internalType":"uint256"},
+        {"name":"DealerCard1","type":"uint256","internalType":"uint256"},{"name":"DealerCard2","type":"uint256","internalType":"uint256"},
+        {"name":"DealerNewCard","type":"uint256","internalType":"uint256"},{"name":"DealerCardTotal","type":"uint256","internalType":"uint256"},
+        {"name":"CanDoubleDown","type":"bool","internalType":"bool"},{"name":"CanInsure","type":"bool","internalType":"bool"},
+        {"name":"CanSplit","type":"bool","internalType":"bool"},{"name":"IsSplitting","type":"bool","internalType":"bool"},
+        {"name":"IsSoftHand","type":"bool","internalType":"bool"},{"name":"IsRoundInProgress","type":"bool","internalType":"bool"},
+        {"name":"DealerMsg","type":"string","internalType":"string"}]}],"stateMutability":"view"}
+]
+""";
+
     private readonly MetamaskHostProvider _metamaskHostProvider = metamaskHostProvider;
 
     private readonly ILogger<Web3Service> _logger = logger;
@@ -339,6 +368,57 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             CancellationToken.None,
             tokenId
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    // blackjack
+    public async Task<string> MintBlackJack(int amount, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
+            amount
+        );
+        _logger.LogInformation("Mint BlackJack, gas={}, value={}", gas, value);
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            value,
+            CancellationToken.None,
+            amount
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> DepositBlackJack(long tokenId, BigInteger amount, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
+        var callsFunction = contract.GetFunction("deposit");
+        
+        var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            value,
+            tokenId,
+            amount
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            value,
+            CancellationToken.None,
+            tokenId,
+            amount
         );
         // TODO: 返回tokenId，添加一个跳转去交易的链接
         return receipt.TransactionHash.ToString();

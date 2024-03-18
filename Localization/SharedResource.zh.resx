@@ -240,6 +240,9 @@
   <data name="My Roulette NFT" xml:space="preserve">
     <value>我的轮盘NFT</value>
   </data>
+  <data name="My BlackJack NFT" xml:space="preserve">
+    <value>我的21点NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>成功行权</value>
   </data>
@@ -368,5 +371,11 @@
   </data>
   <data name="Governor_Intro" xml:space="preserve">
     <value>目前Deswap是我的个人项目，我独自设计并且编写代码实现，但是我希望未来能做成一个社区，如果有人愿意合作的话请联系我 </value>
+  </data>
+  <data name="BlackJack" xml:space="preserve">
+    <value>21点</value>
+  </data>
+  <data name="BlackJack_Intro" xml:space="preserve">
+    <value>铸造出NFT后，代表你是这张桌子的庄家，你可以销售门票，邀请朋友们来下注，每次提走筹码时要消耗用户的门票</value>
   </data>
 </root>

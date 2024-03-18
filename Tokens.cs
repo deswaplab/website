@@ -220,6 +220,46 @@ public class RouletteContract
     }
 }
 
+public static class BlackJackContracts
+{
+    public static readonly IList<BlackJackContract> Inner = [
+        new BlackJackContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xCEe20496BAa9C4F41Ca217f6fDb89213c62676bC",
+            Network = SupportedNetworks.GetNetwork(11155111)!,
+        },
+        new BlackJackContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xCEe20496BAa9C4F41Ca217f6fDb89213c62676bC",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+        }
+    ];
+}
+
+public class BlackJackContract
+{
+    public required string BaseAssetName { get; set; }
+
+    public required string BaseAssetAddress { get; set; }
+
+    public required int BaseAssetDecimals { get; set; }
+
+    public required string NftAddress { get; set; }
+
+    public required Network Network { get; set; }
+
+    public string Name => "BlackJack NFT " + BaseAssetName;
+
+    public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
+    {
+        return Network.EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
+    }
+}
+
 public class Network
 {
     public required string Name { get; set; }

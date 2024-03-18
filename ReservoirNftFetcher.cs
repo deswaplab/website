@@ -226,4 +226,10 @@ public class ReservoirNftFetcher(HttpClient httpClient) : INftFetcher
         await Task.CompletedTask;
         return [];
     }
+
+    public async Task<IList<UserBlackJackNFT>> GetUserBlackJackTokens(string userAddress, long chainId)
+    {
+        await Task.CompletedTask;
+        return [];
+    }
 }

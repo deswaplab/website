@@ -240,6 +240,9 @@
   <data name="My Roulette NFT" xml:space="preserve">
     <value>My Roulette NFT</value>
   </data>
+  <data name="My BlackJack NFT" xml:space="preserve">
+    <value>My BlackJack NFT</value>
+  </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>exercised successfully</value>
   </data>
@@ -371,5 +374,11 @@ costs 0.001 ether, so become a member would save a lot, never the less the NFT w
     <value>Currently Deswap is my personal side project, I designed the website, wrote the code,
 I'm planning to build a DAO to governor the platform in the future. Anyone want to corporate
 can contact me</value>
+  </data>
+  <data name="BlackJack" xml:space="preserve">
+    <value>BlackJack</value>
+  </data>
+  <data name="BlackJack_Intro" xml:space="preserve">
+    <value>mint a BlackJack NFT means you own this desk, you are the dealer, you can then sell those NFTs and invite BlackJack NFT holders to come to play with you.</value>
   </data>
 </root>

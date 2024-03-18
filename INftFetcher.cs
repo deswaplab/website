@@ -14,6 +14,8 @@ public interface INftFetcher
     Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId);
 
     Task<IList<UserRouletteNFT>> GetUserRouletteTokens(string userAddress, long chainId);
+
+    Task<IList<UserBlackJackNFT>> GetUserBlackJackTokens(string userAddress, long chainId);
 }
 
 public class UserOptionNFT
@@ -160,6 +162,30 @@ public class UserRouletteNFT
             return true;
         }
         else if (userAddress.Equals(Writer, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return true;
+        }
+        return false;
+    }
+}
+
+public class UserBlackJackNFT
+{
+    public long TokenId { get; set; }
+
+    public long ChainId { get; set; }
+
+    public required string Contract { get; set; }
+
+    public required string ImageData { get; set; }
+
+    public decimal DealerBalance { get; set; }
+
+    public required string Writer { get; set; }
+
+    public bool CanDeposit(string userAddress)
+    {
+        if (userAddress.Equals(Writer, StringComparison.CurrentCultureIgnoreCase))
         {
             return true;
         }
