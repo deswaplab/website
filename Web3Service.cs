@@ -160,7 +160,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000"));
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             kind,
             baseAssetAmount,
@@ -229,7 +229,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000"));
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             baseAssetAmount,
             maturityUnix,
@@ -276,7 +276,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             baseAssetAmount,
             amount,
@@ -323,7 +323,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             amount,
             openTime
@@ -348,7 +348,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("bet");
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             tokenId,
             baseAssetAmount
@@ -372,7 +372,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("open");
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             tokenId
         );
@@ -396,7 +396,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             amount
         );
@@ -421,7 +421,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             value,
             tokenId,
             amount
@@ -543,7 +543,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         
         var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
-            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            null,
             new Nethereum.Hex.HexTypes.HexBigInteger(0),
             tokenId,
             amount

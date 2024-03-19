@@ -116,6 +116,13 @@ public static class LotteryContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x59a84350f5b9071787623f3E0AC23c5768c98BA2",
             Network = SupportedNetworks.GetNetwork(80001)!,
+        },
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xC04DD964ed36c0e4796F53A7168393ED4Fc38FF6",
+            Network = SupportedNetworks.GetNetwork(1287)!,
         }
     ];
 }
@@ -156,6 +163,13 @@ public static class RedEnvelopeContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x9fB56828d10927cf8DbAe9585586C79E14365ecC",
             Network = SupportedNetworks.GetNetwork(80001)!,
+        },
+        new RedEnvelopeContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
+            Network = SupportedNetworks.GetNetwork(1287)!,
         }
     ];
 }
@@ -193,6 +207,13 @@ public static class RouletteContracts
         new RouletteContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xbDcE3D50aB559474cDA1160253037FD02b97Df9b",
+            Network = SupportedNetworks.GetNetwork(1287)!,
+        },
+        new RouletteContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
             BaseAssetDecimals = 18,
             NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
             Network = SupportedNetworks.GetNetwork(80001)!,
@@ -235,6 +256,13 @@ public static class BlackJackContracts
             BaseAssetAddress = "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
             BaseAssetDecimals = 18,
             NftAddress = "0xCEe20496BAa9C4F41Ca217f6fDb89213c62676bC",
+            Network = SupportedNetworks.GetNetwork(80001)!,
+        },
+        new BlackJackContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
             Network = SupportedNetworks.GetNetwork(80001)!,
         }
     ];
@@ -304,6 +332,16 @@ public static class SupportedNetworks
             OpenseaApiHost="https://testnets-api.opensea.io/api/v2/chain/mumbai",
             ReservoirHost="https://api-mumbai.reservoir.tools",
             Logo="polygon_logo.svg",
+            IsTestNet=true,
+        },
+        new Network{
+            Name = "MoonBase Alpha",
+            ChainId=1287,
+            EtherscanHost="https://moonbase.moonscan.io/",
+            OpenseaHost="",
+            OpenseaApiHost="",
+            ReservoirHost="",
+            Logo="moonbase_alpha_logo.svg",
             IsTestNet=true,
         },
 
