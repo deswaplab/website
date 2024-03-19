@@ -50,19 +50,33 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     {"type":"function","name":"Insurance","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"DoubleDown","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"GetGame","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"user","type":"address","internalType":"address"}],
-    "outputs":[{"name":"game","type":"tuple","internalType":"struct BlackJackNFT.Game","components":[{"name":"Id","type":"uint256","internalType":"uint256"},
-        {"name":"Player","type":"address","internalType":"address"},{"name":"SafeBalance","type":"uint256","internalType":"uint256"},
-        {"name":"OriginalBalance","type":"uint256","internalType":"uint256"},{"name":"SplitCounter","type":"uint256","internalType":"uint256"},
-        {"name":"GamesPlayed","type":"uint256","internalType":"uint256"},{"name":"PlayerBet","type":"uint256","internalType":"uint256"},
-        {"name":"InsuranceBet","type":"uint256","internalType":"uint256"},{"name":"PlayerCard1","type":"uint256","internalType":"uint256"},
-        {"name":"PlayerCard2","type":"uint256","internalType":"uint256"},{"name":"PlayerNewCard","type":"uint256","internalType":"uint256"},
-        {"name":"PlayerCardTotal","type":"uint256","internalType":"uint256"},{"name":"PlayerSplitTotal","type":"uint256","internalType":"uint256"},
-        {"name":"DealerCard1","type":"uint256","internalType":"uint256"},{"name":"DealerCard2","type":"uint256","internalType":"uint256"},
-        {"name":"DealerNewCard","type":"uint256","internalType":"uint256"},{"name":"DealerCardTotal","type":"uint256","internalType":"uint256"},
-        {"name":"CanDoubleDown","type":"bool","internalType":"bool"},{"name":"CanInsure","type":"bool","internalType":"bool"},
-        {"name":"CanSplit","type":"bool","internalType":"bool"},{"name":"IsSplitting","type":"bool","internalType":"bool"},
-        {"name":"IsSoftHand","type":"bool","internalType":"bool"},{"name":"IsRoundInProgress","type":"bool","internalType":"bool"},
-        {"name":"DealerMsg","type":"string","internalType":"string"}]}],"stateMutability":"view"}
+    "outputs":[
+        {"name":"game","type":"tuple","internalType":"struct BlackJackNFT.Game","components":[
+            {"name":"Id","type":"uint256","internalType":"uint256"},
+            {"name":"Player","type":"address","internalType":"address"},
+            {"name":"SafeBalance","type":"uint256","internalType":"uint256"},
+            {"name":"OriginalBalance","type":"uint256","internalType":"uint256"},
+            {"name":"SplitCounter","type":"uint256","internalType":"uint256"},
+            {"name":"GamesPlayed","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerBet","type":"uint256","internalType":"uint256"},
+            {"name":"InsuranceBet","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerCard1","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerCard2","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerNewCard","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerCardTotal","type":"uint256","internalType":"uint256"},
+            {"name":"PlayerSplitTotal","type":"uint256","internalType":"uint256"},
+            {"name":"DealerCard1","type":"uint256","internalType":"uint256"},
+            {"name":"DealerCard2","type":"uint256","internalType":"uint256"},
+            {"name":"DealerNewCard","type":"uint256","internalType":"uint256"},
+            {"name":"DealerCardTotal","type":"uint256","internalType":"uint256"},
+            {"name":"CanDoubleDown","type":"bool","internalType":"bool"},
+            {"name":"CanInsure","type":"bool","internalType":"bool"},
+            {"name":"CanSplit","type":"bool","internalType":"bool"},
+            {"name":"IsSplitting","type":"bool","internalType":"bool"},
+            {"name":"IsSoftHand","type":"bool","internalType":"bool"},
+            {"name":"IsRoundInProgress","type":"bool","internalType":"bool"},
+            {"name":"DealerMsg","type":"string","internalType":"string"}
+        ]}],"stateMutability":"view"}
 ]
 """;
 
@@ -416,6 +430,128 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             _metamaskHostProvider.SelectedAccount,
             gas,
             value,
+            CancellationToken.None,
+            tokenId,
+            amount
+        );
+        // TODO: 返回tokenId，添加一个跳转去交易的链接
+        return receipt.TransactionHash.ToString();
+    }
+
+    [Function("GetGame", "uint256")]
+    public class GetGameFunction : FunctionMessage
+    {
+        [Parameter("uint256", "tokenId", 1)]
+        public long TokenId { get; set; }
+
+        [Parameter("string", "User", 2)]
+        public string User { get; set; } = "";
+    }
+
+    [FunctionOutput]
+    public class GetGameOutputDTO: IFunctionOutputDTO 
+    {
+        [Parameter("int256", "Id", 1)]
+        public virtual BigInteger Id { get; set; }
+
+        [Parameter("address", "Player", 2)]
+        public virtual string Player { get; set; } = "";
+
+        [Parameter("int256", "SafeBalance", 3)]
+        public virtual BigInteger SafeBalance { get; set; }
+
+        [Parameter("int256", "OriginalBalance", 4)]
+        public virtual BigInteger OriginalBalance { get; set; }
+
+        [Parameter("int256", "SplitCounter", 5)]
+        public virtual BigInteger SplitCounter { get; set; }
+
+        [Parameter("int256", "GamesPlayed", 6)]
+        public virtual BigInteger GamesPlayed { get; set; }
+
+        [Parameter("int256", "PlayerBet", 7)]
+        public virtual BigInteger PlayerBet { get; set; }
+
+        [Parameter("int256", "InsuranceBet", 8)]
+        public virtual BigInteger InsuranceBet { get; set; }
+
+        [Parameter("int256", "PlayerCard1", 9)]
+        public virtual BigInteger PlayerCard1 { get; set; }
+
+        [Parameter("int256", "PlayerCard2", 10)]
+        public virtual BigInteger PlayerCard2 { get; set; }
+
+        [Parameter("int256", "PlayerNewCard", 11)]
+        public virtual BigInteger PlayerNewCard { get; set; }
+
+        [Parameter("int256", "PlayerCardTotal", 12)]
+        public virtual BigInteger PlayerCardTotal { get; set; }
+
+        [Parameter("int256", "PlayerSplitTotal", 13)]
+        public virtual BigInteger PlayerSplitTotal { get; set; }
+
+        [Parameter("int256", "DealerCard1", 14)]
+        public virtual BigInteger DealerCard1 { get; set; }
+
+        [Parameter("int256", "DealerCard2", 15)]
+        public virtual BigInteger DealerCard2 { get; set; }
+
+        [Parameter("int256", "DealerNewCard", 16)]
+        public virtual BigInteger DealerNewCard { get; set; }
+
+        [Parameter("int256", "DealerCardTotal", 17)]
+        public virtual BigInteger DealerCardTotal { get; set; }
+
+        [Parameter("bool", "CanDoubleDown", 18)]
+        public virtual bool CanDoubleDown { get; set; }
+
+        [Parameter("bool", "CanInsure", 19)]
+        public virtual bool CanInsure { get; set; }
+
+        [Parameter("bool", "CanSplit", 20)]
+        public virtual bool CanSplit { get; set; }
+
+        [Parameter("bool", "IsSplitting", 21)]
+        public virtual bool IsSplitting { get; set; }
+
+        [Parameter("bool", "IsSoftHand", 22)]
+        public virtual bool IsSoftHand { get; set; }
+
+        [Parameter("bool", "IsRoundInProgress", 23)]
+        public virtual bool IsRoundInProgress { get; set; }
+
+        [Parameter("string", "DealerMsg", 24)]
+        public virtual string DealerMsg { get; set; } = "";
+
+    }
+
+    public async Task GetUserBlackJackGame(long tokenId, string userAddress, string contractAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(BlackJackABI, contractAddress);
+        var callsFunction = contract.GetFunction("GetGame");
+
+        var output = await callsFunction.CallDeserializingToObjectAsync<GetGameOutputDTO>(tokenId, userAddress);
+        _logger.LogInformation("game is {}", output);
+    }
+
+    public async Task<string> StartBlackJack(long tokenId, BigInteger amount, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
+        var callsFunction = contract.GetFunction("StartNewGame");
+        
+        var gas = await callsFunction.EstimateGasAsync(
+            _metamaskHostProvider.SelectedAccount,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
+            tokenId,
+            amount
+        );
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            new Nethereum.Hex.HexTypes.HexBigInteger(0),
             CancellationToken.None,
             tokenId,
             amount
