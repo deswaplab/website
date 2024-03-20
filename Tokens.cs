@@ -339,6 +339,8 @@ public class Network
     // reservoir 可能有些网络不支持，所以可能会null
     public string? ReservoirHost { get; set; }
 
+    public string? CovalentApiHost { get; set; }
+
     public required string Logo { get; set; } // svg文件，保存在 wwwroot/img 下
 
     public bool IsTestNet { get; set; }
@@ -371,12 +373,13 @@ public static class SupportedNetworks
         new Network{
             Name = "MoonBase Alpha",
             ChainId=1287,
-            EtherscanHost="https://moonbase.moonscan.io/",
+            EtherscanHost="https://moonbase.moonscan.io",
             OpenseaHost="",
             OpenseaApiHost="",
             ReservoirHost="",
             Logo="moonbase_alpha_logo.svg",
             IsTestNet=true,
+            CovalentApiHost = "https://api.covalenthq.com/v1/moonbeam-moonbase-alpha",
         },
         new Network{
             Name = "Neon dev",
