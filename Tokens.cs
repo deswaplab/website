@@ -83,6 +83,19 @@ public static class OptionsContracts
             NftAddress = "0x17d7A375E32D986d6e2A367293abD07D7Bac7f94",
             Network = SupportedNetworks.GetNetwork(80001)!,
         },
+
+        // neon devnet
+        new OptionsContract{
+            BaseAssetName = "WNEON",
+            BaseAssetAddress = "0x11adC2d986E334137b9ad0a0F290771F31e9517F",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "USDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0x512E48836Cd42F3eB6f50CEd9ffD81E0a7F15103",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0xC04DD964ed36c0e4796F53A7168393ED4Fc38FF6",
+            Network = SupportedNetworks.GetNetwork(245022926)!,
+        },
     ];
 
     public static IList<OptionsContract> FilterByChainId(long chainId)
@@ -123,6 +136,13 @@ public static class LotteryContracts
             BaseAssetDecimals = 18,
             NftAddress = "0xC04DD964ed36c0e4796F53A7168393ED4Fc38FF6",
             Network = SupportedNetworks.GetNetwork(1287)!,
+        },
+        new LotteryContract{
+            BaseAssetName = "WNEON",
+            BaseAssetAddress = "0x11adC2d986E334137b9ad0a0F290771F31e9517F",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
+            Network = SupportedNetworks.GetNetwork(245022926)!,
         }
     ];
 }
@@ -170,6 +190,13 @@ public static class RedEnvelopeContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
             Network = SupportedNetworks.GetNetwork(1287)!,
+        },
+        new RedEnvelopeContract{
+            BaseAssetName = "WNEON",
+            BaseAssetAddress = "0x11adC2d986E334137b9ad0a0F290771F31e9517F",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xbDcE3D50aB559474cDA1160253037FD02b97Df9b",
+            Network = SupportedNetworks.GetNetwork(245022926)!,
         }
     ];
 }
@@ -217,6 +244,13 @@ public static class RouletteContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
             Network = SupportedNetworks.GetNetwork(80001)!,
+        },
+        new RouletteContract{
+            BaseAssetName = "WNEON",
+            BaseAssetAddress = "0x11adC2d986E334137b9ad0a0F290771F31e9517F",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
+            Network = SupportedNetworks.GetNetwork(245022926)!,
         }
     ];
 }
@@ -263,7 +297,7 @@ public static class BlackJackContracts
             BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
             BaseAssetDecimals = 18,
             NftAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
-            Network = SupportedNetworks.GetNetwork(80001)!,
+            Network = SupportedNetworks.GetNetwork(1287)!,
         }
     ];
 }
@@ -342,6 +376,16 @@ public static class SupportedNetworks
             OpenseaApiHost="",
             ReservoirHost="",
             Logo="moonbase_alpha_logo.svg",
+            IsTestNet=true,
+        },
+        new Network{
+            Name = "Neon dev",
+            ChainId=245022926,
+            EtherscanHost="https://devnet.neonscan.org",
+            OpenseaHost="",
+            OpenseaApiHost="",
+            ReservoirHost="",
+            Logo="neon_logo.svg",
             IsTestNet=true,
         },
 

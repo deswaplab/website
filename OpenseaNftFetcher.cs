@@ -55,6 +55,10 @@ public class OpenseaNftFetcher(HttpClient httpClient, ILogger<OpenseaNftFetcher>
     private async Task<IList<OpenseaNft>> FetchAllUserTokens(string userAddress, long chainId)
     {
         var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        if (string.IsNullOrEmpty(curNetwork.OpenseaApiHost))
+        {
+            return [];
+        }
 
         bool hasMore = true;
         string next = "";
