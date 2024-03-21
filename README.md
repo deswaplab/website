@@ -17,9 +17,6 @@ dotnet watch
 - [ ] gitbook 文档
 - [ ] 不要在每个页面都监听metamask的事件，统一操作
 - [ ] 找到办法如何交易moonbase alpha上的NFT
-- [ ] 完善deck，支持moonbase链
-- [ ] 支持solana链，拿grant
-- [ ] 继续填写moonbeam grant表单
 - [ ] 做一个合约详情页，避免依赖nft接口(难做好，在单独分支)
 - [ ] 切换网络时，遇到未知网络自动添加rpc信息到metamask钱包
-- [ ] fetch支持不同网络使用不同的fetcher
+- [ ] https://devnet.neonft.market/
