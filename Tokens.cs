@@ -96,6 +96,19 @@ public static class OptionsContracts
             NftAddress = "0xC04DD964ed36c0e4796F53A7168393ED4Fc38FF6",
             Network = SupportedNetworks.GetNetwork(245022926)!,
         },
+
+        // manta pacific sepolia
+        new OptionsContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x199d1a27684106dC3Deb673115fc0fc9cf6af287",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0xf8fcC87D007004A156513ef0B5c8B9657ba1831c",
+            Network = SupportedNetworks.GetNetwork(3441006)!,
+        },
     ];
 
     public static IList<OptionsContract> FilterByChainId(long chainId)
@@ -143,7 +156,14 @@ public static class LotteryContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
             Network = SupportedNetworks.GetNetwork(245022926)!,
-        }
+        },
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x199d1a27684106dC3Deb673115fc0fc9cf6af287",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xF30AB0A2378d5Dc1436F81c72D2784748A863938",
+            Network = SupportedNetworks.GetNetwork(3441006)!,
+        },
     ];
 }
 
@@ -197,7 +217,14 @@ public static class RedEnvelopeContracts
             BaseAssetDecimals = 18,
             NftAddress = "0xbDcE3D50aB559474cDA1160253037FD02b97Df9b",
             Network = SupportedNetworks.GetNetwork(245022926)!,
-        }
+        },
+        new RedEnvelopeContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x199d1a27684106dC3Deb673115fc0fc9cf6af287",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xD08D4d2046C234D32f4abf889E9CB93bCB756Dc5",
+            Network = SupportedNetworks.GetNetwork(3441006)!,
+        },
     ];
 }
 
@@ -251,7 +278,14 @@ public static class RouletteContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
             Network = SupportedNetworks.GetNetwork(245022926)!,
-        }
+        },
+        new RouletteContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x199d1a27684106dC3Deb673115fc0fc9cf6af287",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xe33D3D26d5C75bFFb0170d1F06A2c442e643F65E",
+            Network = SupportedNetworks.GetNetwork(3441006)!,
+        },
     ];
 }
 
@@ -390,6 +424,17 @@ public static class SupportedNetworks
             ReservoirHost="",
             Logo="neon_logo.svg",
             IsTestNet=true,
+        },
+        new Network{
+            Name = "Manta Pacific Sepolia",
+            ChainId=3441006,
+            EtherscanHost="https://pacific-explorer.sepolia-testnet.manta.network",
+            OpenseaHost="",
+            OpenseaApiHost="",
+            ReservoirHost="",
+            Logo="manta_pacific_logo.svg",
+            IsTestNet=true,
+            CovalentApiHost = "https://api.covalenthq.com/v1/manta-testnet",
         },
 
     ];
