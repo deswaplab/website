@@ -111,17 +111,17 @@ public static class OptionsContracts
         },
 
         // aurora testnet
-        // new OptionsContract{
-        //     BaseAssetName = "WETH",
-        //     BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
-        //     BaseAssetDecimals = 18,
-        //     QuoteAssetName = "USDC",
-        //     OkxTickSymbol = null,
-        //     QuoteAssetAddress = "0x3dcB6AdF46E4d854E94719b6ed9cfab6939cC1Cb",
-        //     QuoteAssetDecimals = 6,
-        //     NftAddress = "0xf8fcC87D007004A156513ef0B5c8B9657ba1831c",
-        //     Network = SupportedNetworks.GetNetwork(1313161555)!,
-        // },
+        new OptionsContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "USDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0x3dcB6AdF46E4d854E94719b6ed9cfab6939cC1Cb",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0xf94D47c742C97f37424DB1C27817A0697d49F461",
+            Network = SupportedNetworks.NearAuroraTestnet,
+        },
 
         // mantle sepolia testnet
         new OptionsContract{
@@ -190,13 +190,13 @@ public static class LotteryContracts
             NftAddress = "0xF30AB0A2378d5Dc1436F81c72D2784748A863938",
             Network = SupportedNetworks.MantaPacificSepolia,
         },
-        // new LotteryContract{
-        //     BaseAssetName = "WETH",
-        //     BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
-        //     BaseAssetDecimals = 18,
-        //     NftAddress = "0xC04DD964ed36c0e4796F53A7168393ED4Fc38FF6",
-        //     Network = SupportedNetworks.GetNetwork(1313161555)!,
-        // },
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x91A5e08a63eba616A3f7a24614829A035d4d816F",
+            Network = SupportedNetworks.NearAuroraTestnet,
+        },
         new LotteryContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x17f711A85D359cBF0224a017d8e3dd7A29c9932E",
@@ -265,13 +265,13 @@ public static class RedEnvelopeContracts
             NftAddress = "0xD08D4d2046C234D32f4abf889E9CB93bCB756Dc5",
             Network = SupportedNetworks.MantaPacificSepolia,
         },
-        // new RedEnvelopeContract{
-        //     BaseAssetName = "WETH",
-        //     BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
-        //     BaseAssetDecimals = 18,
-        //     NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
-        //     Network = SupportedNetworks.GetNetwork(1313161555)!,
-        // },
+        new RedEnvelopeContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x17f711A85D359cBF0224a017d8e3dd7A29c9932E",
+            Network = SupportedNetworks.NearAuroraTestnet,
+        },
         new RedEnvelopeContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x17f711A85D359cBF0224a017d8e3dd7A29c9932E",
@@ -340,13 +340,13 @@ public static class RouletteContracts
             NftAddress = "0xe33D3D26d5C75bFFb0170d1F06A2c442e643F65E",
             Network = SupportedNetworks.MantaPacificSepolia,
         },
-        // new RouletteContract{
-        //     BaseAssetName = "WETH",
-        //     BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
-        //     BaseAssetDecimals = 18,
-        //     NftAddress = "0xbDcE3D50aB559474cDA1160253037FD02b97Df9b",
-        //     Network = SupportedNetworks.GetNetwork(1313161555)!,
-        // },
+        new RouletteContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x8886E7A8883e9A40b30Bd4E16e0e25C2C3f29Cd8",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xF7db74785A2e3991627996A84AC72B9310b24951",
+            Network = SupportedNetworks.NearAuroraTestnet,
+        },
         new RouletteContract{
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x17f711A85D359cBF0224a017d8e3dd7A29c9932E",
@@ -535,7 +535,7 @@ public static class SupportedNetworks
         MoonBaseAlpha,
         SolanaNeonDev,
         MantaPacificSepolia,
-        // NearAuroraTestnet,
+        NearAuroraTestnet,
         MantleSepolia,
     ];
 
