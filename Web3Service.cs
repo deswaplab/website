@@ -144,7 +144,9 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
         if (chainId == 5003)
         {
+            // mantle 支持1559，但是priority fee建议填0, baseFee填 0.02gwei
             var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+                new HexBigInteger(2),
                 from,
                 gas,
                 value,
@@ -154,13 +156,28 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             );
             return receipt.TransactionHash.ToString();
         }
-        else
+        else if (chainId == 245022926)
         {
+            // https://docs.neonevm.org/docs/evm_compatibility/overview
+            // neon doesn't support eip1559
             var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
                 from,
                 gas,
                 value,
                 CancellationToken.None,
+                functionInput
+            );
+            return receipt.TransactionHash.ToString();
+        }
+        else
+        {
+            var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+                new HexBigInteger(2),
+                from,
+                gas,
+                value,
+                null,
+                null,
                 functionInput
             );
             return receipt.TransactionHash.ToString();

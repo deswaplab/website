@@ -529,7 +529,6 @@ public static class SupportedNetworks
     };
 
     public static readonly IList<Network> Inner = [
-        // we use reservoir to fetch user tokens, so supported chains are limited, in the future we should switch to other api providers
         EthereumSepolia,
         PolygonMumbai,
         MoonBaseAlpha,
