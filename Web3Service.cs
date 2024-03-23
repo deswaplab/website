@@ -235,12 +235,16 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             maturityUnix,
             amount
         );
-        _logger.LogInformation($"Mint Lottery, gas={gas}, value={value}");
+        // _logger.LogInformation($"Mint Lottery, gas={gas}, value={value}");
         var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
             _metamaskHostProvider.SelectedAccount,
             gas,
             value,
+            // new Nethereum.Hex.HexTypes.HexBigInteger(BigInteger.Parse("20000000")),
+            // new Nethereum.Hex.HexTypes.HexBigInteger(0),
             CancellationToken.None,
+            null,
+            null,
             baseAssetAmount,
             maturityUnix,
             amount
