@@ -85,6 +85,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
     private readonly ILogger<Web3Service> _logger = logger;
 
+    private readonly HexBigInteger DefaultFee = new(BigInteger.Parse("1000000000000000")); // default: 0.001 eth
+
     [Function("balanceOf", "uint256")]
     public class BalanceOfFunction : FunctionMessage
     {
@@ -138,7 +140,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             value,
             functionInput
         );
-        _logger.LogInformation("SendTransactionThroughMetamask, from={}, gas={}, value={}, functionInput={}", from, gas, value, functionInput);
+        _logger.LogInformation("SendTransactionThroughMetamask estimateGas, chainId={} from={}, gas={}, value={}, functionInput={}", chainId, from, gas, value, functionInput);
 
         if (chainId == 5003)
         {
@@ -172,19 +174,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         string erc20ApproveAbi = """[{"inputs":[{"internalType":"address","name":"guy","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]""";
         var contract = web3.Eth.GetContract(erc20ApproveAbi, erc20Contract);
         var callsFunction = contract.GetFunction("approve");
-        var gas = await callsFunction.EstimateGasAsync(
-            nftAddr,
-            wad
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            nftAddr,
-            wad
-        );
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, nftAddr, wad);
     }
 
     // Mint a Options NFT
@@ -193,29 +184,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000"));
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            value,
-            kind,
-            baseAssetAmount,
-            quoteAssetAmount,
-            maturityUnix
-        );
-        _logger.LogInformation($"Mint Options, gas={gas}, value={value}");
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            value,
-            CancellationToken.None,
-            kind,
-            baseAssetAmount,
-            quoteAssetAmount,
-            maturityUnix
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = DefaultFee;
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, kind, baseAssetAmount, quoteAssetAmount, maturityUnix);
     }
 
     // 期权行权
@@ -224,17 +194,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("exercise");
-        var gas = await callsFunction.EstimateGasAsync(
-            tokenId
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId
-        );
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
     }
 
     // 作废（燃烧）行权
@@ -243,17 +204,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("burn");
-        var gas = await callsFunction.EstimateGasAsync(
-            tokenId
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId
-        );
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
     }
 
     // Mint a Lottery NFT
@@ -262,7 +214,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000"));
+        var value = DefaultFee;
         return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, baseAssetAmount, maturityUnix, amount);
     }
 
@@ -271,17 +223,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
         var callsFunction = contract.GetFunction("draw");
-        var gas = await callsFunction.EstimateGasAsync(
-            tokenId
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId
-        );
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
     }
 
     // mint a red envelope
@@ -290,27 +233,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RedEnvelopeABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            value,
-            baseAssetAmount,
-            amount,
-            kind
-        );
-        _logger.LogInformation("Mint RedEnvelope, gas={}, value={}", gas, value);
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            value,
-            CancellationToken.None,
-            baseAssetAmount,
-            amount,
-            kind
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = DefaultFee; // 0.001 fee
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, baseAssetAmount, amount, kind);
     }
 
     public async Task<string> OpenRedEnvelope(long tokenId, string nftAddress)
@@ -318,17 +242,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RedEnvelopeABI, nftAddress);
         var callsFunction = contract.GetFunction("open");
-        var gas = await callsFunction.EstimateGasAsync(
-            tokenId
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId
-        );
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
     }
 
     // roulette
@@ -337,25 +252,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            value,
-            amount,
-            openTime
-        );
-        _logger.LogInformation("Mint Roulette, gas={}, value={}", gas, value);
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            value,
-            CancellationToken.None,
-            amount,
-            openTime
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = DefaultFee; // 0.001 fee
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, amount, openTime);
     }
 
     public async Task<string> BetRoulette(BigInteger baseAssetAmount, long tokenId, string nftAddress)
@@ -363,23 +261,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
         var callsFunction = contract.GetFunction("bet");
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            new HexBigInteger(0),
-            tokenId,
-            baseAssetAmount
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId,
-            baseAssetAmount
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId, baseAssetAmount);
     }
 
     public async Task<string> OpenRoulette(long tokenId, string nftAddress)
@@ -387,21 +270,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
         var callsFunction = contract.GetFunction("open");
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            new HexBigInteger(0),
-            tokenId
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
     }
 
     // blackjack
@@ -410,23 +280,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            value,
-            amount
-        );
-        _logger.LogInformation("Mint BlackJack, gas={}, value={}", gas, value);
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            value,
-            CancellationToken.None,
-            amount
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = DefaultFee; // 0.001 fee
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, amount);
     }
 
     public async Task<string> DepositBlackJack(long tokenId, BigInteger amount, string nftAddress)
@@ -434,25 +289,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
         var callsFunction = contract.GetFunction("deposit");
-
-        var value = new HexBigInteger(BigInteger.Parse("1000000000000000")); // 0.001 fee
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            value,
-            tokenId,
-            amount
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            value,
-            CancellationToken.None,
-            tokenId,
-            amount
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId, amount);
     }
 
     [Function("GetGame", "uint256")]
@@ -558,23 +396,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
         var callsFunction = contract.GetFunction("StartNewGame");
 
-        var gas = await callsFunction.EstimateGasAsync(
-            _metamaskHostProvider.SelectedAccount,
-            null,
-            new HexBigInteger(0),
-            tokenId,
-            amount
-        );
-        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
-            _metamaskHostProvider.SelectedAccount,
-            gas,
-            new HexBigInteger(0),
-            CancellationToken.None,
-            tokenId,
-            amount
-        );
-        // TODO: 返回tokenId，添加一个跳转去交易的链接
-        return receipt.TransactionHash.ToString();
+        var value = new HexBigInteger(0);
+        return await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId, amount);
     }
 }
 
