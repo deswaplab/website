@@ -135,6 +135,19 @@ public static class OptionsContracts
             NftAddress = "0xE37C321d3e1Af89A9D027f57CCa5D3d106b7921F",
             Network = SupportedNetworks.MantleSepolia,
         },
+
+        // scroll sepolia testnet
+        new OptionsContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x5300000000000000000000000000000000000004",
+            BaseAssetDecimals = 18,
+            QuoteAssetName = "TUSDC",
+            OkxTickSymbol = null,
+            QuoteAssetAddress = "0x3070a7eA1bC31049068f055f9b31f5d2D7bdfb5d",
+            QuoteAssetDecimals = 6,
+            NftAddress = "0x7374FE94e34c209616cEc0610212DE13151D222f",
+            Network = SupportedNetworks.ScrollSepolia,
+        },
     ];
 
     public static IList<OptionsContract> FilterByChainId(long chainId)
@@ -203,6 +216,13 @@ public static class LotteryContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x543B59955cEb03169EcbF8eE63312a5258212098",
             Network = SupportedNetworks.MantleSepolia,
+        },
+        new LotteryContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x5300000000000000000000000000000000000004",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x912D36F448b9D9456736aB04Ce041767a8e827a1",
+            Network = SupportedNetworks.ScrollSepolia,
         },
     ];
 }
@@ -279,6 +299,13 @@ public static class RedEnvelopeContracts
             NftAddress = "0x7EDaec7d9db23D4Af62eA2FF71F7104279347f14",
             Network = SupportedNetworks.MantleSepolia,
         },
+        new RedEnvelopeContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x5300000000000000000000000000000000000004",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xf8fcC87D007004A156513ef0B5c8B9657ba1831c",
+            Network = SupportedNetworks.ScrollSepolia,
+        },
     ];
 }
 
@@ -353,6 +380,13 @@ public static class RouletteContracts
             BaseAssetDecimals = 18,
             NftAddress = "0x17c8094Df518a6a0a398f19F7d3b38f96D5b2E9F",
             Network = SupportedNetworks.MantleSepolia,
+        },
+        new RouletteContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0x5300000000000000000000000000000000000004",
+            BaseAssetDecimals = 18,
+            NftAddress = "0xF30AB0A2378d5Dc1436F81c72D2784748A863938",
+            Network = SupportedNetworks.ScrollSepolia,
         },
     ];
 }
@@ -528,6 +562,18 @@ public static class SupportedNetworks
         CovalentApiHost = "https://api.covalenthq.com/v1/mantle-testnet",
     };
 
+    public static Network ScrollSepolia { get; } = new Network
+    {
+        Name = "Scroll Sepolia", // nft api 501 not implemented
+        ChainId=534351,
+        EtherscanHost="https://sepolia.scrollscan.com",
+        OpenseaHost="",
+        OpenseaApiHost="",
+        Logo="scroll_logo.svg",
+        IsTestNet=true,
+        CovalentApiHost = "https://api.covalenthq.com/v1/scroll-sepolia-testnet",
+    };
+
     public static readonly IList<Network> Inner = [
         EthereumSepolia,
         PolygonMumbai,
@@ -536,6 +582,7 @@ public static class SupportedNetworks
         MantaPacificSepolia,
         NearAuroraTestnet,
         MantleSepolia,
+        // ScrollSepolia, // scroll doesn't support difficulty/prevrandao, doesn't support
     ];
 
     public static Network? GetNetwork(long chainId)

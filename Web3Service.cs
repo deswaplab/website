@@ -156,10 +156,11 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             );
             return receipt.TransactionHash.ToString();
         }
-        else if (chainId == 245022926)
+        else if (chainId == 245022926 || chainId == 534351)
         {
             // https://docs.neonevm.org/docs/evm_compatibility/overview
-            // neon doesn't support eip1559
+            // https://docs.scroll.io/en/technology/chain/differences/
+            // neon, scroll doesn't support eip1559
             var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
                 from,
                 gas,
