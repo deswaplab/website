@@ -384,4 +384,7 @@ can contact me</value>
   <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
     <value>mint succeed, go to trade.</value>
   </data>
+  <data name="Docs" xml:space="preserve">
+    <value>Docs</value>
+  </data>
 </root>

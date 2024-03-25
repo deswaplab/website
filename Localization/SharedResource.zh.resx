@@ -381,4 +381,7 @@
   <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
     <value>铸造成功，去交易</value>
   </data>
+  <data name="Docs" xml:space="preserve">
+    <value>文档</value>
+  </data>
 </root>
