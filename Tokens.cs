@@ -336,8 +336,15 @@ public static class RouletteContracts
             BaseAssetName = "WETH",
             BaseAssetAddress = "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
             BaseAssetDecimals = 18,
-            NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
+            NftAddress = "0x089d627A7eD616EBc289A45EE3300cBf549F1E80",
             Network = SupportedNetworks.EthereumSepolia,
+        },
+        new RouletteContract{
+            BaseAssetName = "WETH",
+            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
+            BaseAssetDecimals = 18,
+            NftAddress = "0x089d627A7eD616EBc289A45EE3300cBf549F1E80",
+            Network = SupportedNetworks.PolygonMumbai,
         },
         new RouletteContract{
             BaseAssetName = "WETH",
@@ -345,13 +352,6 @@ public static class RouletteContracts
             BaseAssetDecimals = 18,
             NftAddress = "0xbDcE3D50aB559474cDA1160253037FD02b97Df9b",
             Network = SupportedNetworks.MoonBaseAlpha,
-        },
-        new RouletteContract{
-            BaseAssetName = "WETH",
-            BaseAssetAddress = "0xD909178CC99d318e4D46e7E66a972955859670E1",
-            BaseAssetDecimals = 18,
-            NftAddress = "0x36aeEAe86F4af54a7b9249C40E90D88aAC8431E5",
-            Network = SupportedNetworks.PolygonMumbai,
         },
         new RouletteContract{
             BaseAssetName = "WNEON",
