@@ -3,6 +3,7 @@ using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Metamask;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Siwe.Core.Recap;
 using System.Numerics;
 
 namespace DeswapApp;
@@ -239,7 +240,8 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, kind, baseAssetAmount, quoteAssetAmount, maturityUnix);
         _logger.LogInformation("mintOptions, tx={}", receipt.TransactionHash.ToString());
         var events = receipt.DecodeAllEvents<TransferEventDTO>();
-        return (long)events.First().Event.TokenId;
+        // avoid mixing erc721 and erc20 transfer
+        return events.Where(item => item.Event.To.EqualsIgnoreCase(_metamaskHostProvider.SelectedAccount)).Select(item => (long)item.Event.TokenId).First();
     }
 
     // 期权行权
