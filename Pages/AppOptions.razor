@@ -468,7 +468,7 @@
         }
         Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var txHash = await _web3Service.MintOptions(
+            var newTokenId = await _web3Service.MintOptions(
                 SelectedOptionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract!.QuoteAssetDecimals), 
@@ -476,10 +476,10 @@
                 SelectedContract!.NftAddress
             );
 
-            Logger.LogInformation($"mint finished, tx: {txHash}");
+            Logger.LogInformation($"mint finished, tokenId: {newTokenId}");
             Steps[2] = MintProgressButton.Progress.Finished;
 
-            toastService.ShowToast(Loc["OptionsMinted_Stmt"], ToastLevel.Success);
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {

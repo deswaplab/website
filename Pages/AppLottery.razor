@@ -215,7 +215,6 @@
 
     private async Task CheckAllowance(MouseEventArgs e)
     {
-        // TODO: 
         Logger.LogInformation($"check allowance, {MaturityDate}, {InputedBaseAssetAmount}, {SelectedContract!.NftAddress}");
         if (!isSupportedNetwork())
         {
@@ -253,7 +252,6 @@
 
     private async Task Approve()
     {
-        // TODO: 
         Logger.LogInformation("Approve");   
         if (!isSupportedNetwork())
         {
@@ -293,9 +291,6 @@
 
     private async Task Mint()
     {
-        // TODO:
-        Logger.LogInformation("Mint");
-        await Task.CompletedTask;
         if (!isSupportedNetwork())
         {
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
@@ -303,17 +298,17 @@
         }
         Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var txHash = await _web3Service.MintLottery(
+            var newTokenId = await _web3Service.MintLottery(
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAssetDecimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 SelectedAmount,
                 SelectedContract!.NftAddress
             );
 
-            Logger.LogInformation($"mint finished, tx: {txHash}");
+            Logger.LogInformation($"mint finished, tokenId: {newTokenId}");
             Steps[2] = MintProgressButton.Progress.Finished;
 
-            toastService.ShowToast(Loc["OptionsMinted_Stmt"], ToastLevel.Success);
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {

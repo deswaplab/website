@@ -146,8 +146,6 @@
 
     private async Task Mint()
     {
-        Logger.LogInformation("Mint");
-        await Task.CompletedTask;
         if (!isSupportedNetwork())
         {
             toastService.ShowToast(Loc["InvalidNetwork_Stmt"], ToastLevel.Error);
@@ -155,14 +153,14 @@
         }
         Steps[0] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var txHash = await _web3Service.MintRoulette(
+            var newTokenId = await _web3Service.MintRoulette(
                 1000,
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 SelectedContract!.NftAddress
             );
             Steps[0] = MintProgressButton.Progress.Finished;
 
-            toastService.ShowToast(Loc["OptionsMinted_Stmt"], ToastLevel.Success);
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
         } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
             if (e.Message.Contains("User denied transaction signature"))
             {
