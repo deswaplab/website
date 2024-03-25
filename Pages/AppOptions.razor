@@ -131,6 +131,14 @@
                                 <li>
                                     <MintProgressButton Text=@($"3. {Loc["Mint"]}") CurrentProgress="@Steps[2]" ClickCallback="Mint" />
                                 </li>
+                                @if (NewTokenId is not null && buildListUrl() != "")
+                                {
+                                    <li>
+                                        <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                                            <a target="_blank" href="@buildListUrl()">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                        </p>
+                                    </li>
+                                }
                             </ol>
                         </div>
                     </div>
@@ -166,6 +174,14 @@
     {
         _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    public long? NewTokenId = null;
+
+    private string buildListUrl()
+    {
+        var network = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+        return network!.BuildListUrl(SelectedContract!.NftAddress, NewTokenId!.Value);
     }
 
     public OptionsKind SelectedOptionsKind {get; set;}
@@ -468,7 +484,7 @@
         }
         Steps[2] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var newTokenId = await _web3Service.MintOptions(
+            NewTokenId = await _web3Service.MintOptions(
                 SelectedOptionsKind,
                 Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAssetDecimals), 
                 Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract!.QuoteAssetDecimals), 
@@ -476,7 +492,7 @@
                 SelectedContract!.NftAddress
             );
 
-            Logger.LogInformation($"mint finished, tokenId: {newTokenId}");
+            Logger.LogInformation($"mint finished, tokenId: {NewTokenId}");
             Steps[2] = MintProgressButton.Progress.Finished;
 
             toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);

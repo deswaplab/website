@@ -381,4 +381,7 @@ can contact me</value>
   <data name="BlackJack_Intro" xml:space="preserve">
     <value>mint a BlackJack NFT means you own this desk, you are the dealer, you can then sell those NFTs and invite BlackJack NFT holders to come to play with you.</value>
   </data>
+  <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
+    <value>mint succeed, go to trade.</value>
+  </data>
 </root>

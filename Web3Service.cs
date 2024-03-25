@@ -133,6 +133,21 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return balance;
     }
 
+    [Event("Transfer")]
+    public class TransferEventDTO : IEventDTO
+    {
+
+        [Parameter("address", "from", 1, true)]
+        public string From { get; set; } = "";
+
+        [Parameter("address", "to", 2, true)]
+        public string To { get; set; } = "";
+
+        [Parameter("uint256", "tokenId", 3, false)]
+        public BigInteger TokenId { get; set; }
+    }
+
+    // erc1155
     [Event("TransferSingle")]
     public class TransferSingleEventDTO : IEventDTO
     {
@@ -215,15 +230,16 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // Mint a Options NFT
-    public async Task<BigInteger> MintOptions(OptionsKind kind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, string nftAddress)
+    public async Task<long> MintOptions(OptionsKind kind, BigInteger baseAssetAmount, BigInteger quoteAssetAmount, long maturityUnix, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(OptionsABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
         var value = DefaultFee;
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, kind, baseAssetAmount, quoteAssetAmount, maturityUnix);
-        var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
-        return events.First().Event.Id;
+        _logger.LogInformation("mintOptions, tx={}", receipt.TransactionHash.ToString());
+        var events = receipt.DecodeAllEvents<TransferEventDTO>();
+        return (long)events.First().Event.TokenId;
     }
 
     // 期权行权
@@ -249,7 +265,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // Mint a Lottery NFT
-    public async Task<BigInteger> MintLottery(BigInteger baseAssetAmount, long maturityUnix, int amount, string nftAddress)
+    public async Task<long> MintLottery(BigInteger baseAssetAmount, long maturityUnix, int amount, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
@@ -257,7 +273,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = DefaultFee;
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, baseAssetAmount, maturityUnix, amount);
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
-        return events.First().Event.Id;
+        return (long)events.First().Event.Id;
     }
 
     public async Task<string> DrawLottery(long tokenId, string nftAddress)
@@ -271,7 +287,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // mint a red envelope
-    public async Task<BigInteger> MintRedEnvelope(BigInteger baseAssetAmount, int amount, RedEnvelopeKind kind, string nftAddress)
+    public async Task<long> MintRedEnvelope(BigInteger baseAssetAmount, int amount, RedEnvelopeKind kind, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RedEnvelopeABI, nftAddress);
@@ -279,7 +295,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = DefaultFee; // 0.001 fee
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, baseAssetAmount, amount, kind);
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
-        return events.First().Event.Id;
+        return (long)events.First().Event.Id;
     }
 
     public async Task<string> OpenRedEnvelope(long tokenId, string nftAddress)
@@ -293,7 +309,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // roulette
-    public async Task<BigInteger> MintRoulette(int amount, long openTime, string nftAddress)
+    public async Task<long> MintRoulette(int amount, long openTime, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
@@ -301,7 +317,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = DefaultFee; // 0.001 fee
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, amount, openTime);
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
-        return events.First().Event.Id;
+        return (long)events.First().Event.Id;
     }
 
     public async Task<string> BetRoulette(BigInteger baseAssetAmount, long tokenId, string nftAddress)
@@ -325,7 +341,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // blackjack
-    public async Task<BigInteger> MintBlackJack(int amount, string nftAddress)
+    public async Task<long> MintBlackJack(int amount, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(BlackJackABI, nftAddress);
@@ -333,7 +349,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var value = DefaultFee; // 0.001 fee
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, amount);
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
-        return events.First().Event.Id;
+        return (long)events.First().Event.Id;
     }
 
     public async Task<string> DepositBlackJack(long tokenId, BigInteger amount, string nftAddress)

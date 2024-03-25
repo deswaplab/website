@@ -477,6 +477,15 @@ public record Network
     public required string Logo { get; set; } // svg文件，保存在 wwwroot/img 下
 
     public bool IsTestNet { get; set; }
+
+    public string BuildListUrl(string contractAddress, long tokenId)
+    {
+        if (string.IsNullOrEmpty(OpenseaHost))
+        {
+            return "";
+        }
+        return $"{OpenseaHost}/{contractAddress}/{tokenId}/sell";
+    }
 }
 
 public static class SupportedNetworks

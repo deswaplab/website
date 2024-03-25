@@ -378,4 +378,7 @@
   <data name="BlackJack_Intro" xml:space="preserve">
     <value>铸造出NFT后，代表你是这张桌子的庄家，你可以销售门票，邀请朋友们来下注，每次提走筹码时要消耗用户的门票</value>
   </data>
+  <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
+    <value>铸造成功，去交易</value>
+  </data>
 </root>

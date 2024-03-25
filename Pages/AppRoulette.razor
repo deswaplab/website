@@ -56,6 +56,14 @@
                                 <li>
                                     <MintProgressButton Text=@($"1. {Loc["Mint"]}") CurrentProgress="@Steps[0]" ClickCallback="Mint" />
                                 </li>
+                                @if (NewTokenId is not null && buildListUrl() != "")
+                                {
+                                    <li>
+                                        <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                                            <a target="_blank" href="@buildListUrl()">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                        </p>
+                                    </li>
+                                }
                             </ol>
                         </div>
                     </div>
@@ -90,6 +98,14 @@
     {
         _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    public long? NewTokenId = null;
+
+    private string buildListUrl()
+    {
+        var network = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+        return network!.BuildListUrl(SelectedContract!.NftAddress, NewTokenId!.Value);
     }
 
     public IList<RouletteContract> AllContracts => RouletteContracts.Inner
@@ -153,7 +169,7 @@
         }
         Steps[0] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
         try {
-            var newTokenId = await _web3Service.MintRoulette(
+            NewTokenId = await _web3Service.MintRoulette(
                 1000,
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 SelectedContract!.NftAddress
