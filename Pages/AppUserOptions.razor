@@ -33,13 +33,13 @@
                         @foreach (var token in UserTokens)
                         {
                             <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                <a href="@buildOpenseaTokenUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank">
+                                <a href="@buildOpenseaTokenUrl(token.Contract, token.TokenId)" target="_blank">
                                     <img class="rounded-t-lg" src="@token.ImageData" alt="" />
                                 </a>
                                 <div class="flex flex-row items-center gap-2 p-5">
                                     @if (token.Listable())
                                     {
-                                        <a href="@buildListUrl(token.Contract, token.TokenId, token.ChainId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                        <a href="@buildListUrl(token.Contract, token.TokenId)" target="_blank" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                             @Loc["List"]
                                         </a>
                                     }
@@ -85,16 +85,16 @@
 @code {
     private bool loadingTokens = false;
 
-    private string buildListUrl(string nftContractAddress, long tokenId, long chainId)
+    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private string buildListUrl(string nftContractAddress, long tokenId)
     {
-        var network = SupportedNetworks.GetNetwork(chainId);
-        return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}/sell";
+        return SelectedNetwork!.BuildListUrl(nftContractAddress, tokenId);
     }
 
-    private string buildOpenseaTokenUrl(string nftContractAddress, long tokenId, long chainId)
+    private string buildOpenseaTokenUrl(string nftContractAddress, long tokenId)
     {
-        var network = SupportedNetworks.GetNetwork(chainId);
-        return $"{network!.OpenseaHost}/{nftContractAddress}/{tokenId}";
+        return SelectedNetwork!.BuildNftUrl(nftContractAddress, tokenId);
     }
 
     private IList<UserOptionNFT> UserTokens {get; set;} = [];

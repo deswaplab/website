@@ -144,7 +144,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         [Parameter("address", "to", 2, true)]
         public string To { get; set; } = "";
 
-        [Parameter("uint256", "tokenId", 3, false)]
+        [Parameter("uint256", "tokenId", 3, true)]
         public BigInteger TokenId { get; set; }
     }
 
@@ -241,7 +241,11 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         _logger.LogInformation("mintOptions, tx={}", receipt.TransactionHash.ToString());
         var events = receipt.DecodeAllEvents<TransferEventDTO>();
         // avoid mixing erc721 and erc20 transfer
-        return events.Where(item => item.Event.To.EqualsIgnoreCase(_metamaskHostProvider.SelectedAccount)).Select(item => (long)item.Event.TokenId).First();
+        foreach (var item in events)
+        {
+            _logger.LogInformation($"from: {item.Event.From}, to: {item.Event.To}");
+        }
+        return events.Where(item => item.Event.To.Equals(_metamaskHostProvider.SelectedAccount, StringComparison.CurrentCultureIgnoreCase)).Select(item => (long)item.Event.TokenId).First();
     }
 
     // 期权行权

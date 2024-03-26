@@ -30,10 +30,10 @@
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.Address}") target="_blank">@collection.Name</a>
                 </th>
                 <td class="px-6 py-4">
-                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.Address}") target="_blank">@collection.Address</a>
                 </td>
                 <td class="px-6 py-4">
                     @Loc["Options"]
@@ -47,10 +47,10 @@
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.Address}") target="_blank">@collection.Name</a>
                 </th>
                 <td class="px-6 py-4">
-                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.Address}") target="_blank">@collection.Address</a>
                 </td>
                 <td class="px-6 py-4">
                     @Loc["Lottery"]
@@ -65,10 +65,10 @@
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.Address}") target="_blank">@collection.Name</a>
                 </th>
                 <td class="px-6 py-4">
-                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.Address}") target="_blank">@collection.Address</a>
                 </td>
                 <td class="px-6 py-4">
                     @Loc["RedEnvelope"]
@@ -83,10 +83,10 @@
             {
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <a href=@($"{collection.Network.OpenseaHost}/{collection.NftAddress}") target="_blank">@collection.Name</a>
+                    <a href=@($"{collection.Network.OpenseaHost}/{collection.Address}") target="_blank">@collection.Name</a>
                 </th>
                 <td class="px-6 py-4">
-                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.NftAddress}") target="_blank">@collection.NftAddress</a>
+                    <a href=@($"{collection.Network.EtherscanHost}/address/{collection.Address}") target="_blank">@collection.Address</a>
                 </td>
                 <td class="px-6 py-4">
                     @Loc["Roulette"]
@@ -102,11 +102,11 @@
 </section>
 
 @code {
-    public IList<OptionsContract> optionsCollections {get; set;} = OptionsContracts.Inner;
+    public IList<TwoAssetNFTContract> optionsCollections {get; set;} = (new OptionsContracts()).Inner;
 
-    public IList<LotteryContract> lotteryCollections {get; set;} = LotteryContracts.Inner;
+    public IList<SingleAssetNFTContract> lotteryCollections {get; set;} = (new LotteryContracts()).Inner;
 
-    public IList<RedEnvelopeContract> redEnvelopeCollections {get; set;} = RedEnvelopeContracts.Inner;
+    public IList<SingleAssetNFTContract> redEnvelopeCollections {get; set;} = (new RedEnvelopeContracts()).Inner;
 
-    public IList<RouletteContract> rouletteCollections {get; set;} = RouletteContracts.Inner;
+    public IList<SingleAssetNFTContract> rouletteCollections {get; set;} = (new RouletteContracts()).Inner;
 }

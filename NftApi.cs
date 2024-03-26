@@ -73,16 +73,16 @@ public class UserOptionNFT
 
     public (string, BigInteger) GetPayAsset()
     {
-        var tokenPair = OptionsContracts.FilterByChainId(ChainId)
-            .Where(item => item.NftAddress.Equals(Contract, StringComparison.CurrentCultureIgnoreCase))
+        var tokenPair = new OptionsContracts().Inner.Where(p => p.Network.ChainId == ChainId)
+            .Where(item => item.Address.Equals(Contract, StringComparison.CurrentCultureIgnoreCase))
             .First();
         if (OptionsKind == OptionsKind.CALL)
         {
-            return (tokenPair.QuoteAssetAddress, Web3.Convert.ToWei(QuoteAssetAmount, tokenPair.QuoteAssetDecimals));
+            return (tokenPair.QuoteAsset.Address, Web3.Convert.ToWei(QuoteAssetAmount, tokenPair.QuoteAsset.Decimals));
         }
         else if (OptionsKind == OptionsKind.PUT)
         {
-            return (tokenPair.BaseAssetAddress, Web3.Convert.ToWei(BaseAssetAmount, tokenPair.BaseAssetDecimals));
+            return (tokenPair.BaseAsset.Address, Web3.Convert.ToWei(BaseAssetAmount, tokenPair.BaseAsset.Decimals));
         }
         throw new Exception("invalid token");
     }
@@ -222,7 +222,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         var client = GetApiClient(chainId);
         var curTokens = await client.GetUserTokens(userAddress, chainId);
 
-        var supportedContracts = OptionsContracts.FilterSupportedContracts(chainId);
+        var supportedContracts = new OptionsContracts().Inner.Where(p => p.Network.ChainId == chainId).Select(p => p.Address.ToLower()).ToList();
         var tokens = curTokens
             .Where(item => supportedContracts.Contains(item.Contract.ToLower()))
             .Select(item =>
@@ -248,9 +248,9 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
     {
         var client = GetApiClient(chainId);
         var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = LotteryContracts.Inner
+        var supportedContracts = new LotteryContracts().Inner
             .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.NftAddress.ToLower())
+            .Select(p => p.Address.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
             .Select(item =>
@@ -274,9 +274,9 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
     {
         var client = GetApiClient(chainId);
         var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = RedEnvelopeContracts.Inner
+        var supportedContracts = new RedEnvelopeContracts().Inner
             .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.NftAddress.ToLower())
+            .Select(p => p.Address.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
             .Select(item =>
@@ -299,9 +299,9 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
     {
         var client = GetApiClient(chainId);
         var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = RouletteContracts.Inner
+        var supportedContracts = new RouletteContracts().Inner
             .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.NftAddress.ToLower())
+            .Select(p => p.Address.ToLower())
             .ToList();
         var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
             .Select(item =>

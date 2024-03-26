@@ -46,7 +46,7 @@
                                         @bind:set="ChangeSelectedContractName"
                                         >
                                         <option></option>
-                                        @foreach(var tokenPair in OptionsContracts.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId))
+                                        @foreach(var tokenPair in AllContracts)
                                         {
                                             <option value="@tokenPair.Name">@tokenPair.Name</option>
                                         }
@@ -71,7 +71,7 @@
                                         </span>
                                         <span>
                                             @if(UserBaseAssetBalance is not null) {
-                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedContract!.GetEtherScanTokenBalanceUrl(SelectedContract.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
+                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(SelectedContract!.BaseAsset.Address, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
                                             }
                                         </span>
                                     </label>
@@ -84,12 +84,6 @@
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">@Loc["BalanceIsEmpty_Stmt"]</p>
                                     }
-                                    else if (SelectedOptionsKind == OptionsKind.PUT && SelectedContract is not null && SelectedContract.OkxTickSymbol is not null)
-                                    {
-                                        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                            <a @onclick="RecommendPrice" class="font-medium text-blue-600 hover:underline dark:text-blue-500">@Loc["RecommendPrice_Stmt"]</a>
-                                        </p>
-                                    }
                                 </div>
                                 <div>
                                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
@@ -98,7 +92,7 @@
                                         </span>
                                         <span>
                                             @if(UserQuoteAssetBalance is not null) {
-                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedContract!.GetEtherScanTokenBalanceUrl(SelectedContract.QuoteAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserQuoteAssetBalance</a>
+                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(SelectedContract!.QuoteAsset.Address, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserQuoteAssetBalance</a>
                                             }
                                         </span>
                                         
@@ -111,12 +105,6 @@
                                     @if(SelectedOptionsKind == OptionsKind.PUT && UserQuoteAssetBalance == 0)
                                     {
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-red-600 dark:text-red-500">@Loc["BalanceIsEmpty_Stmt"]</p>
-                                    }
-                                    else if (SelectedOptionsKind == OptionsKind.CALL && SelectedContract is not null && SelectedContract.OkxTickSymbol is not null)
-                                    {
-                                        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                            <a @onclick="RecommendPrice" class="font-medium text-blue-600 hover:underline dark:text-blue-500">@Loc["RecommendPrice_Stmt"]</a>
-                                        </p>
                                     }
                                 </div>
 
@@ -131,11 +119,11 @@
                                 <li>
                                     <MintProgressButton Text=@($"3. {Loc["Mint"]}") CurrentProgress="@Steps[2]" ClickCallback="Mint" />
                                 </li>
-                                @if (NewTokenId is not null && buildListUrl() != "")
+                                @if (NewTokenId is not null && SelectedNetwork!.BuildListUrl(SelectedContract!.Address, NewTokenId!.Value) != "")
                                 {
                                     <li>
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                                            <a target="_blank" href="@buildListUrl()">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                            <a target="_blank" href="@SelectedNetwork!.BuildListUrl(SelectedContract!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
                                         </p>
                                     </li>
                                 }
@@ -176,13 +164,13 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    public long? NewTokenId = null;
+    public IList<TwoAssetNFTContract> AllContracts => (new OptionsContracts()).Inner
+        .Where(p => p.Network.ChainId == _metamaskHostProvider.SelectedNetworkChainId)
+        .ToList();
 
-    private string buildListUrl()
-    {
-        var network = SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
-        return network!.BuildListUrl(SelectedContract!.NftAddress, NewTokenId!.Value);
-    }
+    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    public long? NewTokenId = null;
 
     public OptionsKind SelectedOptionsKind {get; set;}
 
@@ -196,26 +184,28 @@
 
     public string BaseAssetAction => SelectedOptionsKind == OptionsKind.CALL ? Loc["You Pay"] : Loc["You Will Get"];
 
-    public string BaseAssetName => SelectedContract is not null ? SelectedContract.BaseAssetName : "";
+    public string BaseAssetName => SelectedContract is not null ? SelectedContract.BaseAsset.Name : "";
 
     public string QuoteAssetAction => SelectedOptionsKind == OptionsKind.CALL ? Loc["You Will Get"] : Loc["You Pay"];
 
-    public string QuoteAssetName => SelectedContract is not null ? SelectedContract.QuoteAssetName : "";
+    public string QuoteAssetName => SelectedContract is not null ? SelectedContract.QuoteAsset.Name : "";
 
     private async Task ChangeSelectedContractName(string value)
     {
         Logger.LogInformation($"selected token pair changed: {value}");
-        SelectedContract = OptionsContracts.FilterByChainId(_metamaskHostProvider.SelectedNetworkChainId)
+        SelectedContract = new OptionsContracts().Inner.Where(p => p.Network.ChainId == _metamaskHostProvider.SelectedNetworkChainId)
             .Where(item => item.Name == value)
             .FirstOrDefault();
         if (SelectedContract is not null)
         {
+            Logger.LogInformation("hello");
             SelectedContractName = value;
 
-            var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.BaseAssetAddress);
-            UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedContract.BaseAssetDecimals);
-            var quoteBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.QuoteAssetAddress);
-            UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedContract.QuoteAssetDecimals);
+            Logger.LogInformation($"base asset: {SelectedContract.BaseAsset.Address}");
+            var baseBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.BaseAsset.Address);
+            UserBaseAssetBalance = Web3.Convert.FromWei(baseBalanceInWei, SelectedContract.BaseAsset.Decimals);
+            var quoteBalanceInWei = await _web3Service.GetUserBalance(_metamaskHostProvider.SelectedAccount, SelectedContract.QuoteAsset.Address);
+            UserQuoteAssetBalance = Web3.Convert.FromWei(quoteBalanceInWei, SelectedContract.QuoteAsset.Decimals);
 
             ResetSteps();
         }
@@ -225,7 +215,7 @@
 
     public decimal? UserQuoteAssetBalance {get; set;}
 
-    public OptionsContract? SelectedContract {get; set;}
+    public TwoAssetNFTContract? SelectedContract {get; set;}
 
     public DateOnly MaturityDate {get; set;} = DateOnly.FromDateTime(DateTime.Now).AddDays(3);
 
@@ -302,22 +292,6 @@
         ResetSteps();
     }
 
-    private async Task RecommendPrice()
-    {
-        var price = await _priceService.GetRecommendOptionsPrice(SelectedOptionsKind, MaturityDate, SelectedContract!.OkxTickSymbol!, SelectedContract!.OkxOptUly);
-        Logger.LogInformation($"recommend price clicked, price={price}");
-        if (SelectedOptionsKind == OptionsKind.CALL)
-        {
-            SetInputedQuoteAssetAmount(InputedBaseAssetAmount * price);
-        }
-        else
-        {
-            SetInputedBaseAssetAmount(InputedQuoteAssetAmount * price);
-        }
-
-        await Task.CompletedTask;
-    }
-
     public MintProgressButton.Progress[] Steps = [
         MintProgressButton.Progress.NotStarted,
         MintProgressButton.Progress.NotStarted,
@@ -373,9 +347,9 @@
             {
                 if (InputedBaseAssetAmount <= UserBaseAssetBalance)
                 {
-                    Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedContract.NftAddress}, {SelectedContract.BaseAssetAddress}");
-                    var baseAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract.NftAddress, SelectedContract.BaseAssetAddress);
-                    var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedContract.BaseAssetDecimals);
+                    Logger.LogInformation($"user base balance is ok, {_metamaskHostProvider.SelectedAccount}, {SelectedContract.Address}, {SelectedContract.BaseAsset.Address}");
+                    var baseAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract.Address, SelectedContract.BaseAsset.Address);
+                    var baseAssetAllowance = Web3.Convert.FromWei(baseAssetAllowanceWei, SelectedContract.BaseAsset.Decimals);
                     Logger.LogInformation($"weth allowance={baseAssetAllowance}");
                     if (baseAssetAllowance >= InputedBaseAssetAmount)
                     {
@@ -392,7 +366,7 @@
                 }
                 else
                 {
-                    toastService.ShowToast($"{SelectedContract.BaseAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
+                    toastService.ShowToast($"{SelectedContract.BaseAsset.Name} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
                     Steps[0] = MintProgressButton.Progress.ToStart;
 
                     return;
@@ -404,8 +378,8 @@
                 {
                     Logger.LogInformation("user quote balance is ok");
                     // Check USDC allowance
-                    var quoteAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract.NftAddress, SelectedContract.QuoteAssetAddress);
-                    var quoteAssetAllowance = Web3.Convert.FromWei(quoteAssetAllowanceWei, SelectedContract.QuoteAssetDecimals);
+                    var quoteAssetAllowanceWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract.Address, SelectedContract.QuoteAsset.Address);
+                    var quoteAssetAllowance = Web3.Convert.FromWei(quoteAssetAllowanceWei, SelectedContract.QuoteAsset.Decimals);
                     if (quoteAssetAllowance >= InputedQuoteAssetAmount)
                     {
                         Logger.LogInformation($"quote allowance is enough, skip approve");
@@ -421,7 +395,7 @@
                 }
                 else
                 {
-                    toastService.ShowToast($"{SelectedContract.QuoteAssetName} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
+                    toastService.ShowToast($"{SelectedContract.QuoteAsset.Name} {Loc["InsufficientBalance_Stmt"]}", ToastLevel.Error);
                     Steps[0] = MintProgressButton.Progress.ToStart;
                     return;
                 }
@@ -444,14 +418,14 @@
             return;
         }
         Steps[1] = MintProgressButton.Progress.InProgress; // 一点击就该置灰
-        var contractAddress = SelectedOptionsKind == OptionsKind.CALL ? SelectedContract!.BaseAssetAddress : SelectedContract!.QuoteAssetAddress;
-        var wad = SelectedOptionsKind == OptionsKind.CALL ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract.BaseAssetDecimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract.QuoteAssetDecimals);
+        var contractAddress = SelectedOptionsKind == OptionsKind.CALL ? SelectedContract!.BaseAsset.Address : SelectedContract!.QuoteAsset.Address;
+        var wad = SelectedOptionsKind == OptionsKind.CALL ? Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract.BaseAsset.Decimals) : Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract.QuoteAsset.Decimals);
         try {
-            var txHash = await _web3Service.Approve(SelectedContract!.NftAddress, wad, contractAddress);
+            var txHash = await _web3Service.Approve(SelectedContract!.Address, wad, contractAddress);
             Logger.LogInformation($"approve finished, tx: {txHash}");
             await Task.Delay(1000);
             // check allowance again
-            var newAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract!.NftAddress, contractAddress);
+            var newAllowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, SelectedContract!.Address, contractAddress);
             if (newAllowance < wad)
             {
                 // 没有授权足够的金额
@@ -486,10 +460,10 @@
         try {
             NewTokenId = await _web3Service.MintOptions(
                 SelectedOptionsKind,
-                Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAssetDecimals), 
-                Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract!.QuoteAssetDecimals), 
+                Web3.Convert.ToWei(InputedBaseAssetAmount, SelectedContract!.BaseAsset.Decimals), 
+                Web3.Convert.ToWei(InputedQuoteAssetAmount, SelectedContract!.QuoteAsset.Decimals), 
                 new DateTimeOffset(MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
-                SelectedContract!.NftAddress
+                SelectedContract!.Address
             );
 
             Logger.LogInformation($"mint finished, tokenId: {NewTokenId}");
