@@ -60,6 +60,45 @@ public class RouletteContracts
     ];
 }
 
+public class AllContracts
+{
+    public readonly IList<(string, string, Network)> Inner;
+
+    public AllContracts()
+    {
+        Inner = [];
+        foreach (var item in new OptionsContracts().Inner)
+        {
+            Inner.Add(("OptionsContracts", item.Address, item.Network));
+        }
+        foreach (var item in new LotteryContracts().Inner)
+        {
+            Inner.Add(("LotteryContracts", item.Address, item.Network));
+        }
+        foreach (var item in new RedEnvelopeContracts().Inner)
+        {
+            Inner.Add(("RedEnvelopeContracts", item.Address, item.Network));
+        }
+        foreach (var item in new RouletteContracts().Inner)
+        {
+            Inner.Add(("RouletteContracts", item.Address, item.Network));
+        }
+    }
+
+    // 返回是哪种nft合约
+    public string GetContractKind(string address, string networkname)
+    {
+        foreach (var item in Inner)
+        {
+            if (item.Item2.Equals(address, StringComparison.CurrentCultureIgnoreCase) && item.Item3.InnerName.Equals(networkname, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return item.Item1;
+            }
+        }
+        return "";
+    }
+}
+
 public static class BlackJackContracts
 {
     public static readonly IList<BlackJackContract> Inner = [
@@ -111,6 +150,8 @@ public record Network
 {
     public required string Name { get; set; }
 
+    public required string InnerName { get; set; }
+
     public long ChainId { get; set; }
 
     public required string EtherscanHost { get; set; }
@@ -160,6 +201,7 @@ public static class SupportedNetworks
     public static Network EthereumSepolia { get; } = new Network
     {
         Name = "Sepolia",
+        InnerName = "sepolia",
         ChainId = 11155111,
         EtherscanHost = "https://sepolia.etherscan.io",
         OpenseaHost = "https://testnets.opensea.io/assets/sepolia",
@@ -173,6 +215,7 @@ public static class SupportedNetworks
     public static Network PolygonMumbai { get; } = new Network
     {
         Name = "Pylogon Mumbai",
+        InnerName = "polygon_mumbai",
         ChainId = 80001,
         EtherscanHost = "https://mumbai.polygonscan.com",
         OpenseaHost = "https://testnets.opensea.io/assets/mumbai",
@@ -187,6 +230,7 @@ public static class SupportedNetworks
     public static Network MoonBaseAlpha { get; } = new Network
     {
         Name = "MoonBase Alpha",
+        InnerName = "moonbase_alpha",
         ChainId = 1287,
         EtherscanHost = "https://moonbase.moonscan.io",
         OpenseaHost = "",
@@ -201,6 +245,7 @@ public static class SupportedNetworks
     public static Network SolanaNeonDev { get; } = new Network
     {
         Name = "Neon dev",
+        InnerName = "neondev",
         ChainId = 245022926,
         EtherscanHost = "https://devnet.neonscan.org",
         OpenseaHost = "",
@@ -214,6 +259,7 @@ public static class SupportedNetworks
     public static Network MantaPacificSepolia { get; } = new Network
     {
         Name = "Manta Pacific Sepolia", // nft api 501 not implemented
+        InnerName = "manta_pacific_sepolia",
         ChainId = 3441006,
         EtherscanHost = "https://pacific-explorer.sepolia-testnet.manta.network",
         OpenseaHost = "",
@@ -228,6 +274,7 @@ public static class SupportedNetworks
     public static Network NearAuroraTestnet { get; } = new Network
     {
         Name = "Aurora Testnet",
+        InnerName = "aurora_testnet",
         ChainId = 1313161555,
         EtherscanHost = "https://explorer.testnet.aurora.dev",
         OpenseaHost = "",
@@ -242,6 +289,7 @@ public static class SupportedNetworks
     public static Network MantleSepolia { get; } = new Network
     {
         Name = "Mantle Sepolia", // nft api 501 not implemented
+        InnerName = "mantle_sepolia",
         ChainId = 5003,
         EtherscanHost = "https://explorer.sepolia.mantle.xyz",
         OpenseaHost = "",
@@ -256,6 +304,7 @@ public static class SupportedNetworks
     public static Network ScrollSepolia { get; } = new Network
     {
         Name = "Scroll Sepolia", // nft api 501 not implemented
+        InnerName = "scroll_sepolia",
         ChainId = 534351,
         EtherscanHost = "https://sepolia.scrollscan.com",
         OpenseaHost = "",
@@ -282,6 +331,11 @@ public static class SupportedNetworks
     {
         var res = Inner.FirstOrDefault(item => item.ChainId == chainId);
         return res;
+    }
+
+    public static Network? GetNetworkByName(string name)
+    {
+        return Inner.FirstOrDefault(item => item.InnerName.Equals(name, StringComparison.CurrentCultureIgnoreCase));
     }
 }
 

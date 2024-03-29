@@ -1,4 +1,5 @@
 @using Nethereum.UI
+@using System.Security.Claims
 
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject SelectedEthereumHostProviderService _selectedHostProvider
@@ -9,79 +10,39 @@
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
         <Authorized>
-            <li>
-                <button id="userCenterDropDown"
-                    class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:w-auto md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-                    @onclick="ToggleUserDropDown"
-                    @onclick:stopPropagation="true"
-                >
-                    <div class="inline-flex items-center">
-                        @Truncate(_metamaskHostProvider.SelectedAccount, 10)
-                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                        </svg>
-                    </div>
-                </button>
-                <div class="@UserDropDownClass z-10 absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton"
-                        @onclick="ToggleUserDropDown"
-                    >
-                        <li>
-                            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
-                                href="/app/user/options"
-                            >
-                                @Loc["My Options NFT"]
-                            </a>
-                        </li>
-                        <li>
-                            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
-                                href="/app/user/lottery"
-                            >
-                                @Loc["My Lottery NFT"]
-                            </a>
-                        </li>
-                        <li>
-                            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
-                                href="/app/user/redenvelope"
-                            >
-                                @Loc["My RedEnvelope NFT"]
-                            </a>
-                        </li>
-                        <li>
-                            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
-                                href="/app/user/roulette"
-                            >
-                                @Loc["My Roulette NFT"]
-                            </a>
-                        </li>
-                        @* <li>
-                            <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
-                                href="/app/user/blackjack"
-                            >
-                                @Loc["My BlackJack NFT"]
-                            </a>
-                        </li> *@
-                    </ul>
-                </div>
-            </li>
+            <NavLink href="/app/user/tokens" Match="NavLinkMatch.All"
+                     ActiveClass="md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+                     class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                @Truncate(SelectedAccount, 10)
+            </NavLink>
         </Authorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
 
 @code {
+    public string SelectedAccount = "0x";
 
-    public static string Truncate(string? value, int maxLength, string truncationSuffix = "…")
+    public string Truncate(string? value, int maxLength, string truncationSuffix = "…")
     {
         return value?.Length > maxLength
             ? value.Substring(0, maxLength) + truncationSuffix
             : "";
     }
-   
-    private bool CollapseUserDropDown = false;
 
-    private string UserDropDownClass => CollapseUserDropDown ? "" : "hidden";
-    private void ToggleUserDropDown()
+    protected override void OnInitialized()
     {
-        CollapseUserDropDown = !CollapseUserDropDown;
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        SelectedAccount = account;
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
     }
 }

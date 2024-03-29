@@ -134,6 +134,48 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return balance;
     }
 
+    // ERC-1155 Uri
+    [Function("uri", "string")]
+    public class UriFunction : FunctionMessage
+    {
+        [Parameter("uint256", "tokenId", 1)]
+        public BigInteger TokenId { get; set; }
+    }
+    public async Task<string> GetUri(string contractAddress, long tokenId)
+    {
+        var UriFunctionMessage = new UriFunction()
+        {
+            TokenId = tokenId,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<UriFunction>();
+        var uri = await balanceHandler.QueryAsync<string>(contractAddress, UriFunctionMessage);
+        _logger.LogInformation("get uri, {}, {}", tokenId, uri);
+        return uri;
+    }
+
+    // ERC-721 tokenUri
+    [Function("tokenURI", "string")]
+    public class TokenUriFunction : FunctionMessage
+    {
+        [Parameter("uint256", "tokenId", 1)]
+        public BigInteger TokenId { get; set; }
+    }
+    public async Task<string> GetTokenUri(string contractAddress, long tokenId)
+    {
+        var TokenUriFunctionMessage = new TokenUriFunction()
+        {
+            TokenId = tokenId,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<TokenUriFunction>();
+        var uri = await balanceHandler.QueryAsync<string>(contractAddress, TokenUriFunctionMessage);
+        _logger.LogInformation("get token uri, {}, {}", tokenId, uri);
+        return uri;
+    }
+
     [Event("Transfer")]
     public class TransferEventDTO : IEventDTO
     {

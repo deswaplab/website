@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Nethereum.Contracts.Standards.ERC20.TokenList;
 using Nethereum.Web3;
 
 // 发查询请求的客户端，不同网络可以使用不同的api，如ethereum走opensea，moonbeam走covan
@@ -17,7 +18,7 @@ public interface IApiClient
     Task RefreshMetadata(string contractAddress, long chainId, long tokenId);
 }
 
-public class UserOptionNFT
+public record UserNftBase
 {
     public long TokenId { get; set; }
 
@@ -26,7 +27,11 @@ public class UserOptionNFT
     public required string Contract { get; set; }
 
     public required string ImageData { get; set; }
+}
 
+public record UserOptionNFT : UserNftBase
+{
+   
     public DateTimeOffset MaturityDate { get; set; }
 
     public OptionsKind OptionsKind { get; set; }
@@ -86,19 +91,27 @@ public class UserOptionNFT
         }
         throw new Exception("invalid token");
     }
+
+    public static UserOptionNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserOptionNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            MaturityDate = NftMetadataParser.ParseMaturityDate(metadataUrl, "maturityDate"),
+            OptionsKind = NftMetadataParser.ParseOptionsKind(metadataUrl),
+            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+            QuoteAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "quoteAssetAmount"),
+            Price = NftMetadataParser.ParsePrice(metadataUrl),
+        };
+    }
 }
 
-public class UserLotteryNFT
+public record UserLotteryNFT : UserNftBase
 {
-    public long TokenId { get; set; }
-
-    public long ChainId { get; set; }
-
-    public required string Contract { get; set; }
-
     public required string Status { get; set; }
-
-    public required string ImageData { get; set; }
 
     public DateTimeOffset DrawTime { get; set; }
 
@@ -121,33 +134,44 @@ public class UserLotteryNFT
         }
         return false;
     }
+
+    public static UserLotteryNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserLotteryNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            Status = NftMetadataParser.ParseString(metadataUrl, "status"), // open|close
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            DrawTime = NftMetadataParser.ParseMaturityDate(metadataUrl, "drawTime"),
+            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+        };
+    }
 }
 
-public class UserRedEnvelopeNFT
+public record UserRedEnvelopeNFT : UserNftBase
 {
-    public long TokenId { get; set; }
-
-    public long ChainId { get; set; }
-
-    public required string Contract { get; set; }
-
     public required string Status { get; set; }
 
-    public required string ImageData { get; set; }
-
     public decimal BaseAssetAmount { get; set; }
+
+    public static UserRedEnvelopeNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserRedEnvelopeNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            Status = NftMetadataParser.ParseString(metadataUrl, "status"), // open|close
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+        };
+    }
 }
 
-public class UserRouletteNFT
+public record UserRouletteNFT : UserNftBase
 {
-    public long TokenId { get; set; }
-
-    public long ChainId { get; set; }
-
-    public required string Contract { get; set; }
-
-    public required string ImageData { get; set; }
-
     public decimal BaseAssetAmount { get; set; }
 
     public DateTimeOffset OpenTime { get; set; }
@@ -166,18 +190,24 @@ public class UserRouletteNFT
         }
         return false;
     }
+
+    public static UserRouletteNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserRouletteNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+            OpenTime = NftMetadataParser.ParseMaturityDate(metadataUrl, "openTime"),
+            Writer = NftMetadataParser.ParseString(metadataUrl, "writer"),
+        };
+    }
 }
 
-public class UserBlackJackNFT
+public record UserBlackJackNFT : UserNftBase
 {
-    public long TokenId { get; set; }
-
-    public long ChainId { get; set; }
-
-    public required string Contract { get; set; }
-
-    public required string ImageData { get; set; }
-
     public decimal DealerBalance { get; set; }
 
     public required string Writer { get; set; }
@@ -190,6 +220,20 @@ public class UserBlackJackNFT
         }
         return false;
     }
+
+    public static UserBlackJackNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserBlackJackNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            DealerBalance = NftMetadataParser.ParseAmount(metadataUrl, "dealerBalance"),
+            Writer = NftMetadataParser.ParseString(metadataUrl, "writer"),
+        };
+    }
+
 }
 
 public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
@@ -217,136 +261,24 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         await client.RefreshMetadata(contractAddress, chainId, tokenId);
     }
 
-    public async Task<IList<UserOptionNFT>> GetUserOptionTokens(string userAddress, long chainId)
+    public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
     {
         var client = GetApiClient(chainId);
-        var curTokens = await client.GetUserTokens(userAddress, chainId);
-
-        var supportedContracts = new OptionsContracts().Inner.Where(p => p.Network.ChainId == chainId).Select(p => p.Address.ToLower()).ToList();
-        var tokens = curTokens
-            .Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserOptionNFT
-                {
-                    TokenId = item.TokenId,
-                    ChainId = chainId,
-                    Contract = item.Contract,
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    MaturityDate = ParseMaturityDate(item.MetadataUrl, "maturityDate"),
-                    OptionsKind = ParseOptionsKind(item.MetadataUrl),
-                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
-                    QuoteAssetAmount = ParseAmount(item.MetadataUrl, "quoteAssetAmount"),
-                    Price = ParsePrice(item.MetadataUrl),
-                };
-            })
-            .ToList();
-        return tokens;
+        return await client.GetUserTokens(userAddress, chainId);
     }
 
-    public async Task<IList<UserLotteryNFT>> GetUserLotteryTokens(string userAddress, long chainId)
+    public async Task<IList<UserNftBase>> GetUserNftBases(string userAddress, long chainId)
     {
-        var client = GetApiClient(chainId);
-        var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = new LotteryContracts().Inner
-            .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.Address.ToLower())
-            .ToList();
-        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserLotteryNFT
-                {
-                    TokenId = item.TokenId,
-                    ChainId = chainId,
-                    Contract = item.Contract,
-                    Status = ParseString(item.MetadataUrl, "status"), // open|close
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    DrawTime = ParseMaturityDate(item.MetadataUrl, "drawTime"),
-                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
-                };
-            })
-            .ToList();
-        return tokens;
+        var metadatas = await GetUserTokens(userAddress, chainId);
+        var allContracts = new AllContracts().Inner.Select(item => item.Item2.ToLower());
+        return metadatas.Where(item => allContracts.Contains(item.Contract.ToLower())).Select(item => new UserNftBase {TokenId = item.TokenId, Contract = item.Contract, ChainId = chainId, ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl) }).ToList();
     }
+}
 
-    public async Task<IList<UserRedEnvelopeNFT>> GetUserRedEnvelopeTokens(string userAddress, long chainId)
-    {
-        var client = GetApiClient(chainId);
-        var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = new RedEnvelopeContracts().Inner
-            .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.Address.ToLower())
-            .ToList();
-        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserRedEnvelopeNFT
-                {
-                    TokenId = item.TokenId,
-                    ChainId = chainId,
-                    Contract = item.Contract,
-                    Status = ParseString(item.MetadataUrl, "status"), // open|close
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
-                };
-            })
-            .ToList();
-        return tokens;
-    }
-
-    public async Task<IList<UserRouletteNFT>> GetUserRouletteTokens(string userAddress, long chainId)
-    {
-        var client = GetApiClient(chainId);
-        var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = new RouletteContracts().Inner
-            .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.Address.ToLower())
-            .ToList();
-        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserRouletteNFT
-                {
-                    TokenId = item.TokenId,
-                    ChainId = chainId,
-                    Contract = item.Contract,
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    BaseAssetAmount = ParseAmount(item.MetadataUrl, "baseAssetAmount"),
-                    OpenTime = ParseMaturityDate(item.MetadataUrl, "openTime"),
-                    Writer = ParseString(item.MetadataUrl, "writer"),
-                };
-            })
-            .ToList();
-        return tokens;
-    }
-
-    public async Task<IList<UserBlackJackNFT>> GetUserBlackJackTokens(string userAddress, long chainId)
-    {
-        var client = GetApiClient(chainId);
-        var curTokens = await client.GetUserTokens(userAddress, chainId);
-        var supportedContracts = BlackJackContracts.Inner
-            .Where(p => p.Network.ChainId == chainId)
-            .Select(p => p.NftAddress.ToLower())
-            .ToList();
-        var tokens = curTokens.Where(item => supportedContracts.Contains(item.Contract.ToLower()))
-            .Select(item =>
-            {
-                return new UserBlackJackNFT
-                {
-                    TokenId = item.TokenId,
-                    ChainId = chainId,
-                    Contract = item.Contract,
-                    ImageData = ParseImageSvg(item.MetadataUrl),
-                    DealerBalance = ParseAmount(item.MetadataUrl, "dealerBalance"),
-                    Writer = ParseString(item.MetadataUrl, "writer"),
-                };
-            })
-            .ToList();
-        return tokens;
-    }
-
-    private static string ParseImageSvg(string metadataUrl)
+// NFT metadata 统一用opensea格式，所以可以统一方式解析
+public static class NftMetadataParser
+{
+    public static string ParseImageSvg(string metadataUrl)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -380,7 +312,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         public IList<OpenseaTraits>? Attributes { get; set; }
     }
 
-    private static DateTimeOffset ParseMaturityDate(string metadataUrl, string name)
+    public static DateTimeOffset ParseMaturityDate(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -402,7 +334,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         throw new Exception("can find maturity date");
     }
 
-    private static OptionsKind ParseOptionsKind(string metadataUrl)
+    public static OptionsKind ParseOptionsKind(string metadataUrl)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -429,7 +361,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         throw new Exception("no options kind found");
     }
 
-    private static decimal ParseAmount(string metadataUrl, string name)
+    public static decimal ParseAmount(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -448,7 +380,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         throw new Exception("no baseAssetAmount found");
     }
 
-    private static decimal ParsePrice(string metadataUrl)
+    public static decimal ParsePrice(string metadataUrl)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -467,7 +399,7 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         throw new Exception("no price found");
     }
 
-    private static string ParseString(string metadataUrl, string name)
+    public static string ParseString(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
         if (metadataUrl.StartsWith(head))
@@ -485,7 +417,6 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
         }
         throw new Exception("no price found");
     }
-
 }
 
 public record NFTMetadataBase(long TokenId, string Contract, string MetadataUrl);

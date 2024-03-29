@@ -55,6 +55,13 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
+        await _selectedHostProvider.SetSelectedEthereumHostProvider(_metamaskHostProvider);
+
+        if (_authenticationStateProvider is EthereumAuthenticationStateProvider)
+        {
+            ((EthereumAuthenticationStateProvider)_authenticationStateProvider)?.NotifyAuthenticationStateAsEthereumConnected(account);
+        }
+
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -70,7 +77,7 @@
 
         if (_authenticationStateProvider is EthereumAuthenticationStateProvider)
         {
-            ((EthereumAuthenticationStateProvider)_authenticationStateProvider)?.NotifyStateHasChanged();
+            ((EthereumAuthenticationStateProvider)_authenticationStateProvider)?.NotifyAuthenticationStateAsEthereumConnected(SelectedAccount);
         }
 
         StateHasChanged();
