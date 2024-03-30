@@ -17,10 +17,24 @@
             <section class="bg-gray-50 dark:bg-gray-900 my-10">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                        <div class="flex flex-row items-center content-center justify-between p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                                 @Title(ContractKind)
                             </h1>
+                            <div class="flex flex-row items-center content-center justify-between">
+                                @if (!string.IsNullOrEmpty(OpenseaUrl))
+                                {
+                                    <CopyToClickboard TextToCopy="@OpenseaUrl" IconPath="/img/opensea_logo.svg" Name="" />
+                                }
+                                @if (!string.IsNullOrEmpty(EtherscanUrl))
+                                {
+                                    <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="/img/etherscan_logo.svg" Name="" />
+                                }
+                                @if (!string.IsNullOrEmpty(MetamaskDeepLink))
+                                {
+                                    <CopyToClickboard TextToCopy="@MetamaskDeepLink" IconPath="/img/metamask_logo.svg" Name="" />
+                                }
+                            </div>
                         </div>
                         @if (ContractKind == "OptionsContracts")
                         {
@@ -58,6 +72,14 @@
 
     [Parameter]
     public string NetworkName { get; set; } = "";
+
+    public Network? SelectedNetwork => SupportedNetworks.GetNetworkByName(NetworkName);
+
+    public string OpenseaUrl => (SelectedNetwork is not null && SelectedNetwork.OpenseaHost != "") ? $"{SelectedNetwork.OpenseaHost}/{ContractAddress}/{TokenId}" : "";
+
+    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost != "") ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
+
+    public string MetamaskDeepLink => $"https://metamask.app.link/dapp/deswap.one/app/{NetworkName}/{ContractAddress}/{TokenId}";
 
     public AllContracts allContracts = new AllContracts();
 

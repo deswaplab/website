@@ -1,0 +1,25 @@
+@inject IClipboardService ClipboardService
+
+<button type="button" @onclick="OnClick" class="text-gray-900 hover:text-white hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">
+    <div class="inline-flex items-center">
+    <img class="h-3.5 w-3.5 rounded-full me-2" src="@IconPath" alt="icon" />
+    <span>@Name</span>
+    </div>
+</button>
+
+@code {
+
+    [Parameter]
+    public required string TextToCopy { get; set; }
+
+    [Parameter]
+    public required string IconPath { get; set; }
+
+    [Parameter]
+    public required string Name { get; set; }
+
+    private async Task OnClick()
+    {
+        await ClipboardService.CopyToClipboard(TextToCopy);
+    }
+}
