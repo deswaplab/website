@@ -102,6 +102,19 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+                Token = UserOptionNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+                StateHasChanged();
+            }
+        }
+    }
+
     private bool ExerciseButtonDisabled = false;
 
     private string ExerciseButtonDisabledClass => ExerciseButtonDisabled ? "cursor-not-allowed" : "";

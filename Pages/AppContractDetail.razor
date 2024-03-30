@@ -9,7 +9,7 @@
 @page "/app/{NetworkName}/{ContractAddress}/{TokenId:long}"
 @layout AppLayout
 
-<PageTitle>@Loc["My RedEnvelope NFT"]</PageTitle>
+<PageTitle>@Title(ContractKind)</PageTitle>
 
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
@@ -19,7 +19,7 @@
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                                @ContractKind
+                                @Title(ContractKind)
                             </h1>
                         </div>
                         @if (ContractKind == "OptionsContracts")
@@ -62,4 +62,23 @@
     public AllContracts allContracts = new AllContracts();
 
     public string ContractKind => allContracts.GetContractKind(ContractAddress, NetworkName);
+
+    public string Title(string contractKind) {
+        if (contractKind == "OptionsContracts")
+        {
+            return Loc["Options"];
+        }
+        else if (contractKind == "LotteryContracts")
+        {
+            return Loc["Lottery"];
+        } else if (contractKind == "RedEnvelopeContracts")
+        {
+            return Loc["RedEnvelope"];
+        }
+        else if (contractKind == "Roulette")
+        {
+            return Loc["Roulette"];
+        }
+        return "Unknown Contract";
+    }
 }

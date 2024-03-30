@@ -384,4 +384,7 @@
   <data name="Docs" xml:space="preserve">
     <value>文档</value>
   </data>
+  <data name="My Tokens" xml:space="preserve">
+    <value>我的代币</value>
+  </data>
 </root>

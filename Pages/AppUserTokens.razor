@@ -10,7 +10,7 @@
 @page "/app/user/tokens"
 @layout AppLayout
 
-<PageTitle>@Loc["My Lottery NFT"]</PageTitle>
+<PageTitle>@Loc["My Tokens"]</PageTitle>
 
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
@@ -34,7 +34,7 @@
                             @foreach (var token in Tokens)
                             {
                                 <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                    <a href="@buildDetailUrl(SelectedNetworkName, token.Contract, token.TokenId)" target="_blank">
+                                    <a href="@buildDetailUrl(SelectedNetworkName, token.Contract, token.TokenId)">
                                         <img class="rounded-t-lg" src="@token.ImageData" alt="" />
                                     </a>
                                 </div>
@@ -97,5 +97,17 @@
     {
         _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Tokens is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                Tokens = await _nftFetcher.GetUserNftBases(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
+                StateHasChanged();
+            }
+        }
     }
 }

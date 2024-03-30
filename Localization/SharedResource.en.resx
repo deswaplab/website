@@ -387,4 +387,7 @@ can contact me</value>
   <data name="Docs" xml:space="preserve">
     <value>Docs</value>
   </data>
+  <data name="My Tokens" xml:space="preserve">
+    <value>My Tokens</value>
+  </data>
 </root>
