@@ -3,7 +3,7 @@
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
-@inject NftApi _nftFetcher
+@inject NftApi _nftApi
 @inject IStringLocalizer<SharedResource> Loc
 
 
@@ -58,7 +58,7 @@
 </CascadingAuthenticationState>
 
 @code {
-    public Network? SelectedNetwork;
+    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private string SelectedNetworkName => SelectedNetwork?.InnerName ?? "";
 
@@ -83,14 +83,14 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        SelectedNetwork = SupportedNetworks.GetNetwork(chainId);
         await fetchTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
         await InvokeAsync(() => this.StateHasChanged());
     }
 
     private async Task fetchTokens(string userAddress, long chainId)
     {
-        Tokens = await _nftFetcher.GetUserNftBases(userAddress, chainId);
+        Tokens = await _nftApi.GetUserNftBases(userAddress, chainId);
+        Logger.LogInformation("fetchTokens, {}, {}, {}, {}", Tokens.Count, userAddress, chainId, SelectedNetworkName);
     }
 
     public void Dispose()
@@ -105,8 +105,8 @@
         {
             if (Tokens is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
             {
-                Tokens = await _nftFetcher.GetUserNftBases(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
-                StateHasChanged();
+                await fetchTokens(_metamaskHostProvider.SelectedAccount, _metamaskHostProvider.SelectedNetworkChainId);
+                await InvokeAsync(() => this.StateHasChanged());
             }
         }
     }

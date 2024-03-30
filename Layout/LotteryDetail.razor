@@ -17,7 +17,7 @@
     {
         if (!string.IsNullOrEmpty(NftUrl))
         {
-            <a href="@NftUrl">
+            <a href="@NftUrl" target="_blank">
                 <img class="rounded-t-lg"
                      src="@Token.ImageData"
                      alt="">
@@ -55,7 +55,7 @@
     [Parameter]
     public string NetworkName { get; set; } = "";
 
-    public Network? SelectedNetwork { get; set;  }
+    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     public string NftUrl => SelectedNetwork is not null ? SelectedNetwork.BuildNftUrl(ContractAddress, TokenId) : "";
 

@@ -5,7 +5,7 @@
 @inject ToastService toastService
 @inject IStringLocalizer<SharedResource> Loc
 @inject Web3Service _web3Service
-@inject NftApi _nftFetcher
+@inject NftApi _nftApi
 
 <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     @if (Token is null)
@@ -18,7 +18,7 @@
     {
         if (!string.IsNullOrEmpty(NftUrl))
         {
-            <a href="@NftUrl">
+            <a href="@NftUrl" target="_blank">
                 <img class="rounded-t-lg"
                      src="@Token.ImageData"
                      alt="">
@@ -97,7 +97,7 @@
     [Parameter]
     public string NetworkName { get; set; } = "";
 
-    public Network? SelectedNetwork { get; set; }
+    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     public string NftUrl => SelectedNetwork is not null ? SelectedNetwork.BuildNftUrl(ContractAddress, TokenId) : "";
 
@@ -209,7 +209,7 @@
         CloseModal();
         BetButtonDisabled = false;
         await Task.Delay(1000);
-        await _nftFetcher.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
+        await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
     }
 
     private bool OpenButtonDisabled = false;
@@ -228,7 +228,7 @@
             toastService.ShowToast($"Token: {token.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
 
             await Task.Delay(1000);
-            await _nftFetcher.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
+            await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
