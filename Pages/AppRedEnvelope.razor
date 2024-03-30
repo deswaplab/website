@@ -25,44 +25,47 @@
                             <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["RedEnvelope_Intro"]</p>
 
                             <form class="space-y-4 md:space-y-6">
-                                <div>
-                                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
-                                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        @bind:get="SelectedContractName"
-                                        @bind:event="onchange"
-                                        @bind:set="ChangeSelectedContractName"
-                                        >
-                                        <option></option>
-                                        @foreach(var contract in AllContracts)
-                                        {
-                                            <option value="@contract.Name">@contract.Name</option>
-                                        }
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                        @if (SelectedContract is not null) {
-                                            <span>@SelectedContract.BaseAsset.Name</span>
-                                        } else {
-                                            <span>Asset</span>
-                                        }
-                                        <span>
-                                            @if(UserBaseAssetBalance is not null) {
-                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(SelectedContract!.BaseAsset.Address, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
+                                
+                                <div class="grid md:grid-cols-2 md:gap-6">
+                                    <div class="relative z-0 w-full mb-2 group">
+                                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            @bind:get="SelectedContractName"
+                                            @bind:event="onchange"
+                                            @bind:set="ChangeSelectedContractName"
+                                            >
+                                            <option></option>
+                                            @foreach(var contract in AllContracts)
+                                            {
+                                                <option value="@contract.Name">@contract.Name</option>
                                             }
-                                        </span>
-                                        
-                                    </label>
-                                    <input type="number" name="baseAssetAmount" id="baseAssetAmount"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
-                                        min="0.001" max="10000000" step="0.001"
-                                    >
-                                    @if(UserBaseAssetBalance == new Decimal(0))
-                                    {
-                                        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">@Loc["BalanceIsEmpty_Stmt"]</p>
-                                    }
+                                        </select>
+                                    </div>
+
+                                    <div class="relative z-0 w-full mb-2 group">
+                                        <label for="baseAsset" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                            @if (SelectedContract is not null) {
+                                                <span>@SelectedContract.BaseAsset.Name</span>
+                                            } else {
+                                                <span>Asset</span>
+                                            }
+                                            <span>
+                                                @if(UserBaseAssetBalance is not null) {
+                                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(SelectedContract!.BaseAsset.Address, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @UserBaseAssetBalance</a>
+                                                }
+                                            </span>
+                                            
+                                        </label>
+                                        <input type="number" name="baseAssetAmount" id="baseAssetAmount"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            required @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
+                                            min="0.001" max="10000000" step="0.001"
+                                        >
+                                        @if(UserBaseAssetBalance == new Decimal(0))
+                                        {
+                                            <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">@Loc["BalanceIsEmpty_Stmt"]</p>
+                                        }
+                                    </div>
                                 </div>
 
                                 <div>
@@ -102,7 +105,7 @@
                                 {
                                     <li>
                                         <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                                            <a target="_blank" href="@SelectedNetwork!.BuildListUrl(SelectedContract!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                            <a target="_blank" href="@SelectedNetwork!.BuildDetailUrl(SelectedContract!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
                                         </p>
                                     </li>
                                 }

@@ -181,6 +181,11 @@ public record Network
         return $"{OpenseaHost}/{contractAddress}/{tokenId}/sell";
     }
 
+    public string BuildDetailUrl(string contractAddress, long tokenId)
+    {
+        return $"/app/{InnerName}/{contractAddress}/{tokenId}";
+    }
+
     public string BuildNftUrl(string contractAddress, long tokenId)
     {
         if (string.IsNullOrEmpty(OpenseaHost))
