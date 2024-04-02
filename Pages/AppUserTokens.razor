@@ -43,7 +43,7 @@
                     }
                     else
                     {
-                        if (SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId) is not null)
+                        if (NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId) is not null)
                         {
                             <h1 class="px-64 mx-auto text-yellow-800 bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300">No tokens for address: @_metamaskHostProvider.SelectedAccount on chain: @_metamaskHostProvider.SelectedNetworkChainId</h1>
                         }
@@ -58,7 +58,7 @@
 </CascadingAuthenticationState>
 
 @code {
-    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private string SelectedNetworkName => SelectedNetwork?.InnerName ?? "";
 

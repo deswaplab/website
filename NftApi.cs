@@ -6,8 +6,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Nethereum.Contracts.Standards.ERC20.TokenList;
-using Nethereum.Web3;
 
 // 发查询请求的客户端，不同网络可以使用不同的api，如ethereum走opensea，moonbeam走covan
 
@@ -31,80 +29,56 @@ public record UserNftBase
 
 public record UserOptionNFT : UserNftBase
 {
-   
+
     public DateTimeOffset MaturityDate { get; set; }
 
-    public OptionsKind OptionsKind { get; set; }
+    public decimal? BaseAssetAmount { get; set; }
 
-    public decimal BaseAssetAmount { get; set; }
+    public required string BaseAssetAddress { get; set; }
 
-    public decimal QuoteAssetAmount { get; set; }
+    public required string BaseAssetKind { get; set; }
 
-    public decimal Price { get; set; }
+    public long BaseAssetTokenId { get; set; }
 
-    public bool Listable()
-    {
-        if (!Burnable() && !Exercisable())
-        {
-            return true;
-        }
-        return false;
-    }
+    public required string QuoteAssetKind { get; set; }
 
-    public bool Burnable()
-    {
-        var now = DateTime.Now;
-        if (now >= MaturityDate.AddDays(1))
-        {
-            return true;
-        }
-        return false;
-    }
+    public required string QuoteAssetAddress { get; set; }
+
+    public decimal? QuoteAssetAmount { get; set; }
+
+    public BigInteger? QuoteAssetAmountWei { get; set; }
+
+    public long QuoteAssetTokenId { get; set; } = 0;
 
     public bool Exercisable()
     {
-        var now = DateTime.Now;
-        // TODO: 方便测试暂且注释，上线时解除
-        // if (now >= MaturityDate && now < MaturityDate.AddDays(1))
-        // {
-        //     return true;
-        // }
-        if (now < MaturityDate.AddDays(1))
+        if (DateTime.Now < MaturityDate.AddDays(1))
         {
             return true;
         }
         return false;
-    }
-
-    public (string, BigInteger) GetPayAsset()
-    {
-        var tokenPair = new OptionsContracts().Inner.Where(p => p.Network.ChainId == ChainId)
-            .Where(item => item.Address.Equals(Contract, StringComparison.CurrentCultureIgnoreCase))
-            .First();
-        if (OptionsKind == OptionsKind.CALL)
-        {
-            return (tokenPair.QuoteAsset.Address, Web3.Convert.ToWei(QuoteAssetAmount, tokenPair.QuoteAsset.Decimals));
-        }
-        else if (OptionsKind == OptionsKind.PUT)
-        {
-            return (tokenPair.BaseAsset.Address, Web3.Convert.ToWei(BaseAssetAmount, tokenPair.BaseAsset.Decimals));
-        }
-        throw new Exception("invalid token");
     }
 
     public static UserOptionNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
     {
+        string baseAssetKind = NftMetadataParser.ParseString(metadataUrl, "baseAssetKind"); // ERC20/721/1155
+        string quoteAssetKind = NftMetadataParser.ParseString(metadataUrl, "quoteAssetKind"); // ERC20/721/1155
+
         return new UserOptionNFT
         {
             TokenId = tokenId,
             ChainId = chainId,
             Contract = contractAddress,
             ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+
             MaturityDate = NftMetadataParser.ParseMaturityDate(metadataUrl, "maturityDate"),
-            OptionsKind = NftMetadataParser.ParseOptionsKind(metadataUrl),
-            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
-            QuoteAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "quoteAssetAmount"),
-            Price = NftMetadataParser.ParsePrice(metadataUrl),
+            BaseAssetKind = baseAssetKind,
+            BaseAssetAddress = NftMetadataParser.ParseString(metadataUrl, "baseAssetAddress"),
+            BaseAssetAmount = baseAssetKind == "ERC20" ? NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount") : 0,
+            BaseAssetTokenId = (baseAssetKind == "ERC721" || baseAssetKind == "ERC1155") ? NftMetadataParser.ParseLong(metadataUrl, "baseAssetTokenId") : 0,
+            QuoteAssetKind = quoteAssetKind,
+            QuoteAssetAddress = NftMetadataParser.ParseString(metadataUrl, "quoteAssetAddress"),
+            QuoteAssetAmount = quoteAssetKind == "ERC20" ? NftMetadataParser.ParseAmount(metadataUrl, "quoteAssetAmount") : 0,
         };
     }
 }
@@ -116,15 +90,6 @@ public record UserLotteryNFT : UserNftBase
     public DateTimeOffset DrawTime { get; set; }
 
     public decimal BaseAssetAmount { get; set; }
-
-    public bool Listable()
-    {
-        if (Status == "open")
-        {
-            return true;
-        }
-        return false;
-    }
 
     public bool Drawable()
     {
@@ -172,24 +137,9 @@ public record UserRedEnvelopeNFT : UserNftBase
 
 public record UserRouletteNFT : UserNftBase
 {
-    public decimal BaseAssetAmount { get; set; }
+    public required string BaseAssetAddress { get; set; }
 
-    public DateTimeOffset OpenTime { get; set; }
-
-    public required string Writer { get; set; }
-
-    public bool Openable(string userAddress)
-    {
-        if (DateTime.Now > OpenTime)
-        {
-            return true;
-        }
-        else if (userAddress.Equals(Writer, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return true;
-        }
-        return false;
-    }
+    public required string AssetKind { get; set; }
 
     public static UserRouletteNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
     {
@@ -199,9 +149,8 @@ public record UserRouletteNFT : UserNftBase
             ChainId = chainId,
             Contract = contractAddress,
             ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
-            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
-            OpenTime = NftMetadataParser.ParseMaturityDate(metadataUrl, "openTime"),
-            Writer = NftMetadataParser.ParseString(metadataUrl, "writer"),
+            AssetKind = NftMetadataParser.ParseString(metadataUrl, "assetKind"),
+            BaseAssetAddress = NftMetadataParser.ParseString(metadataUrl, "baseAssetAddress"),
         };
     }
 }
@@ -270,8 +219,9 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
     public async Task<IList<UserNftBase>> GetUserNftBases(string userAddress, long chainId)
     {
         var metadatas = await GetUserTokens(userAddress, chainId);
-        var allContracts = new AllContracts().Inner.Select(item => item.Item2.ToLower());
-        return metadatas.Where(item => allContracts.Contains(item.Contract.ToLower())).Select(item => new UserNftBase {TokenId = item.TokenId, Contract = item.Contract, ChainId = chainId, ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl) }).ToList();
+        NetworkCore? network = NetworkConfig.GetNetwork(chainId);
+        var allContracts = ContractConfig.GetAllContracts(network).Select(item => item.ToLower());
+        return metadatas.Where(item => allContracts.Contains(item.Contract.ToLower())).Select(item => new UserNftBase { TokenId = item.TokenId, Contract = item.Contract, ChainId = chainId, ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl) }).ToList();
     }
 }
 
@@ -334,33 +284,6 @@ public static class NftMetadataParser
         throw new Exception("can find maturity date");
     }
 
-    public static OptionsKind ParseOptionsKind(string metadataUrl)
-    {
-        string head = "data:application/json;base64,";
-        if (metadataUrl.StartsWith(head))
-        {
-            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
-            var json = Encoding.UTF8.GetString(blob);
-            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
-            foreach (var attr in payload!.Attributes!)
-            {
-                if (attr.TraitType == "optionsKind")
-                {
-                    var s = attr.Value.GetString() ?? "";
-                    if (s == "call")
-                    {
-                        return OptionsKind.CALL;
-                    }
-                    else if (s == "put")
-                    {
-                        return OptionsKind.PUT;
-                    }
-                }
-            }
-        }
-        throw new Exception("no options kind found");
-    }
-
     public static decimal ParseAmount(string metadataUrl, string name)
     {
         string head = "data:application/json;base64,";
@@ -378,6 +301,25 @@ public static class NftMetadataParser
             }
         }
         throw new Exception("no baseAssetAmount found");
+    }
+
+    public static long ParseLong(string metadataUrl, string name)
+    {
+        string head = "data:application/json;base64,";
+        if (metadataUrl.StartsWith(head))
+        {
+            var blob = Convert.FromBase64String(metadataUrl[head.Length..]);
+            var json = Encoding.UTF8.GetString(blob);
+            var payload = JsonSerializer.Deserialize<MetadataUrlPayload>(json);
+            foreach (var attr in payload!.Attributes!)
+            {
+                if (attr.TraitType == name && attr.DisplayType == "number")
+                {
+                    return attr.Value.GetInt64();
+                }
+            }
+        }
+        throw new Exception("no long field found");
     }
 
     public static decimal ParsePrice(string metadataUrl)
@@ -430,7 +372,7 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
     public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
     {
         // https://api.opensea.io/api/v2/chain/sepolia/contract/address/nfts/0/refresh
-        var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         string url = $"{curNetwork.OpenseaApiHost}/contract/{contractAddress}/nfts/{tokenId}/refresh";
         if (!_httpClient.DefaultRequestHeaders.Contains("x-api-key"))
         {
@@ -441,7 +383,7 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
 
     public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
     {
-        var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         if (string.IsNullOrEmpty(curNetwork.OpenseaApiHost))
         {
             return [];
@@ -506,7 +448,7 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
 
     public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
     {
-        var curNetwork = SupportedNetworks.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         if (string.IsNullOrEmpty(curNetwork.CovalentApiHost))
         {
             return [];

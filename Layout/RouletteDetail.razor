@@ -34,22 +34,31 @@
         }
 
         <div class="flex flex-row items-center justify-center gap-2 p-5">
+            @if (!UserBetted)
+            {
             <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    @onclick="() => OpenModal(Token)">
+                @onclick="OpenModal">
                 @Loc["Bet_Stmt"]
             </button>
-            @if (Token.Openable(_metamaskHostProvider.SelectedAccount) && IsUserOwner)
+            }
+            @if (IsUserOwner)
             {
-                <button type="button" class="@OpenButtonClass inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        @onclick="async () => await HandleOpen(Token)"
-                        disabled=@OpenButtonDisabled>
+                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    @onclick="HandleOpen">
+                    @if (InProgress)
+                    {
+                        <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                        </svg>
+                    }
                     @Loc["Open_Stmt"]
                 </button>
             }
         </div>
 
         <div id="authentication-modal" tabindex="-1" aria-hidden="true" class="@ShowModalClass overflow-y-auto overflow-x-auto fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative mx-auto p-4 w-full max-w-md max-h-full">
                 <!-- Modal content -->
                 <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                     <!-- Modal header -->
@@ -69,15 +78,69 @@
                     <div class="p-4 md:p-5">
                         <form class="space-y-4">
                             <div>
-                                <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@CurAssetSymbol</label>
-                                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
-                                       @bind-value:get="InputedBaseAssetAmount" @bind-value:set="SetInputedBaseAssetAmount"
-                                       min="0.001" max="10000000" step="0.001" />
+                                <label for="baseAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                    <span>Address</span>
+                                    <span>
+                                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
+                                    </span>
+                                </label>
+                                <input id="baseAssetAddress" type="text" 
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                    value="@Token.BaseAssetAddress"
+                                    disabled=true />
                             </div>
+            
+                            @if (Token.AssetKind == "ERC20")
+                            {
+                            <div>
+                                <label for="baseAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                    <span>ERC20</span>
+                                    @if (_userBaseAssetBalance is not null && _userBaseAssetBalance > 0)
+                                    {
+                                    <span>
+                                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_userBaseAssetBalance</a>
+                                    </span>
+                                    }
+                                </label>
+                                <input id="baseAssetAmount" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    @bind-value="@InputedBaseAssetAmount" />
+                            </div>
+                            }
+                            else if (Token.AssetKind == "ERC721")
+                            {
+                            <div>
+                                <label for="baseAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                <input id="baseAssetId" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    @bind-value="InputedBaseAssetId"
+                                    min="0" max="100000000000" step="1" />
+                            </div>
+                            }
+                            else if (Token.AssetKind == "ERC1155")
+                            {
+                            <div>
+                                <label for="baseAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                <input id="baseAssetId" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    @bind-value="InputedBaseAssetId"
+                                    min="0" max="100000000000" step="1" />
+                            </div>
+
+                            <div>
+                                <label for="baseAssetValue" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                <input id="baseAssetValue" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    @bind-value="InputedBaseAssetValue"
+                                    min="1" max="100000000000" step="1" />
+                            </div>
+                            }
                             <button type="button" class="@BetButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    @onclick="async () => await HandleBet(Token)"
-                                    disabled=@BetButtonDisabled>
-                                Submit
+                                @onclick="HandleBet">
+                                @if (InProgress)
+                                {
+                                    <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                    </svg>
+                                }
+                                Bet
                             </button>
                         </form>
                     </div>
@@ -99,19 +162,17 @@
     [Parameter]
     public string NetworkName { get; set; } = "";
 
-    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     public string NftUrl => SelectedNetwork is not null ? SelectedNetwork.BuildNftUrl(ContractAddress, TokenId) : "";
 
     public UserRouletteNFT? Token { get; set; }
 
-    private string CurAssetSymbol => Token is not null ? new RouletteContracts().Inner.Where(p => p.Address.Equals(Token.Contract, StringComparison.CurrentCultureIgnoreCase))
-        .Select(p => p.BaseAsset.Name)
-        .First() : "Asset";
+    public string? Owner { get; set; }
 
-    public BigInteger Balance { get; set;}
+    public bool UserBetted = true;
 
-    public bool IsUserOwner => Balance > 0;
+    public bool IsUserOwner => _metamaskHostProvider.SelectedAccount.Equals(Owner, StringComparison.CurrentCultureIgnoreCase);
 
     protected override void OnInitialized()
     {
@@ -121,13 +182,14 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
-        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+        UserBetted = await _web3Service.UserBettedRoulette(TokenId, ContractAddress);
         await InvokeAsync(() => this.StateHasChanged());
     }
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        var targetNetwork = SupportedNetworks.GetNetworkByName(NetworkName);
+        Logger.LogInformation("chan id callback");
+        var targetNetwork = NetworkConfig.GetNetworkByName(NetworkName);
         if (targetNetwork is not null && targetNetwork.ChainId != chainId)
         {
             var p = new Dictionary<string, string>();
@@ -135,11 +197,7 @@
             await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
         }
 
-        string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-        Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-
-        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-
+        await initTokens();
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -153,14 +211,31 @@
     {
         if (firstRender)
         {
-            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-            {
-                string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-                Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+            Logger.LogInformation("first render");
+            await initTokens();
+            await InvokeAsync(() => this.StateHasChanged());
+        }
+    }
 
-                Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-                Logger.LogInformation($"first render, {Balance}");
-                StateHasChanged();
+    private async Task initTokens()
+    {
+        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+        {
+            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+            Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+            Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
+
+            UserBetted = await _web3Service.UserBettedRoulette(TokenId, ContractAddress);
+
+            if (Token!.AssetKind == "ERC20")
+            {
+                _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
+                var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Token!.BaseAssetAddress);
+                _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
+                InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
+                Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
             }
         }
     }
@@ -169,11 +244,13 @@
 
     private string ShowModalClass => IsShowModal ? "" : "hidden";
 
+    private bool InProgress = false;
+
     private bool BetButtonDisabled = false;
 
     private string BetButtonClass => BetButtonDisabled ? "cursor-not-allowed" : "";
 
-    private void OpenModal(UserRouletteNFT token)
+    private void OpenModal()
     {
         IsShowModal = true;
     }
@@ -185,31 +262,57 @@
 
     public decimal InputedBaseAssetAmount { get; set; } = 0m;
 
-    private void SetInputedBaseAssetAmount(decimal value)
+    private int _baseAssetDecimals = 0;
+
+    private decimal? _userBaseAssetBalance = null;
+
+    public long InputedBaseAssetId { get; set; } = 0; // erc721/erc1155
+
+    public long InputedBaseAssetValue { get; set; } = 1; //erc1155
+
+    private async Task HandleBet()
     {
-        InputedBaseAssetAmount = value;
+        if (Token!.AssetKind == "ERC20")
+        {
+            await Bet20();
+        }
+        else if (Token!.AssetKind == "ERC721")
+        {
+            await Bet721();
+        }
+        else
+        {
+            await Bet1155();
+        }
+    
+        CloseModal();
+        await Task.Delay(1000);
+        await _nftApi.RefreshMetadata(Token!.Contract, Token!.ChainId, Token!.TokenId);
     }
 
-    private async Task HandleBet(UserRouletteNFT token)
+    private async Task Bet20()
     {
-        var selecteContract = new RouletteContracts().Inner.Where(p => p.Address.Equals(token.Contract, StringComparison.CurrentCultureIgnoreCase))
-            .First();
-        var wad = Web3.Convert.ToWei(InputedBaseAssetAmount, selecteContract.BaseAsset.Decimals);
-        string baseAssetContract = selecteContract.BaseAsset.Address;
-        BetButtonDisabled = true;
+        InProgress = true;
         try
         {
-            var allowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, token.Contract, baseAssetContract);
-            if (allowance < wad)
+            var allowance = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.BaseAssetAddress);
+            var InputedBaseAssetAmountWei = Web3.Convert.ToWei(InputedBaseAssetAmount, _baseAssetDecimals);
+            if (allowance < InputedBaseAssetAmountWei)
             {
-                await _web3Service.Approve(token.Contract, wad, baseAssetContract);
+                await _web3Service.Erc20Approve(Token!.Contract, InputedBaseAssetAmountWei, Token!.BaseAssetAddress);
             }
-            var txHash = await _web3Service.BetRoulette(
-                wad,
-                token.TokenId,
-                token.Contract
+            await Task.Delay(1000);
+            Logger.LogInformation("Bet20, {}, {}, {}",
+                Token!.TokenId,
+                InputedBaseAssetAmountWei,
+                Token!.Contract
             );
-            toastService.ShowToast($"Token: {token.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
+            await _web3Service.BetRoulette20(
+                Token!.TokenId,
+                InputedBaseAssetAmountWei,
+                Token!.Contract
+            );
+            toastService.ShowToast($"Token: {Token.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
@@ -217,30 +320,108 @@
             {
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
+        } finally {
+            InProgress = false;
         }
-        CloseModal();
-        BetButtonDisabled = false;
-        await Task.Delay(1000);
-        await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
     }
 
-    private bool OpenButtonDisabled = false;
-
-    private string OpenButtonClass => OpenButtonDisabled ? "cursor-not-allowed" : "";
-
-    private async Task HandleOpen(UserRouletteNFT token)
+    private async Task Bet721()
     {
-        OpenButtonDisabled = true;
+        InProgress = true;
+        try {
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.BaseAssetAddress);
+            if (!isApproved)
+            {
+                await _web3Service.Erc1155SetApprovalForAll(Token!.Contract, true, Token!.BaseAssetAddress);
+                await Task.Delay(1000);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.BaseAssetAddress);
+                if (!newIsApproved)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        // bet
+        Logger.LogInformation("Bet721, {}, {}, {}", Token!.TokenId, InputedBaseAssetId, Token!.Contract);
+        try {
+            await _web3Service.BetRoulette721(Token!.TokenId, InputedBaseAssetId, Token!.Contract);
+            toastService.ShowToast($"Token {Token!.TokenId} {Loc["ExerciseSuccess_Stmt"]}", ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+            else
+            {
+                toastService.ShowToast("Unknown metamask error", ToastLevel.Error);
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+        } finally {
+            InProgress = false;
+        }
+    }
+
+    private async Task Bet1155()
+    {
+        InProgress = true;
+        try {
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.BaseAssetAddress);
+            if (!isApproved)
+            {
+                await _web3Service.Erc1155SetApprovalForAll(Token!.Contract, true, Token!.BaseAssetAddress);
+                await Task.Delay(1000);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.BaseAssetAddress);
+                if (!newIsApproved)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        // bet
+        try {
+            await _web3Service.BetRoulette1155(Token!.TokenId, InputedBaseAssetId, InputedBaseAssetValue, Token!.Contract);
+            toastService.ShowToast($"Token {Token!.TokenId} {Loc["ExerciseSuccess_Stmt"]}", ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+            else
+            {
+                toastService.ShowToast("Unknown metamask error", ToastLevel.Error);
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+        } finally {
+            InProgress = false;
+        }
+    }
+
+    private async Task HandleOpen()
+    {
+        InProgress = true;
         try
         {
             var txHash = await _web3Service.OpenRoulette(
-                token.TokenId,
-                token.Contract
+                Token!.TokenId,
+                Token!.Contract
             );
-            toastService.ShowToast($"Token: {token.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
-
-            await Task.Delay(1000);
-            await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
+            toastService.ShowToast($"Token: {Token!.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
@@ -249,6 +430,9 @@
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
             }
         }
-        OpenButtonDisabled = false;
+        finally
+        {
+            InProgress = false;
+        }
     }
 }

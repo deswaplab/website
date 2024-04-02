@@ -36,19 +36,19 @@
                                 }
                             </div>
                         </div>
-                        @if (ContractKind == "OptionsContracts")
+                        @if (ContractKind == "Barter")
                         {
-                            <OptionsDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
+                            <BarterDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
-                        else if (ContractKind == "LotteryContracts")
+                        else if (ContractKind == "Lottery")
                         {
                             <LotteryDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
-                        else if (ContractKind == "RedEnvelopeContracts")
+                        else if (ContractKind == "RedEnvelope")
                         {
                             <RedEnvelopeDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
-                        else if (ContractKind == "RouletteContracts")
+                        else if (ContractKind == "Roulette")
                         {
                             <RouletteDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
@@ -73,7 +73,7 @@
     [Parameter]
     public string NetworkName { get; set; } = "";
 
-    public Network? SelectedNetwork => SupportedNetworks.GetNetworkByName(NetworkName);
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
 
     public string OpenseaUrl => (SelectedNetwork is not null && SelectedNetwork.OpenseaHost != "") ? $"{SelectedNetwork.OpenseaHost}/{ContractAddress}/{TokenId}" : "";
 
@@ -81,19 +81,17 @@
 
     public string MetamaskDeepLink => $"https://metamask.app.link/dapp/deswap.one/app/{NetworkName}/{ContractAddress}/{TokenId}";
 
-    public AllContracts allContracts = new AllContracts();
-
-    public string ContractKind => allContracts.GetContractKind(ContractAddress, NetworkName);
+    public string ContractKind => ContractConfig.GetContractKind(SelectedNetwork, ContractAddress);
 
     public string Title(string contractKind) {
-        if (contractKind == "OptionsContracts")
+        if (contractKind == "Barter")
         {
-            return Loc["Options"];
+            return Loc["Barter"];
         }
-        else if (contractKind == "LotteryContracts")
+        else if (contractKind == "Lottery")
         {
             return Loc["Lottery"];
-        } else if (contractKind == "RedEnvelopeContracts")
+        } else if (contractKind == "RedEnvelope")
         {
             return Loc["RedEnvelope"];
         }

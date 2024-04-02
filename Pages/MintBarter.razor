@@ -1,0 +1,541 @@
+@page "/app/barter"
+
+@layout AppLayout
+@inject ILogger<MintBarter> Logger
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IJSRuntime JS
+@inject ToastService toastService
+@inject Web3Service _web3Service
+@inject IStringLocalizer<SharedResource> Loc
+<PageTitle>@Loc["Barter"]</PageTitle>
+
+<section class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    @Loc["Barter"]
+                </h1>
+
+                <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["Barter_Intro"]</p>
+
+                <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="MintBarter" class="space-y-4 md:space-y-6">
+                    <div>
+                        <label for="assetKind" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Asset Kind"]</label>
+                        <select id="assetKind" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            @bind-value:event="onchange"
+                            @bind-value="Model!.AssetKind">
+                            <option value="FT->FT">FT->FT</option>
+                            <option value="NFT->NFT">NFT->NFT</option>
+                        </select>
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                    </div>
+                                      
+                    @if (Model!.AssetKind == "FT->FT")
+                    {
+                    <div>
+                        <label for="baseAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["You Pay"]</label>
+                        <div class="grid grid-cols-4 gap-1">
+                            <select id="baseAssetSymbols"
+                            disabled="@IsFormDisabled"
+                            @bind-value="@baseAssetSymbolAddress"
+                            @bind-value:event="onchange"
+                            @bind-value:after="@fillBaseAssetAddress"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                <option value=""></option>
+                                @foreach(var item in knownErc20Contracts)
+                                {
+                                    <option value="@item.Address.ToLower()">@item.Name</option>
+                                }
+                            </select>
+                            <div class="relative w-full col-span-3">
+                                <input id="baseAssetAddress" type="text"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    disabled="@IsFormDisabled"
+                                    required @bind-value="Model!.BaseAssetAddress"
+                                    @bind-value:after="performSearch">
+                                <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="erc20Amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>
+                                ERC20
+                            </span>
+                            <span>
+                                @if(Model!.BaseAssetAddress != "" && _erc20UserBalance is not null) {
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_erc20UserBalance</a>
+                                }
+                            </span>
+                        </label>
+                        <input id="erc20Amount" type="number"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.BaseAssetAmount"
+                            min="0.001" max="10000000" step="0.00001">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAmount" />
+                    </div>
+
+                    <div>
+                        <label for="quoteAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["You Will Get"]</label>
+                        <div class="grid grid-cols-4 gap-1">
+                            <select id="baseAssetSymbols"
+                            disabled="@IsFormDisabled"
+                            @bind-value="@quoteAssetSymbolAddress"
+                            @bind-value:event="onchange"
+                            @bind-value:after="@fillQuoteAssetAddress"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                <option value=""></option>
+                                @foreach(var item in knownErc20Contracts)
+                                {
+                                    <option value="@item.Address.ToLower()">@item.Name</option>
+                                }
+                            </select>
+                            <div class="relative w-full col-span-3">
+                                <input id="quoteAssetAddress" type="text"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    disabled="@IsFormDisabled"
+                                    @bind-value:after="searchQuoteAsset"
+                                    required @bind-value="Model!.QuoteAssetAddress">
+                                <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.QuoteAssetAddress" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="quoteAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>
+                                ERC20
+                            </span>
+                            <span>
+                                @if(Model!.QuoteAssetAddress != "" && _quoteAssetDecimals > 0) {
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.QuoteAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Decimals"]: @_quoteAssetDecimals</a>
+                                }
+                            </span>
+                        </label>
+                        <input id="quoteAssetAmount" type="number"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.QuoteAssetAmount"
+                            min="0.001" max="10000000" step="0.00001">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.QuoteAssetAmount" />
+                    </div>
+                    }
+                    else if (Model!.AssetKind == "NFT->NFT")
+                    {
+                    <div>
+                        <label for="baseAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["You Pay"]</label>
+                        <input id="baseAssetAddress" type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.BaseAssetAddress">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                    </div>
+
+                    <div>
+                        <label for="baseAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>
+                                ID
+                            </span>
+                            <span>
+                                @if(Model!.BaseAssetAddress != "") {
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]</a>
+                                }
+                            </span>
+                        </label>
+                        <input id="baseAssetId" type="number"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.BaseAssetId"
+                            min="0" max="10000000000000000" step="1">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetId" />
+                    </div>
+
+                    <div>
+                        <label for="quoteAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>@Loc["You Will Get"]</span>
+                            @if(Model!.QuoteAssetAddress != "")
+                            {
+                                <span>
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenUrl(Model!.BaseAssetAddress)" target="_blank">@Loc["Token"]</a>
+                                </span>
+                            }
+                        </label>
+                        <input id="quoteAssetAddress" type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.QuoteAssetAddress">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.QuoteAssetAddress" />
+                    </div>
+                    }
+
+                    <div>
+                        <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
+                        <input id="maturityDate" type="date" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                            placeholder="Select date"
+                            disabled="@IsFormDisabled"
+                            @bind-value="Model!.MaturityDate"
+                            @bind-value:format="yyyy-MM-dd">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.MaturityDate" />
+                    </div>
+
+                    <CascadingAuthenticationState>
+                        <AuthorizeView Roles="EthereumConnected" Context="innerContext">
+                            <Authorized>
+                                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                    disabled="@IsFormDisabled"
+                                >
+                                    @if (InProgress)
+                                    {
+                                        <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                        </svg>
+                                    }
+                                    Mint
+                                </button>
+                                @if (NewTokenId is not null)
+                                {
+                                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                                        <a href="@SelectedNetwork!.BuildDetailUrl(_barter!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                    </p>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <LoginButton />
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </EditForm>
+            </div>
+        </div>
+        <SingleToast />
+    </div>
+</section>
+
+@code {
+
+    private string baseAssetSymbolAddress { get; set; } = "";
+
+    private async Task fillBaseAssetAddress()
+    {
+        Model!.BaseAssetAddress = baseAssetSymbolAddress;
+        if (baseAssetSymbolAddress != "")
+        {
+            await fetchErc20();
+        }
+    }
+
+    private string quoteAssetSymbolAddress { get; set; } = "";
+
+    private async Task fillQuoteAssetAddress()
+    {
+        Model!.QuoteAssetAddress = quoteAssetSymbolAddress;
+        await fetchQuoteAssetDecimals();
+    }
+
+    private IList<ERC20Contract> knownErc20Contracts => ContractConfig.GetERC20Contracts(SelectedNetwork);
+
+    private EditContext? editContext;
+
+    private ValidationMessageStore? messageStore;
+
+    private void HandleValidationRequested(object? sender,
+        ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+
+        if (Model!.BaseAssetAddress.Length != 42)
+        {
+            messageStore?.Add(() => Model.BaseAssetAddress, "Address must be 42 characters");
+        }
+
+        if (Model!.QuoteAssetAddress.Length != 42)
+        {
+            messageStore?.Add(() => Model.QuoteAssetAddress, "Address must be 42 characters");
+        }
+
+        if (Model!.AssetKind == "FT->FT")
+        {
+            if (Model!.BaseAssetAmount < 0.001m)
+                messageStore?.Add(() => Model.BaseAssetAmount, "At least 0.001");
+            else if (_erc20UserBalance is null || _erc20Decimals == 0)
+                messageStore?.Add(() => Model.BaseAssetAmount, "Invalid ERC20 contract");
+            else if (Model!.BaseAssetAmount > _erc20UserBalance)
+                messageStore?.Add(() => Model.BaseAssetAmount, $"Insufficient balance, max: {_erc20UserBalance}");
+
+            if (Model!.QuoteAssetAmount < 0.001m)
+                messageStore?.Add(() => Model.QuoteAssetAmount, "At least 0.001");
+            else if (_quoteAssetDecimals == 0)
+                messageStore?.Add(() => Model.QuoteAssetAmount, "Invalid ERC20 contract");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new()
+        {
+            AssetKind = "FT->FT", // FT->FT, NFT->NFT
+            BaseAssetAddress = "",
+            BaseAssetAmount = 0,
+            BaseAssetId = 0,
+            QuoteAssetAddress = "",
+            QuoteAssetAmount = 0,
+            MaturityDate = DateOnly.FromDateTime(DateTime.Now).AddDays(3)
+        };
+        editContext = new(Model);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        if (SelectedNetwork is not null)
+        {
+            if (ContractConfig.Barter.TryGetValue(SelectedNetwork, out var t))
+            {
+                _barter = t;
+            }
+        }
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    public class BarterForm
+    {
+        public required string AssetKind { get; set; }
+
+        public required string BaseAssetAddress { get; set; }
+
+        public decimal BaseAssetAmount { get; set; }
+
+        public long BaseAssetId { get; set; }
+
+        public required string QuoteAssetAddress { get; set; }
+
+        public decimal QuoteAssetAmount { get; set; }
+
+        public DateOnly MaturityDate { get; set; }
+    }
+
+    private BarterForm? Model { get; set; }
+
+    private NFTContract? _barter;
+
+    public long? NewTokenId = null;
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
+
+    public string ButtonDisabledClass => IsFormDisabled ? "cursor-not-allowed" : "";
+
+    private bool InProgress = false;
+
+    private int _erc20Decimals = 0;
+
+    private int _quoteAssetDecimals = 0;
+
+    private decimal? _erc20UserBalance = null;
+
+    private async Task performSearch()
+    {
+        if (Model!.BaseAssetAddress.Length != 42 || !Model!.BaseAssetAddress.StartsWith("0x"))
+        {
+            return;
+        }
+        if (Model!.AssetKind == "FT->FT")
+        {
+            var supportedErc20s = knownErc20Contracts.Select(x => x.Address.ToLower());
+            if (supportedErc20s.Contains(Model!.BaseAssetAddress.ToLower()))
+            {
+                baseAssetSymbolAddress = Model!.BaseAssetAddress.ToLower();
+            }
+            await fetchErc20();
+        }
+    }
+
+    private async Task fetchErc20()
+    {
+        _erc20Decimals = 0;
+        _erc20UserBalance = null;
+        try {
+            _erc20Decimals = await _web3Service.Erc20Decimals(Model!.BaseAssetAddress);
+            Logger.LogInformation("decimals: {}", _erc20Decimals);
+            var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Model!.BaseAssetAddress);
+            _erc20UserBalance = Web3.Convert.FromWei(balanceInWei, _erc20Decimals);
+            Logger.LogInformation("user balance: {}", _erc20UserBalance);
+        } catch (Exception e) {
+            Logger.LogError("error: {}", e.Message);
+            toastService.ShowToast("Not erc20 contract", ToastLevel.Error);
+            return;
+        }
+    }
+
+    // to make sure address is erc20
+    private async Task fetchQuoteAssetDecimals()
+    {
+        _quoteAssetDecimals = 0;
+        try {
+            _quoteAssetDecimals = await _web3Service.Erc20Decimals(Model!.QuoteAssetAddress);
+            Logger.LogInformation("decimals: {}", _quoteAssetDecimals);
+        } catch (Exception e) {
+            Logger.LogError("error: {}", e.Message);
+            toastService.ShowToast("Not erc20 contract", ToastLevel.Error);
+            return;
+        }
+    }
+
+    private async Task searchQuoteAsset()
+    {
+        if (Model!.QuoteAssetAddress.Length != 42 || !Model!.QuoteAssetAddress.StartsWith("0x"))
+        {
+            return;
+        }
+        if (Model!.AssetKind == "FT->FT")
+        {
+            var supportedErc20s = knownErc20Contracts.Select(x => x.Address.ToLower());
+            if (supportedErc20s.Contains(Model!.QuoteAssetAddress.ToLower()))
+            {
+                quoteAssetSymbolAddress = Model!.QuoteAssetAddress.ToLower();
+            }
+            await fetchQuoteAssetDecimals();
+        }
+    }
+
+    private async Task Submit()
+    {
+        Logger.LogInformation("fuck");
+        if (Model!.AssetKind == "FT->FT")
+        {
+            await Submit_FT2FT();
+        }
+        else if (Model!.AssetKind == "NFT->NFT")
+        {
+            await Submit_NFT2NFT();
+        }
+    }
+
+    private async Task Submit_FT2FT()
+    {
+        if (_erc20Decimals == 0 || _erc20UserBalance is null)
+        {
+            toastService.ShowToast("Not erc20 contract", ToastLevel.Error);
+            return;
+        }
+
+        InProgress = true;
+        // approve then mint
+        var allowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Model!.BaseAssetAddress);
+        var allowance = Web3.Convert.FromWei(allowanceInWei, _erc20Decimals);
+        if (allowance < Model!.BaseAssetAmount)
+        {
+            try {
+                var wad = Web3.Convert.ToWei(Model.BaseAssetAmount, _erc20Decimals);
+                var txHash = await _web3Service.Erc20Approve(_barter!.Address, wad, Model!.BaseAssetAddress);
+                await Task.Delay(1000);
+                // check allowance again
+                var newAllowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Model!.BaseAssetAddress);
+                var newAllowance = Web3.Convert.FromWei(newAllowanceInWei, _erc20Decimals);
+                if (newAllowance < Model!.BaseAssetAmount)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+
+                toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
+            } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+                if (e.Message.Contains("User denied transaction signature"))
+                {
+                    toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        }
+
+        // handle mint
+        try {
+            NewTokenId = await _web3Service.MintBarter_FT2FT(
+                Model!.BaseAssetAddress,
+                Web3.Convert.ToWei(Model.BaseAssetAmount, _erc20Decimals), 
+                Model!.QuoteAssetAddress,
+                Web3.Convert.ToWei(Model.QuoteAssetAmount, _quoteAssetDecimals),
+                new DateTimeOffset(Model!.MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
+                _barter.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        } catch {
+            toastService.ShowToast(Loc["TxFailed_Stmt"], ToastLevel.Error);
+        } finally {
+            InProgress = false;
+        }
+
+    }
+
+    private async Task Submit_NFT2NFT()
+    {
+        InProgress = true;
+
+        // check approved
+        try {
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Model!.BaseAssetAddress);
+            if (!isApproved)
+            {
+                await _web3Service.Erc1155SetApprovalForAll(_barter!.Address, true, Model!.BaseAssetAddress);
+                await Task.Delay(1000);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Model!.BaseAssetAddress);
+                if (!newIsApproved)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        } catch {
+            toastService.ShowToast("Not ERC-1155 token or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        // handle mint
+        try {
+            NewTokenId = await _web3Service.MintBarter_NFT2NFT(
+                Model!.BaseAssetAddress,
+                Model!.BaseAssetId,
+                Model!.QuoteAssetAddress,
+                new DateTimeOffset(Model!.MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
+                _barter!.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        } catch {
+            toastService.ShowToast(Loc["TxFailed_Stmt"], ToastLevel.Error);
+        }
+
+        InProgress = false;
+    }
+}

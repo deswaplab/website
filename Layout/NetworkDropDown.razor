@@ -1,6 +1,10 @@
-@inject IMetamaskInterop _metamaskInterop;
-@inject MetamaskHostProvider _metamaskHostProvider;
-@inject ILogger<NetworkDropDown> Logger;
+@using Nethereum.JsonRpc.Client.RpcMessages
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@inject IMetamaskInterop _metamaskInterop
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject ILogger<NetworkDropDown> Logger
 @inject IStringLocalizer<SharedResource> Loc
 
 <CascadingAuthenticationState>
@@ -29,7 +33,7 @@
             <!-- Dropdown menu -->
             <div id="dropdownNavbar" class="@NetworkListClass z-10 absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
-                    @foreach (var network in SupportedNetworks.Inner)
+                    @foreach (var network in NetworkConfig.Inner)
                     {
                     <li>
                         <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
@@ -80,27 +84,42 @@
         _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
     }
 
-    private Network? currentConnectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    private NetworkCore? currentConnectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private bool CollapseNetworkList = false;
 
     private string NetworkListClass => CollapseNetworkList ? "" : "hidden";
     private void ToggleNetworkList()
     {
-        Logger.LogInformation("toggle networklist");
         CollapseNetworkList = !CollapseNetworkList;
     }
 
     private async Task ToggleNetwork(long chainId)
     {
-        Logger.LogInformation("start trigger metamask to change network");
+        CollapseNetworkList = false; // close dropdown
         if (chainId != _metamaskHostProvider.SelectedNetworkChainId)
         {
             var p = new Dictionary<string, string>();
             p.Add("chainId", "0x"+Convert.ToString(chainId, 16));
-            await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+            var res = await _metamaskInterop.SendAsync(new RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+            // add new network, https://docs.metamask.io/wallet/how-to/manage-networks/add-network/
+            if (res.Error.Code == 4902)
+            {
+                var p2 = new Dictionary<string, object>();
+                var network = NetworkConfig.GetNetwork(chainId);
+                p2.Add("chainId", "0x"+Convert.ToString(chainId, 16));
+                p2.Add("chainName", network!.Name);
+                p2.Add("rpcUrls", new List<string> {network!.RpcUrl});
+                p2.Add("blockExplorerUrls", new List<string> {network!.EtherscanHost});
+                // TODO: optimize config more carefully
+                p2.Add("nativeCurrency", new Dictionary<string, object> {
+                    {"name", "ETH"},
+                    {"symbol", "ETH"},
+                    {"decimals", 18}
+                });
+                object[] p3 = [p2];
+                await _metamaskInterop.SendAsync(new RpcRequestMessage(null, "wallet_addEthereumChain", p3));
+            }
         }
-        CollapseNetworkList = false; // 收起网络菜单
-        Logger.LogInformation("change network succeed");
     }
 }

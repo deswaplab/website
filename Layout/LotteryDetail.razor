@@ -57,13 +57,13 @@
     [Parameter]
     public string NetworkName { get; set; } = "";
 
-    public Network? SelectedNetwork => SupportedNetworks.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     public string NftUrl => SelectedNetwork is not null ? SelectedNetwork.BuildNftUrl(ContractAddress, TokenId) : "";
 
     public UserLotteryNFT? Token { get; set; }
 
-    public BigInteger Balance { get; set;}
+    public int Balance { get; set;}
 
     public bool IsUserOwner => Balance > 0;
 
@@ -81,7 +81,7 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        var targetNetwork = SupportedNetworks.GetNetworkByName(NetworkName);
+        var targetNetwork = NetworkConfig.GetNetworkByName(NetworkName);
         if (targetNetwork is not null && targetNetwork.ChainId != chainId)
         {
             var p = new Dictionary<string, string>();
@@ -89,11 +89,18 @@
             await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
         }
 
-        string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-        Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-
+        await initTokens();
         await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task initTokens()
+    {
+        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+        {
+            string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
+            Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+            Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+        }
     }
 
     public void Dispose()
@@ -106,15 +113,8 @@
     {
         if (firstRender)
         {
-            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-            {
-                string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-                Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-
-                Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-                Logger.LogInformation($"first render, {Balance}");
-                StateHasChanged();
-            }
+            await initTokens();
+            await InvokeAsync(() => this.StateHasChanged());
         }
     }
 

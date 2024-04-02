@@ -1,0 +1,600 @@
+@page "/app/roulette"
+
+@layout AppLayout
+@inject ILogger<MintRoulette> Logger
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IJSRuntime JS
+@inject ToastService toastService
+@inject Web3Service _web3Service
+@inject IStringLocalizer<SharedResource> Loc
+<PageTitle>@Loc["Roulette"]</PageTitle>
+
+<section class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    @Loc["Roulette"]
+                </h1>
+
+                <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["Roulette_Intro"]</p>
+
+                <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="MintRoulette" class="space-y-4 md:space-y-6">
+                    <div>
+                        <label for="assetKind" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Asset Kind"]</label>
+                        <select id="assetKind" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            @bind-value:event="onchange"
+                            @bind-value="Model!.AssetKind">
+                            <option value="ERC20">ERC20</option>
+                            <option value="ERC721">ERC721</option>
+                            <option value="ERC1155">ERC1155</option>
+                        </select>
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                    </div>
+                    
+                    @if (Model!.AssetKind == "ERC20")
+                    {
+                    <div>
+                        <label for="baseAssetAddressErc20" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["ERC20 Address"]</label>
+                        <div class="grid grid-cols-4 gap-1">
+                            <select id="baseAssetSymbols"
+                                disabled="@IsFormDisabled"
+                                @bind-value="@baseAssetSymbolAddress"
+                                @bind-value:event="onchange"
+                                @bind-value:after="@fillBaseAssetAddress"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                <option value=""></option>
+                                @foreach(var item in knownErc20Contracts)
+                                {
+                                    <option value="@item.Address.ToLower()">@item.Name</option>
+                                }
+                            </select>
+                            <div class="relative w-full col-span-3">
+                                <input id="baseAssetAddressErc20" type="text"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    disabled="@IsFormDisabled"
+                                    required @bind-value="Model!.BaseAssetAddress"
+                                    @bind-value:after="performSearch">
+                                <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="erc20Amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>
+                                Init Bet ERC20 Amount
+                            </span>
+                            <span>
+                                @if(Model!.BaseAssetAddress != "" && _erc20UserBalance is not null) {
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_erc20UserBalance</a>
+                                }
+                            </span>
+                        </label>
+                        <input id="erc20Amount" type="number"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.Erc20Amount"
+                            min="0.001" max="10000000" step="0.00001">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Erc20Amount" />
+                    </div>
+                    }
+                    else if (Model!.AssetKind == "ERC721")
+                    {
+                    <div>
+                        <label for="baseAssetAddressErc721" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                        <input id="baseAssetAddressErc721" type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.BaseAssetAddress"
+                            @bind-value:after="performSearch">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                    </div>
+                    <div>
+                        <label for="erc721Id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            <span>
+                                ERC721 ID
+                            </span>
+                            <span>
+                                @if(Model!.BaseAssetAddress != "" && _erc721UserBalance is not null) {
+                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_erc721UserBalance</a>
+                                }
+                            </span>
+                        </label>
+                        <input id="erc721Id" type="number"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.Erc721Id"
+                            min="0" max="10000000000000000" step="1">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Erc721Id" />
+                    </div>
+                    }
+                    else if (Model!.AssetKind == "ERC1155")
+                    {
+                    <div>
+                        <label for="baseAssetAddressErc1155" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Token Pair"]</label>
+                        <input id="baseAssetAddressErc1155" type="text"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            disabled="@IsFormDisabled"
+                            required @bind-value="Model!.BaseAssetAddress"
+                            @bind-value:after="performSearch">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.BaseAssetAddress" />
+                    </div>
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="erc1155Id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                <span>
+                                    ERC1155 ID
+                                </span>
+                                <span>
+                                    @if(Model!.BaseAssetAddress != "") {
+                                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]</a>
+                                    }
+                                </span>
+                            </label>
+                            <input id="erc1155Id" type="number"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                disabled="@IsFormDisabled"
+                                required @bind-value="Model!.Erc1155Id"
+                                @bind-value:after="performErc1155Search"
+                                min="0" max="10000000000000000" step="1">
+                            <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Erc1155Id" />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="erc1155Value" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                <span>
+                                    Amount
+                                </span>
+                                <span>
+                                    @if(Model!.BaseAssetAddress != "" && _erc1155UserBalance is not null) {
+                                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Model!.BaseAssetAddress, @_metamaskHostProvider.SelectedAccount)" target="_blank">@_erc1155UserBalance</a>
+                                    }
+                                </span>
+                            </label>
+                            <input id="erc1155Value" type="number"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                disabled="@IsFormDisabled"
+                                required @bind-value="Model!.Erc1155Value"
+                                min="1" max="10000000000000000" step="1">
+                            <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Erc1155Value" />
+                        </div>
+                    </div>
+                    }
+
+                    <CascadingAuthenticationState>
+                        <AuthorizeView Roles="EthereumConnected" Context="innerContext">
+                            <Authorized>
+                                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                    disabled="@IsFormDisabled"
+                                >
+                                    @if (InProgress)
+                                    {
+                                        <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                        </svg>
+                                    }
+                                    Mint
+                                </button>
+                                @if (NewTokenId is not null)
+                                {
+                                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                                        <a href="@SelectedNetwork!.BuildDetailUrl(_roulette!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                    </p>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <LoginButton />
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </EditForm>
+            </div>
+        </div>
+        <SingleToast />
+    </div>
+</section>
+
+@code {
+
+    private string baseAssetSymbolAddress { get; set; } = "";
+
+    private async Task fillBaseAssetAddress()
+    {
+        Model!.BaseAssetAddress = baseAssetSymbolAddress;
+        if (baseAssetSymbolAddress != "")
+        {
+            await fetchErc20();
+        }
+    }
+
+    private IList<ERC20Contract> knownErc20Contracts => ContractConfig.GetERC20Contracts(SelectedNetwork);
+
+    private EditContext? editContext;
+
+    private ValidationMessageStore? messageStore;
+
+    private void HandleValidationRequested(object? sender,
+        ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+
+        if (Model!.BaseAssetAddress.Length != 42)
+        {
+            messageStore?.Add(() => Model.BaseAssetAddress, "Invalid contract address");
+        }
+        if (Model!.AssetKind == "ERC20")
+        {
+            if (Model!.Erc20Amount < 0.001m)
+                messageStore?.Add(() => Model.Erc20Amount, "At least 0.001");
+            else if (_erc20UserBalance is null || _erc20Decimals == 0)
+                messageStore?.Add(() => Model.Erc20Amount, "No Erc20 Balance found, refresh or check address is erc20");
+            else if (Model!.Erc20Amount > _erc20UserBalance)
+                messageStore?.Add(() => Model.Erc20Amount, $"Insufficient Erc20 Balance, max: {_erc20UserBalance}");
+        }
+        else if (Model!.AssetKind == "ERC721")
+        {
+            if (Model!.Erc721Id < 0)
+                messageStore?.Add(() => Model.Erc721Id, "Invalid ERC721 ID");
+            else if (_erc721UserBalance is null)
+                messageStore?.Add(() => Model.Erc721Id, "No Erc721 Balance found, refresh or check address is erc721");
+            else if (_erc721UserBalance < 1)
+                messageStore?.Add(() => Model.Erc721Id, "Insufficient Erc721 Balance");
+        }
+        else if (Model!.AssetKind == "ERC1155")
+        {
+            if (Model!.Erc1155Id < 0)
+                messageStore?.Add(() => Model.Erc1155Id, "Invalid ERC1155 ID");
+            else if (_erc1155UserBalance is null)
+                messageStore?.Add(() => Model.Erc1155Id, "No Erc1155 Balance found, refresh or check address is erc1155");
+            else if (Model!.Erc1155Value > _erc1155UserBalance)
+                messageStore?.Add(() => Model.Erc1155Id, "Insufficient Erc1155 Balance");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new()
+        {
+            AssetKind = "ERC20",
+            BaseAssetAddress = "",
+            Erc20Amount = 0.001m,
+            Erc721Id = 0,
+            Erc1155Id = 0,
+            Erc1155Value = 1
+        };
+        editContext = new(Model);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        if (SelectedNetwork is not null)
+        {
+            if (ContractConfig.Roulette.TryGetValue(SelectedNetwork, out var t))
+            {
+                _roulette = t;
+            }
+        }
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    public class RouletteForm
+    {
+        public required string AssetKind { get; set; }
+
+        public required string BaseAssetAddress { get; set; }
+
+        public decimal Erc20Amount { get; set; }
+
+        public long Erc721Id { get; set; }
+
+        public long Erc1155Id { get; set; }
+
+        public long Erc1155Value { get; set; }
+    }
+
+    private RouletteForm? Model { get; set; }
+
+    private NFTContract? _roulette;
+
+    public long? NewTokenId = null;
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
+
+    public string ButtonDisabledClass => IsFormDisabled ? "cursor-not-allowed" : "";
+
+    private bool InProgress = false;
+
+    private int _erc20Decimals = 0;
+
+    private decimal? _erc20UserBalance = null;
+
+    private int? _erc721UserBalance = null;
+
+    private int? _erc1155UserBalance = null;
+
+    private async Task performSearch()
+    {
+        if (Model!.BaseAssetAddress.Length != 42 || !Model!.BaseAssetAddress.StartsWith("0x"))
+        {
+            return;
+        }
+        if (Model!.AssetKind == "ERC20")
+        {
+            var supportedErc20s = knownErc20Contracts.Select(x => x.Address.ToLower());
+            if (supportedErc20s.Contains(Model!.BaseAssetAddress.ToLower()))
+            {
+                baseAssetSymbolAddress = Model!.BaseAssetAddress.ToLower();
+            }
+           await fetchErc20(); 
+        }
+        else if (Model!.AssetKind == "ERC721")
+        {
+            _erc721UserBalance = null;
+            try {
+                _erc721UserBalance = await _web3Service.Erc721BalanceOf(Model!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount);
+                Logger.LogInformation("get erc721 balance, {}, {}, {}", Model!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount, _erc721UserBalance);
+            } catch {
+                toastService.ShowToast("Not erc721 contract", ToastLevel.Error);
+                return;
+            }
+        }
+    }
+
+    private async Task fetchErc20()
+    {
+        _erc20Decimals = 0;
+        _erc20UserBalance = null;
+        try {
+            _erc20Decimals = await _web3Service.Erc20Decimals(Model!.BaseAssetAddress);
+            Logger.LogInformation("decimals: {}", _erc20Decimals);
+            var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Model!.BaseAssetAddress);
+            _erc20UserBalance = Web3.Convert.FromWei(balanceInWei, _erc20Decimals);
+            Logger.LogInformation("user balance: {}", _erc20UserBalance);
+        } catch (Exception e) {
+            Logger.LogError("error: {}", e.Message);
+            toastService.ShowToast("Not erc20 contract", ToastLevel.Error);
+            return;
+        }
+    }
+
+    private async Task performErc1155Search()
+    {
+        if (Model!.BaseAssetAddress.Length != 42 || !Model!.BaseAssetAddress.StartsWith("0x"))
+        {
+            return;
+        }
+        if (Model!.AssetKind == "ERC1155")
+        {
+            _erc1155UserBalance = null;
+            try {
+                _erc1155UserBalance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, Model!.BaseAssetAddress, Model!.Erc1155Id);
+                Logger.LogInformation("get erc1155 balance, {}, {}, {}, {}", _metamaskHostProvider.SelectedAccount, Model!.BaseAssetAddress, Model!.Erc1155Id, _erc1155UserBalance);
+            } catch {
+                toastService.ShowToast("Not erc1155 contract", ToastLevel.Error);
+                return;
+            }
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (Model!.AssetKind == "ERC20")
+        {
+            await Submit20();
+        }
+        else if (Model!.AssetKind == "ERC721")
+        {
+            await Submit721();
+        }
+        else if (Model!.AssetKind == "ERC1155")
+        {
+            await Submit1155();
+        }
+        else
+        {
+            toastService.ShowToast("Wrong asset kind", ToastLevel.Error);
+        }
+    }
+
+    private async Task Submit20()
+    {
+        InProgress = true;
+        Logger.LogInformation("Submit20 called: addr: {addr}, user: {}, erc20 amount: {}", Model!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount, Model!.Erc20Amount);
+        // approve then mint
+        var allowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _roulette!.Address, Model!.BaseAssetAddress);
+        var allowance = Web3.Convert.FromWei(allowanceInWei, _erc20Decimals);
+        if (allowance < Model!.Erc20Amount)
+        {
+            try {
+                var wad = Web3.Convert.ToWei(Model.Erc20Amount, _erc20Decimals);
+                var txHash = await _web3Service.Erc20Approve(_roulette!.Address, wad, Model!.BaseAssetAddress);
+                await Task.Delay(1000);
+                // check allowance again
+                var newAllowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _roulette!.Address, Model!.BaseAssetAddress);
+                var newAllowance = Web3.Convert.FromWei(newAllowanceInWei, _erc20Decimals);
+                if (newAllowance < Model!.Erc20Amount)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+
+                toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
+            } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+                if (e.Message.Contains("User denied transaction signature"))
+                {
+                    toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        }
+
+        // mint erc20
+        try {
+            NewTokenId = await _web3Service.MintRoulette20(
+                Model!.BaseAssetAddress,
+                Web3.Convert.ToWei(Model.Erc20Amount, _erc20Decimals), 
+                500,
+                _roulette.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        }
+
+        InProgress = false;
+    }
+
+    private async Task Submit721()
+    {
+        Logger.LogInformation("submit 721");
+        if (_erc721UserBalance is null)
+        {
+            toastService.ShowToast("Not erc721 contract", ToastLevel.Error);
+            return;
+        }
+
+        InProgress = true;
+
+        // check owner
+        try {
+            string owner = await _web3Service.Erc721OwnerOf(Model!.BaseAssetAddress, Model!.Erc721Id);
+            if (!owner.Equals(_metamaskHostProvider.SelectedAccount, StringComparison.CurrentCultureIgnoreCase))
+            {
+                toastService.ShowToast("you don't own this token", ToastLevel.Error);
+                InProgress = false;
+                return;
+            }
+        } catch {
+            toastService.ShowToast("Not ERC-721 token or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        // approve single
+        var approvedAddress = await _web3Service.Erc721GetApproved(Model!.Erc721Id, Model!.BaseAssetAddress);
+        if (!approvedAddress.Equals(_roulette!.Address, StringComparison.CurrentCultureIgnoreCase))
+        {
+            try {
+                await _web3Service.Erc721Approve(_roulette!.Address, Model!.Erc721Id, Model!.BaseAssetAddress);
+                await Task.Delay(1000);
+                // check allowance again
+                var newApprovedAddress = await _web3Service.Erc721GetApproved(Model!.Erc721Id, Model!.BaseAssetAddress);
+                Logger.LogInformation("after erc721 approve, newApprove: {newApprovedAddress}, addr: {}", newApprovedAddress, _roulette!.Address);
+                if (!newApprovedAddress.Equals(_roulette!.Address, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+
+                toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
+            } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+                if (e.Message.Contains("User denied transaction signature"))
+                {
+                    toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        }
+
+        // handle mint
+        Logger.LogInformation("start handle mint");
+        try {
+            NewTokenId = await _web3Service.MintRoulette721(
+                Model!.BaseAssetAddress,
+                Model!.Erc721Id,
+                _roulette!.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        }
+        InProgress = false;
+    }
+
+    private async Task Submit1155()
+    {
+        Logger.LogInformation("submit 1155");
+        if (_erc1155UserBalance is null)
+        {
+            toastService.ShowToast("Not erc1155 contract", ToastLevel.Error);
+            return;
+        }
+        InProgress = true;
+
+        // check approved
+        try {
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _roulette!.Address, Model!.BaseAssetAddress);
+            if (!isApproved)
+            {
+                await _web3Service.Erc1155SetApprovalForAll(_roulette!.Address, true, Model!.BaseAssetAddress);
+                await Task.Delay(1000);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _roulette!.Address, Model!.BaseAssetAddress);
+                if (!newIsApproved)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        } catch {
+            toastService.ShowToast("Not ERC-1155 token or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        Logger.LogInformation("start handle mint 1155");
+        try {
+            NewTokenId = await _web3Service.MintRoulette1155(
+                Model!.BaseAssetAddress,
+                Model!.Erc1155Id,
+                Model!.Erc1155Value,
+                _roulette!.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        }
+        InProgress = false;
+    }
+}

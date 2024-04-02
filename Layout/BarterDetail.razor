@@ -1,0 +1,357 @@
+﻿@inject Web3Service _web3Service
+@inject ILogger<BarterDetail> Logger
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject IMetamaskInterop _metamaskInterop;
+@inject ToastService toastService
+@inject IStringLocalizer<SharedResource> Loc
+@inject Web3Service _web3Service
+
+<div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    @if (Token is null)
+    {
+        <img class="rounded-t-lg"
+             src="@DefaultImage"
+             alt="">
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(NftUrl))
+        {
+            <a href="@NftUrl" target="_blank">
+                <img class="rounded-t-lg"
+                     src="@Token.ImageData"
+                     alt="">
+            </a>
+        }
+        else
+        {
+            <img class="rounded-t-lg"
+                 src="@Token.ImageData"
+                 alt="">
+        }
+
+        <div class="flex flex-row items-center justify-center gap-2 p-5">
+            @if (Token.Exercisable() && IsUserOwner)
+            {
+                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        @onclick="OpenModal">
+                    @Loc["Exercise_Stmt"]
+                </button>
+            }
+            @if (IsUserOwner)
+            {
+                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @BurnButtonDisabledClass"
+                        @onclick="HandleBurn"
+                        disabled=@BurnButtonDisabled>
+                    @Loc["Burn_Stmt"]
+                </button>
+            }
+        </div>
+
+        <!-- Exercise Modal -->
+        <div id="authentication-modal" tabindex="-1" aria-hidden="true" class="@ShowModalClass overflow-y-auto overflow-x-auto fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative mx-auto p-4 w-full max-w-md max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Exercise
+                        </h3>
+                        <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
+                                @onclick="CloseModal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                            </svg>
+                            <span class="sr-only">Close</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="p-4 md:p-5">
+                        <form class="space-y-4">
+                            <div>
+                                <label for="quoteAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                    <span>Address</span>
+                                    <span>
+                                        <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.QuoteAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
+                                    </span>
+                                </label>
+                                <input id="quoteAssetAddress" type="text" 
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                    value="@Token.QuoteAssetAddress"
+                                    disabled=true />
+                            </div>
+                            @if (Token.QuoteAssetKind == "ERC20")
+                            {
+                            <div>
+                                <label for="quoteAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                <input id="quoteAssetAmount" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    value="@Token.QuoteAssetAmountWei"
+                                    disabled=true />
+                            </div>
+                            }
+                            else
+                            {
+                            <div>
+                                <label for="quoteAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                <input id="quoteAssetId" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                    @bind-value="@Token.QuoteAssetTokenId"
+                                    min="0" max="100000000000" step="1" />
+                            </div>
+                            }
+                            <button type="button" @onclick="HandleExercise"
+                                class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                @if (InProgress)
+                                {
+                                    <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                    </svg>
+                                }
+                                Exercise
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string DefaultImage = "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgaWQ9Imljb24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5uby1pbWFnZTwvdGl0bGU+PHBhdGggZD0iTTMwLDMuNDE0MSwyOC41ODU5LDIsMiwyOC41ODU5LDMuNDE0MSwzMGwyLTJIMjZhMi4wMDI3LDIuMDAyNywwLDAsMCwyLTJWNS40MTQxWk0yNiwyNkg3LjQxNDFsNy43OTI5LTcuNzkzLDIuMzc4OCwyLjM3ODdhMiwyLDAsMCwwLDIuODI4NCwwTDIyLDE5bDQsMy45OTczWm0wLTUuODMxOC0yLjU4NTgtMi41ODU5YTIsMiwwLDAsMC0yLjgyODQsMEwxOSwxOS4xNjgybC0yLjM3Ny0yLjM3NzFMMjYsNy40MTQxWiIvPjxwYXRoIGQ9Ik02LDIyVjE5bDUtNC45OTY2LDEuMzczMywxLjM3MzMsMS40MTU5LTEuNDE2LTEuMzc1LTEuMzc1YTIsMiwwLDAsMC0yLjgyODQsMEw2LDE2LjE3MTZWNkgyMlY0SDZBMi4wMDIsMi4wMDIsMCwwLDAsNCw2VjIyWiIvPjxyZWN0IGlkPSJfVHJhbnNwYXJlbnRfUmVjdGFuZ2xlXyIgZGF0YS1uYW1lPSImbHQ7VHJhbnNwYXJlbnQgUmVjdGFuZ2xlJmd0OyIgY2xhc3M9ImNscy0xIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiLz48L3N2Zz4K";
+
+    [Parameter]
+    public string ContractAddress { get; set; } = "";
+
+    [Parameter]
+    public long TokenId { get; set; }
+
+    [Parameter]
+    public string NetworkName { get; set; } = "";
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    public string NftUrl => SelectedNetwork is not null ? SelectedNetwork.BuildNftUrl(ContractAddress, TokenId) : "";
+
+    public UserOptionNFT? Token { get; set; }
+
+    public string? Owner { get; set; }
+
+    private bool InProgress = false;
+
+    private NFTContract? _barter => ContractConfig.Barter[SelectedNetwork!];
+
+    public bool IsUserOwner => !string.IsNullOrEmpty(Owner) && Owner.Equals(_metamaskHostProvider.SelectedAccount, StringComparison.CurrentCultureIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        var targetNetwork = NetworkConfig.GetNetworkByName(NetworkName);
+        if (targetNetwork is not null && targetNetwork.ChainId != chainId)
+        {
+            var p = new Dictionary<string, string>();
+            p.Add("chainId", "0x" + Convert.ToString(targetNetwork.ChainId, 16));
+            await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
+        }
+
+        await initTokens();
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task initTokens()
+    {
+        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+        {
+            try {
+                string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+                Token = UserOptionNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+                Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+
+                if (Token.QuoteAssetKind == "ERC20")
+                {
+                    var metadata = await _web3Service.GetBarterTokenMetadata(TokenId, ContractAddress);
+                    Token.QuoteAssetAmountWei = metadata.QuoteAssetAmount;
+                    Logger.LogInformation("after chain id, {}, {}, {}", metadata.QuoteAssetKind, metadata.QuoteAssetAddress, metadata.QuoteAssetAmount);
+                }
+            } catch {
+                Logger.LogError("fetch token failed");
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await initTokens();
+            await InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private async Task HandleExercise()
+    {
+        Logger.LogInformation("exercise token");
+        if (Token!.QuoteAssetKind == "ERC20")
+        {
+            await Exercise_FT();
+        }
+        else
+        {
+            await Exercise_NFT();
+        }
+    }
+
+    private async Task Exercise_FT()
+    {
+        Logger.LogInformation("exercise ft token");
+        InProgress = true;
+        var allowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+        if (allowanceInWei < Token!.QuoteAssetAmountWei)
+        {
+            // approve
+            try {
+                await _web3Service.Erc20Approve(_barter!.Address, Token!.QuoteAssetAmountWei.Value, Token!.QuoteAssetAddress);
+                await Task.Delay(1000);
+                // check allowance again
+                var newAllowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+                if (newAllowanceInWei < Token!.QuoteAssetAmountWei)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+
+                toastService.ShowToast(Loc["ApproveSuccess_Stmt"], ToastLevel.Success);
+            } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+                if (e.Message.Contains("User denied transaction signature"))
+                {
+                    toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        }
+
+        // exercise
+        try {
+            await _web3Service.ExerciseBarter_FT2FT(Token!.TokenId, Token!.Contract);
+            toastService.ShowToast($"Token {Token!.TokenId} {Loc["ExerciseSuccess_Stmt"]}", ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        } finally {
+            InProgress = false;
+        }
+    }
+
+    private async Task Exercise_NFT()
+    {
+        Logger.LogInformation("exercise nft token, addr: {}, nft: {}, id: {}", _barter!.Address, Token!.QuoteAssetAddress, Token!.QuoteAssetTokenId);
+        InProgress = true;
+
+        // approve nft
+        try {
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+            if (!isApproved)
+            {
+                await _web3Service.Erc1155SetApprovalForAll(_barter!.Address, true, Token!.QuoteAssetAddress);
+                await Task.Delay(1000);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+                if (!newIsApproved)
+                {
+                    toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
+                    InProgress = false;
+                    return;
+                }
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+            InProgress = false;
+            return;
+        }
+
+        // exercise
+        Logger.LogInformation("after approve, handle exercise, {}, {}, {}", Token!.TokenId, Token!.QuoteAssetTokenId, Token!.Contract);
+        try {
+            await _web3Service.ExerciseBarter_NFT2NFT(Token!.TokenId, Token!.QuoteAssetTokenId, Token!.Contract);
+            toastService.ShowToast($"Token {Token!.TokenId} {Loc["ExerciseSuccess_Stmt"]}", ToastLevel.Success);
+        } catch (Nethereum.JsonRpc.Client.RpcResponseException e) {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+            else
+            {
+                toastService.ShowToast("Unknown metamask error", ToastLevel.Error);
+            }
+        } catch {
+            toastService.ShowToast("Not NFT or token not exist", ToastLevel.Error);
+        } finally {
+            InProgress = false;
+        }
+    }
+
+    private bool BurnButtonDisabled = false;
+
+    private string BurnButtonDisabledClass => BurnButtonDisabled ? "cursor-not-allowed" : "";
+
+    private async Task HandleBurn()
+    {
+        BurnButtonDisabled = true;
+        try
+        {
+            await _web3Service.BurnBarter(Token!.TokenId, Token!.Contract);
+            toastService.ShowToast($"Token {Token!.TokenId} {Loc["BurnSuccess_Stmt"]}", ToastLevel.Success);
+        }
+        catch (Nethereum.JsonRpc.Client.RpcResponseException e)
+        {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+            else
+            {
+                toastService.ShowToast("Unknown error", ToastLevel.Error);
+            }
+        }
+        finally
+        {
+            BurnButtonDisabled = false;
+        }
+    }
+
+    private bool IsShowModal = false;
+
+    private string ShowModalClass => IsShowModal ? "" : "hidden";
+
+    private void OpenModal()
+    {
+        IsShowModal = true;
+    }
+
+    private void CloseModal()
+    {
+        IsShowModal = false;
+    }
+
+}
