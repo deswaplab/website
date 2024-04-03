@@ -1,4 +1,6 @@
-﻿@inject Web3Service _web3Service
+﻿@using System.Numerics
+
+@inject Web3Service _web3Service
 @inject ILogger<LotteryDetail> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject IMetamaskInterop _metamaskInterop;
@@ -61,6 +63,10 @@
 
     public UserLotteryNFT? Token { get; set; }
 
+    public BigInteger Balance { get; set;}
+
+    public bool IsUserOwner => Balance > 0;
+
     protected override void OnInitialized()
     {
         _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
@@ -69,6 +75,7 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -82,9 +89,10 @@
             await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
         }
 
-        // 发请求取图片信息，更新页面
         string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-        Token = UserLotteryNFT.FromStr(chainId, ContractAddress, TokenId, metadataUri);
+        Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -102,6 +110,9 @@
             {
                 string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
                 Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+                Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+                Logger.LogInformation($"first render, {Balance}");
                 StateHasChanged();
             }
         }

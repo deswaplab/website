@@ -109,6 +109,50 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return balance;
     }
 
+    [Function("ownerOf", "address")]
+    public class Erc721OwnerOfFunction : FunctionMessage
+    {
+        [Parameter("uint256", "tokenId", 1)]
+        public BigInteger TokenId { get; set; }
+    }
+
+    public async Task<string> Erc721OwnerOf(string contractAddress, long tokenId)
+    {
+        var ownerOfFunctionMessage = new Erc721OwnerOfFunction()
+        {
+            TokenId = tokenId,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<Erc721OwnerOfFunction>();
+        var owner = await balanceHandler.QueryAsync<string>(contractAddress, ownerOfFunctionMessage);
+        return owner;
+    }
+
+    [Function("balanceOf", "uint256")]
+    public class Erc1155BalanceOfFunction : FunctionMessage
+    {
+        [Parameter("address", "_owner", 1)]
+        public string Owner { get; set; } = "";
+
+        [Parameter("uint256", "tokenId", 2)]
+        public BigInteger TokenId { get; set; }
+    }
+
+    public async Task<BigInteger> Erc1155BalanceOf(string userAddress, string contractAddress, long tokenId)
+    {
+        var ownerOfFunctionMessage = new Erc1155BalanceOfFunction()
+        {
+            Owner = userAddress,
+            TokenId = tokenId,
+        };
+
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var balanceHandler = web3.Eth.GetContractQueryHandler<Erc1155BalanceOfFunction>();
+        var balance = await balanceHandler.QueryAsync<BigInteger>(contractAddress, ownerOfFunctionMessage);
+        return balance;
+    }
+
     [Function("allowance", "uint256")]
     public class AllowanceFunction : FunctionMessage
     {

@@ -1,4 +1,6 @@
-﻿@inject Web3Service _web3Service
+﻿@using System.Numerics
+
+@inject Web3Service _web3Service
 @inject ILogger<RouletteDetail> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject IMetamaskInterop _metamaskInterop;
@@ -36,7 +38,7 @@
                     @onclick="() => OpenModal(Token)">
                 @Loc["Bet_Stmt"]
             </button>
-            @if (Token.Openable(_metamaskHostProvider.SelectedAccount))
+            @if (Token.Openable(_metamaskHostProvider.SelectedAccount) && IsUserOwner)
             {
                 <button type="button" class="@OpenButtonClass inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         @onclick="async () => await HandleOpen(Token)"
@@ -107,6 +109,10 @@
         .Select(p => p.BaseAsset.Name)
         .First() : "Asset";
 
+    public BigInteger Balance { get; set;}
+
+    public bool IsUserOwner => Balance > 0;
+
     protected override void OnInitialized()
     {
         _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
@@ -115,6 +121,7 @@
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
     {
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -128,9 +135,11 @@
             await _metamaskInterop.SendAsync(new Nethereum.JsonRpc.Client.RpcMessages.RpcRequestMessage(null, "wallet_switchEthereumChain", p));
         }
 
-        // 发请求取图片信息，更新页面
         string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-        Token = UserRouletteNFT.FromStr(chainId, ContractAddress, TokenId, metadataUri);
+        Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -148,6 +157,9 @@
             {
                 string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
                 Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+                Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+                Logger.LogInformation($"first render, {Balance}");
                 StateHasChanged();
             }
         }
