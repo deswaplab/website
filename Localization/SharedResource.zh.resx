@@ -204,8 +204,8 @@
   <data name="Network" xml:space="preserve">
     <value>网络</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>期权</value>
+  <data name="Barter" xml:space="preserve">
+    <value>兑换</value>
   </data>
   <data name="List_Stmt" xml:space="preserve">
     <value>挂单</value>
@@ -253,10 +253,10 @@
     <value>铸造成功</value>
   </data>
   <data name="Slogan" xml:space="preserve">
-    <value>Deswap 让Web3 更有趣</value>
+    <value>包装您的数字资产</value>
   </data>
   <data name="SloganDetail" xml:space="preserve">
-    <value>我们将一系列Web2资产如期权，彩票，红包等做成NFT，因为这些底层资产的价值，使得NFT也有了价值，用户以NFT的形式进行交易。</value>
+    <value>我们提供一系列的工具来打包您的数字资产，经过包装后，您的资产将获得更多的流动性</value>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
     <value>连接钱包</value>
@@ -295,22 +295,22 @@
     <value>交易成功</value>
   </data>
   <data name="Lottery_Intro" xml:space="preserve">
-    <value>你存入一定资产就能获得一个彩票NFT，买家在NFT市场买到兑奖权后，就能在开奖日后进行开奖，最终有一个幸运儿能获得你存入的资产</value>
+    <value>要发行你自己的彩票，你需要先存入一定的资产，然后选择开奖时间和份数，铸造成功后，去NFT交易市场挂单，就可以等待用户被你的珍贵资产吸引来购买</value>
   </data>
-  <data name="Options_Intro" xml:space="preserve">
-    <value>你即将要铸造一个期权NFT，此NFT的拥有者在到期日之前转入指定金额的行权资产就能获得你立约时转入的标的资产金额</value>
+  <data name="Barter_Intro" xml:space="preserve">
+    <value>铸造你的兑换NFT，你需要先存入你付出的资产，然后设置好你希望得到的资产，目前只支持FT兑换FT，NFT兑换NFT</value>
   </data>
   <data name="RedEnvelope_Intro" xml:space="preserve">
-    <value>你将传入一定的资产，得到一个红包NFT，随后你可以将此红包NFT的主页发到你的社区里，让成员们来试试手气，红包的规则是一个地址只能领取一次，因此如果同一个地址反复领取将会失败，opensea支持0售价挂单，快来试试吧</value>
+    <value>将你的ERC20/721/1155资产打包为一个红包NFT，去NFT市场挂单，然后将链接分享到群里，等待用户来抢红包</value>
   </data>
   <data name="Roulette_Intro" xml:space="preserve">
-    <value>你将发行你自己的轮盘NFT，拥有此NFT的地址就有了下注权，下注后消耗下注权，累积奖池，你开奖后，有一位幸运玩家能赢走奖池里的资金</value>
+    <value>轮盘NFT限量发行3000个，下注资产类型一旦选定不可更改，可以选择赌ERC20/721/1155资产，为了确保你有这些资产，需要你做初始下注</value>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
-    <value>发行你的期权NFT</value>
+    <value>发行你的兑换NFT</value>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
-    <value>如果你对金融感兴趣，想要自己坐庄发行自己的期权，来试试我们的期权NFT产品，支持多种资产，操作简单，安全性有保证</value>
+    <value>兑换即以物易物，在web3世界中我们已经有了uniswap来交换ERC20代币，有了opensea来用ERC20换ERC721，通过这个兑换NFT，我们可以实现NFT兑换NFT以及ERC20之间的兑换</value>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
     <value>发行和交易彩票</value>
@@ -329,24 +329,6 @@
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
     <value>声明一下，玩法有点类似赌博，但实际上不是，你可以mint出你自己的轮盘NFT，然后当作下注的凭证进行售卖，此NFT凭证的拥有者可以进行下注累积资金池，最后由这个token的铸造者进行开奖，所有下注的用户都有机会瓜分奖池</value>
-  </data>
-  <data name="FAQ_A1" xml:space="preserve">
-    <value>我们会发行会员身份NFT，拥有此身份的人可以免服务费交易，未来我们发行治理代币的时候也能获得空投</value>
-  </data>
-  <data name="FAQ_A2" xml:space="preserve">
-    <value>目前还没有具体的时间计划，等我们发售完身份NFT后再看</value>
-  </data>
-  <data name="FAQ_A3" xml:space="preserve">
-    <value>红包合约设计是一个地址只能领一个红包，如果多买多开会报错，请检查你这个地址是否已经领取过了</value>
-  </data>
-  <data name="FAQ_Q1" xml:space="preserve">
-    <value>Deswap会员系统会是怎样的？</value>
-  </data>
-  <data name="FAQ_Q2" xml:space="preserve">
-    <value>何时会发布DAO</value>
-  </data>
-  <data name="FAQ_Q3" xml:space="preserve">
-    <value>我没法抢红包</value>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
     <value>民主化</value>
@@ -386,5 +368,14 @@
   </data>
   <data name="My Tokens" xml:space="preserve">
     <value>我的代币</value>
+  </data>
+  <data name="Select Asset Kind" xml:space="preserve">
+    <value>选择资产类型</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>金额</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>地址</value>
   </data>
 </root>

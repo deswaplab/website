@@ -204,8 +204,8 @@
   <data name="Network" xml:space="preserve">
     <value>Network</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>Options</value>
+  <data name="Barter" xml:space="preserve">
+    <value>Barter</value>
   </data>
   <data name="List_Stmt" xml:space="preserve">
     <value>List</value>
@@ -253,10 +253,10 @@
     <value>mint successfully</value>
   </data>
   <data name="Slogan" xml:space="preserve">
-    <value>Deswap wraps Web2 assets into Web3 using NFT</value>
+    <value>Wrap your cryptos</value>
   </data>
   <data name="SloganDetail" xml:space="preserve">
-    <value>We wrap Web2 assets like options, lottery, red envelope into NFTs, you trade these assets the NFT way, because the value of the underlying assets, your NFT get valuable.</value>
+    <value>We provide a lot of tools to wrap your cryptos, with our help, your assets will get more liquidity.</value>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
     <value>Connect Wallet</value>
@@ -295,59 +295,58 @@
     <value>Tx Success</value>
   </data>
   <data name="Lottery_Intro" xml:space="preserve">
-    <value>If you deposit a certain amount of assets, you can get a lottery NFT. After the buyer buys the redemption rights in the NFT market, the lottery can be drawn after the lottery day. In the end, one lucky person will get the assets you deposited.</value>
+    <value>First choose the asset you want to deposit, choose a draw date, then click the mint button you will get your Lottery NFT, you can trade it on any NFT marketplaces.</value>
   </data>
-  <data name="Options_Intro" xml:space="preserve">
-    <value>You are about to mint an option NFT. If the owner of this NFT transfers a specified amount of exercise assets before the expiration date, he will receive the amount of the underlying assets you transferred when entering into the contract</value>
+  <data name="Barter_Intro" xml:space="preserve">
+    <value>First choose the asset you want to deposit, then choose the target asset you want to receive, then click the mint button you will get your Barter NFT, you can trade it on any NFT marketplaces.</value>
   </data>
   <data name="RedEnvelope_Intro" xml:space="preserve">
-    <value>You will pass in a certain amount of assets and get a red envelope NFT. Then you can send the red envelope NFT homepage to your community and let members try their luck. The rule of the red envelope is that an address can only receive it once, so if Repeated withdrawals from the same address will fail. Opensea supports 0 price orders. Come and try it.</value>
+    <value>Choose some amount of asset you want to deposit, then click the mint button, list it on NFT marketplaces, only the owner of the NFT can open it.</value>
   </data>
   <data name="Roulette_Intro" xml:space="preserve">
-    <value>You will issue your own roulette NFT. The address that owns this NFT will have the right to place bets. After placing the bet, the right to place bets will be consumed and the prize pool will accumulate. After you draw the prize, a lucky player will win the funds in the prize pool.</value>
+    <value>To mint your roulette table, you have to do the initial bet, after that other people can follow you place more bets. 
+    Every round of game, each can only bet once. When a new round is begin, you can place bet again.</value>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
-    <value>Mint your Options NFT</value>
+    <value>Mint your Barter NFT</value>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
-    <value>Interested in trading? try our Options NFT, you trade NFT as Options, no centerilized account needed.</value>
+    <value>Barter means trading one thing using another thing without using money. 
+    In web3 world, we use uniswap to trade ERC20 token using another ERC20 token, we use NFT marketplace like opensea to trade NFT using a FT like ETH or WETH. 
+    The Barter NFT is a place to trade NFT by another NFT. In NFT world, one big problem is lack of liquidity, famous NFT projects are too expensive, unfamous NFT projects are too cheap that no one want to buy.
+    The Barter NFT is to solve this problem, you don't need to pay you ETH to buy a NFT, you just need to trade your NFT to get another NFT.
+    </value>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
-    <value>Trade Lottery</value>
+    <value>Mint your Lottery NFT</value>
   </data>
   <data name="Cta2_Intro" xml:space="preserve">
-    <value>In realworld, only the company can issue a lottery, normal users can only buy lottery, but in web3 world, you mint a NFT, deposit some money in it, then you can sell it on NFT markets, you define the sell price, NFT owners can draw the lottery and only one lucky guy can win the prize.</value>
+    <value>
+    If you deposit a certain amount of assets, you can get a lottery NFT. 
+    After the buyer buys the redemption rights in the NFT market, the lottery can be drawn after the lottery day. 
+    In the end, one lucky person will get the assets you deposited. The deposited assets can be ERC20/ERC721/ERC1155 tokens,
+    the lottery NFT is a ERC1155 token, the more shares you own, the more chance you win.
+    </value>
   </data>
   <data name="Cta3_Header" xml:space="preserve">
-    <value>Send Red Envelope to your friends</value>
+    <value>Mint your red envelope NFT</value>
   </data>
   <data name="Cta3_Intro" xml:space="preserve">
-    <value>If you run a community, or just want to give some lucky money to your friends, try using our RedEnvelope NFT, the NFT holders have the right to open the red envelope and get the underlying money</value>
+    <value>
+    red envelope is a Chinese tradition, people put some money in a red envelope and give it to others as a gift, the receiver can only open it once, and the money inside is a surprise.
+    Here you deposit some ERC20/ERC1155 tokens will mint a ERC1155 red envelope NFT, it is designed that every address can only buy once and open once, 
+    if you choose to buy more than 1, you would see errors. Currently there are many meme coins in the web3 world, if one day those coins loose value, 
+    you can use them to mint red envelope NFTs and send them to your friends for free.
+    </value>
   </data>
   <data name="Cta4_Header" xml:space="preserve">
-    <value>Play Roulette game</value>
+    <value>Play the Roulette NFT game</value>
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
-    <value>People who mint the NFT is the owner of the table, he then sell it in NFT markets, people who bought the NFT has the right to bet some money in, then the owner can finish this round and choose a winner randomly and win the prize, it looks like a gamble but it actually not and I don't want it to be, just hope people can get fun.</value>
-  </data>
-  <data name="FAQ_A1" xml:space="preserve">
-    <value>I want to create a membership NFT collection on opensea, people who own the membership NFT can use Deswap without fees, currently all the mint operation at Deswap
-costs 0.001 ether, so become a member would save a lot, never the less the NFT would become more valuable in the future the community becomes larger.</value>
-  </data>
-  <data name="FAQ_A2" xml:space="preserve">
-    <value>No particular time now, I want to launch the membership NFT first, then deploy the DAO contract and then airdrop some governor tokens to some of the membership NFT owners.</value>
-  </data>
-  <data name="FAQ_A3" xml:space="preserve">
-    <value>The red envelope NFT is designed that every address can only buy once and open once, if you choose to buy more than 1, you would see errors.</value>
-  </data>
-  <data name="FAQ_Q1" xml:space="preserve">
-    <value>What would the Deswap membership be like?</value>
-  </data>
-  <data name="FAQ_Q2" xml:space="preserve">
-    <value>When will you launch the DAO?</value>
-  </data>
-  <data name="FAQ_Q3" xml:space="preserve">
-    <value>I can't buy red envelope NFT</value>
+    <value>
+    The roulette NFT is a game, everyone can place bet into a roulette, the owner of the roulette NFT can draw the prize and tax some fees, the prize is the sum of all the bets.
+    The placed bets can be ERC20/ERC721/ERC1155 tokens. the roulette is fairy game, the owner can't cheat, the owner can't know the result before the draw.
+    </value>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
     <value>Democratization</value>
@@ -389,5 +388,14 @@ can contact me</value>
   </data>
   <data name="My Tokens" xml:space="preserve">
     <value>My Tokens</value>
+  </data>
+  <data name="Select Asset Kind" xml:space="preserve">
+    <value>Select Asset Kind</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address</value>
   </data>
 </root>
