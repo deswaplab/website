@@ -91,6 +91,10 @@ public record UserLotteryNFT : UserNftBase
 
     public decimal BaseAssetAmount { get; set; }
 
+    public required string AssetKind { get; set; }
+
+    public long BaseAssetTokenId { get; set; }
+
     public bool Drawable()
     {
         if (DateTime.Now > DrawTime)
@@ -102,6 +106,7 @@ public record UserLotteryNFT : UserNftBase
 
     public static UserLotteryNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
     {
+        string assetKind = NftMetadataParser.ParseString(metadataUrl, "assetKind"); // ERC20/721/1155
         return new UserLotteryNFT
         {
             TokenId = tokenId,
@@ -110,7 +115,9 @@ public record UserLotteryNFT : UserNftBase
             Status = NftMetadataParser.ParseString(metadataUrl, "status"), // open|close
             ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
             DrawTime = NftMetadataParser.ParseMaturityDate(metadataUrl, "drawTime"),
-            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+            AssetKind = assetKind,
+            BaseAssetAmount = assetKind == "ERC20" ? NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount") : 0,
+            BaseAssetTokenId = (assetKind == "ERC721" || assetKind == "ERC1155") ? NftMetadataParser.ParseLong(metadataUrl, "baseAssetTokenId") : 0,
         };
     }
 }
@@ -121,8 +128,13 @@ public record UserRedEnvelopeNFT : UserNftBase
 
     public decimal BaseAssetAmount { get; set; }
 
+    public required string AssetKind { get; set; }
+
+    public long BaseAssetTokenId { get; set; }
+
     public static UserRedEnvelopeNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
     {
+        string assetKind = NftMetadataParser.ParseString(metadataUrl, "assetKind"); // ERC20/721/1155
         return new UserRedEnvelopeNFT
         {
             TokenId = tokenId,
@@ -130,7 +142,9 @@ public record UserRedEnvelopeNFT : UserNftBase
             Contract = contractAddress,
             Status = NftMetadataParser.ParseString(metadataUrl, "status"), // open|close
             ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
-            BaseAssetAmount = NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount"),
+            AssetKind = assetKind,
+            BaseAssetAmount = assetKind == "ERC20" ? NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount") : 0,
+            BaseAssetTokenId = (assetKind == "ERC721" || assetKind == "ERC1155") ? NftMetadataParser.ParseLong(metadataUrl, "baseAssetTokenId") : 0,
         };
     }
 }
