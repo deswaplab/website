@@ -267,13 +267,6 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        if (SelectedNetwork is not null)
-        {
-            if (ContractConfig.RedEnvelope.TryGetValue(SelectedNetwork, out var t))
-            {
-                _redenvelope = t;
-            }
-        }
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -308,11 +301,12 @@
 
     private RedEnvelopeForm? Model { get; set; }
 
-    private NFTContract? _redenvelope;
 
     public long? NewTokenId = null;
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private NFTContract? _redenvelope => SelectedNetwork is not null ? ContractConfig.RedEnvelope[SelectedNetwork] : null;
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

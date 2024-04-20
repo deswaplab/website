@@ -303,13 +303,6 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        if (SelectedNetwork is not null)
-        {
-            if (ContractConfig.Barter.TryGetValue(SelectedNetwork, out var t))
-            {
-                _barter = t;
-            }
-        }
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -342,11 +335,13 @@
 
     private BarterForm? Model { get; set; }
 
-    private NFTContract? _barter;
 
     public long? NewTokenId = null;
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private NFTContract? _barter => SelectedNetwork is not null ? ContractConfig.Barter[SelectedNetwork!] : null;
+
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 
     public string ButtonDisabledClass => IsFormDisabled ? "cursor-not-allowed" : "";
@@ -426,7 +421,6 @@
 
     private async Task Submit()
     {
-        Logger.LogInformation("fuck");
         if (Model!.AssetKind == "FT->FT")
         {
             await Submit_FT2FT();
@@ -444,6 +438,7 @@
             toastService.ShowToast("Not erc20 contract", ToastLevel.Error);
             return;
         }
+        Logger.LogInformation("submit_ft2ft, {}, {}, {}", _erc20Decimals, _erc20UserBalance, _barter!.Address);
 
         InProgress = true;
         // approve then mint

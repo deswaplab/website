@@ -280,13 +280,6 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        if (SelectedNetwork is not null)
-        {
-            if (ContractConfig.Roulette.TryGetValue(SelectedNetwork, out var t))
-            {
-                _roulette = t;
-            }
-        }
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -317,11 +310,11 @@
 
     private RouletteForm? Model { get; set; }
 
-    private NFTContract? _roulette;
-
     public long? NewTokenId = null;
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private NFTContract? _roulette => SelectedNetwork is not null ? ContractConfig.Roulette[SelectedNetwork] : null;
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

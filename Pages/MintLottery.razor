@@ -312,13 +312,6 @@
 
     private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
     {
-        if (SelectedNetwork is not null)
-        {
-            if (ContractConfig.Lottery.TryGetValue(SelectedNetwork, out var t))
-            {
-                _lottery = t;
-            }
-        }
         await InvokeAsync(() => this.StateHasChanged());
     }
 
@@ -353,11 +346,12 @@
 
     private LotteryForm? Model { get; set; }
 
-    private NFTContract? _lottery;
 
     public long? NewTokenId = null;
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private NFTContract? _lottery => SelectedNetwork is not null ? ContractConfig.Lottery[SelectedNetwork!] : null;
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 
