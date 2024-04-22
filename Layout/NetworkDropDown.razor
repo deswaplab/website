@@ -12,8 +12,9 @@
         <Authorized>
             <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" 
                 class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:w-auto md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-                @onclick="ToggleNetworkList"
                 @onclick:stopPropagation="true"
+                @onmouseover="ShowNetworkList" 
+                @onmouseout="HideNetworkList"
             >
                 <div class="inline-flex items-center">
                     @if (currentConnectedNetwork is not null)
@@ -31,12 +32,12 @@
                 </div> 
             </button>
             <!-- Dropdown menu -->
-            <div id="dropdownNavbar" class="@NetworkListClass z-10 absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+            <div id="dropdownNavbar" class="@NetworkListClass z-10 absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600 @NetworkListClass" @onmouseover="ShowNetworkList" @onmouseout="HideNetworkList">
                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
                     @foreach (var network in NetworkConfig.Inner)
                     {
                     <li>
-                        <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem"
+                        <a class="flex flex-row items-center justify-between block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer" role="menuitem"
                             @onclick="async () => await ToggleNetwork(network.ChainId)"
                         >
                             <div class="inline-flex items-center">
@@ -86,13 +87,19 @@
 
     private NetworkCore? currentConnectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
-    private bool CollapseNetworkList = false;
+    private bool CollapseNetworkList = true;
 
-    private string NetworkListClass => CollapseNetworkList ? "" : "hidden";
-    private void ToggleNetworkList()
+    private void ShowNetworkList()
     {
-        CollapseNetworkList = !CollapseNetworkList;
+        CollapseNetworkList = false; 
     }
+
+    private void HideNetworkList()
+    {
+        CollapseNetworkList = true; 
+    }
+
+    private string NetworkListClass => CollapseNetworkList ? "hidden" : "block";
 
     private async Task ToggleNetwork(long chainId)
     {
