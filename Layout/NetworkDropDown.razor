@@ -110,7 +110,7 @@
             p.Add("chainId", "0x"+Convert.ToString(chainId, 16));
             var res = await _metamaskInterop.SendAsync(new RpcRequestMessage(null, "wallet_switchEthereumChain", p));
             // add new network, https://docs.metamask.io/wallet/how-to/manage-networks/add-network/
-            if (res.Error.Code == 4902)
+            if (res?.Error?.Code == 4902)
             {
                 var p2 = new Dictionary<string, object>();
                 var network = NetworkConfig.GetNetwork(chainId);
