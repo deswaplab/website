@@ -398,4 +398,22 @@ can contact me</value>
   <data name="Address" xml:space="preserve">
     <value>Address</value>
   </data>
+  <data name="Sicbo" xml:space="preserve">
+    <value>Sicbo</value>
+  </data>
+  <data name="Sicbo_Intro" xml:space="preserve">
+    <value>Sicbo is a traditional Chinese dice game</value>
+  </data>
+  <data name="Deposit_Stmt" xml:space="preserve">
+    <value>Deposit</value>
+  </data>
+  <data name="Win_Stmt" xml:space="preserve">
+    <value>You Win!</value>
+  </data>
+  <data name="Lose_Stmt" xml:space="preserve">
+    <value>You Lose!</value>
+  </data>
+  <data name="DiceNumber_Stmt" xml:space="preserve">
+    <value>Dice number is</value>
+  </data>
 </root>

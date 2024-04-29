@@ -61,6 +61,15 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 ]
 """;
 
+    private readonly string SicboABI = """
+[
+    {"type":"function","name":"mint","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"deposit","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"placeBet","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"result","type":"uint8","internalType":"enum SicBo.DiceResults"}],"outputs":[{"name":"","type":"bool","internalType":"bool"},{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},
+    {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"}
+]
+""";
+
     private readonly string BlackJackABI = """
 [
     {"type":"function","name":"mint","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
@@ -416,6 +425,26 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
         [Parameter("uint256", "value", 5, false)]
         public BigInteger Value { get; set; }
+    }
+
+    [Event("Betted")]
+    public class SicboBettedEventDTO : IEventDTO
+    {
+
+        [Parameter("address", "player", 1, true)]
+        public string Player { get; set; } = "";
+
+        [Parameter("uint256", "tokenId", 2, true)]
+        public BigInteger TokenId { get; set; }
+
+        [Parameter("bool", "isPlayerWin", 3, false)]
+        public bool IsPlayerWin { get; set; }
+
+        [Parameter("uint256", "diceNumbers", 4, false)]
+        public BigInteger DiceNumbers { get; set; }
+
+        [Parameter("uint8", "result", 5, false)]
+        public short DiceResult { get; set; }
     }
 
     private async Task<TransactionReceipt> SendTransactionThroughMetamask(Function callsFunction, long chainId, string from, HexBigInteger value, params object[] functionInput)
@@ -866,6 +895,78 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return receipt.TransactionHash.ToString();
     }
 
+    // Sicbo
+    public async Task<long> MintSicbo(string erc20Address, BigInteger erc20Amount, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(SicboABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = DefaultFee; // 0.001 fee
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            erc20Address,
+            erc20Amount
+        );
+        var events = receipt.DecodeAllEvents<TransferEventDTO>();
+        return (long)events.First().Event.TokenId;
+    }
+
+    public async Task<string> BurnSicbo(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(SicboABI, nftAddress);
+        var callsFunction = contract.GetFunction("burn");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId
+        );
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> DepositSicbo(long tokenId, BigInteger erc20Amount, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(SicboABI, nftAddress);
+        var callsFunction = contract.GetFunction("deposit");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId,
+            erc20Amount
+        );
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<(bool, int)> BetSicbo(long tokenId, BigInteger erc20Amount, int result, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(SicboABI, nftAddress);
+        var callsFunction = contract.GetFunction("placeBet");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId,
+            erc20Amount,
+            result
+        );
+        var events = receipt.DecodeAllEvents<SicboBettedEventDTO>();
+        _logger.LogInformation("event length is {}", events.Count);
+        return (events.First().Event.IsPlayerWin, (int)events.First().Event.DiceNumbers);
+    }
+
     // blackjack
     public async Task<long> MintBlackJack(int amount, string nftAddress)
     {
@@ -1001,4 +1102,65 @@ public enum RedEnvelopeKind
 {
     Fixed = 0,
     Random = 1,
+}
+
+
+public enum DiceResult
+{
+    Small = 0,
+    Big,
+    
+    SpecificDouble_1, // 对1
+    SpecificDouble_2,
+    SpecificDouble_3,
+    SpecificDouble_4,
+    SpecificDouble_5,
+    SpecificDouble_6,
+
+    SpecificTriple_1, // 三条1
+    SpecificTriple_2,
+    SpecificTriple_3,
+    SpecificTriple_4,
+    SpecificTriple_5,
+    SpecificTriple_6,
+
+    AnyTriple, // 三同
+    
+    ThreeDiceTotal_4, // 三个骰子的点数之和为4
+    ThreeDiceTotal_5, // 三个骰子的点数之和为5
+    ThreeDiceTotal_6, // 三个骰子的点数之和为6
+    ThreeDiceTotal_7, // 三个骰子的点数之和为7
+    ThreeDiceTotal_8, // 三个骰子的点数之和为8
+    ThreeDiceTotal_9, // 三个骰子的点数之和为9
+    ThreeDiceTotal_10, // 三个骰子的点数之和为10
+    ThreeDiceTotal_11, // 三个骰子的点数之和为11
+    ThreeDiceTotal_12, // 三个骰子的点数之和为12
+    ThreeDiceTotal_13, // 三个骰子的点数之和为13
+    ThreeDiceTotal_14, // 三个骰子的点数之和为14
+    ThreeDiceTotal_15, // 三个骰子的点数之和为15
+    ThreeDiceTotal_16, // 三个骰子的点数之和为16
+    ThreeDiceTotal_17, // 三个骰子的点数之和为17
+
+    TwoDice_12, // 中两个骰子
+    TwoDice_13,
+    TwoDice_14,
+    TwoDice_15,
+    TwoDice_16,
+    TwoDice_23,
+    TwoDice_24,
+    TwoDice_25,
+    TwoDice_26,
+    TwoDice_34,
+    TwoDice_35,
+    TwoDice_36,
+    TwoDice_45,
+    TwoDice_46,
+    TwoDice_56,
+
+    OneDice_1, // 中1个骰子
+    OneDice_2, // 中2个骰子
+    OneDice_3, // 中3个骰子
+    OneDice_4,
+    OneDice_5,
+    OneDice_6
 }

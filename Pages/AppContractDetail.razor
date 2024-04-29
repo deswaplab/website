@@ -52,6 +52,10 @@
                         {
                             <RouletteDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
+                        else if (ContractKind == "Sicbo")
+                        {
+                            <SicboDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
+                        }
                     </div>
                 </div>
                 <SingleToast />
@@ -98,6 +102,10 @@
         else if (contractKind == "Roulette")
         {
             return Loc["Roulette"];
+        }
+        else if (contractKind == "Sicbo")
+        {
+            return Loc["Sicbo"];
         }
         return "Unknown Contract";
     }

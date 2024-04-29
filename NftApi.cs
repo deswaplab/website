@@ -169,6 +169,23 @@ public record UserRouletteNFT : UserNftBase
     }
 }
 
+public record UserSicboNFT : UserNftBase
+{
+    public required string BaseAssetAddress { get; set; }
+
+    public static UserSicboNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserSicboNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            BaseAssetAddress = NftMetadataParser.ParseString(metadataUrl, "baseAssetAddress"),
+        };
+    }
+}
+
 public record UserBlackJackNFT : UserNftBase
 {
     public decimal DealerBalance { get; set; }

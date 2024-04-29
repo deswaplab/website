@@ -247,6 +247,13 @@ public static class ContractConfig
         { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x7C38B98cc50fcA103529253F0Be1C079f7E39b82") },
     };
 
+    public static readonly Dictionary<NetworkCore, NFTContract> Sicbo = new() {
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Sicbo", "0xd5F79e329bf07c8beF48F32246752Ba018CAFa1A") },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Sicbo", "0x5494bC19Ce5AA656437Db2D6d151DCf47b8b9C6F") },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Sicbo", "0x47CEA152577A40EB97Ef02cF6E64b5645fB1D748") },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0xAC03A3475F3E76169aF6Ce11D21490a4389FE4aB") },
+    };
+
     public static string GetContractKind(NetworkCore? network, string contractAddress)
     {
         if (network == null)
@@ -268,6 +275,10 @@ public static class ContractConfig
         if (Roulette.TryGetValue(network, out var roulette) && roulette.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
         {
             return "Roulette";
+        }
+        if (Sicbo.TryGetValue(network, out var sicbo) && sicbo.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return "Sicbo";
         }
 
         return "";
@@ -295,6 +306,10 @@ public static class ContractConfig
         if (Roulette.TryGetValue(network, out var roulette))
         {
             res.Add(roulette.Address);
+        }
+        if (Sicbo.TryGetValue(network, out var sicbo))
+        {
+            res.Add(sicbo.Address);
         }
 
         return res;

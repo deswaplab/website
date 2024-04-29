@@ -378,4 +378,22 @@
   <data name="Address" xml:space="preserve">
     <value>地址</value>
   </data>
+  <data name="Sicbo" xml:space="preserve">
+    <value>骰宝</value>
+  </data>
+  <data name="Sicbo_Intro" xml:space="preserve">
+    <value>骰宝是一个中国传统的骰子游戏</value>
+  </data>
+  <data name="Deposit_Stmt" xml:space="preserve">
+    <value>充值</value>
+  </data>
+  <data name="Win_Stmt" xml:space="preserve">
+    <value>你赢了!</value>
+  </data>
+  <data name="Lose_Stmt" xml:space="preserve">
+    <value>你输了!</value>
+  </data>
+  <data name="DiceNumber_Stmt" xml:space="preserve">
+    <value>骰子点数是</value>
+  </data>
 </root>
