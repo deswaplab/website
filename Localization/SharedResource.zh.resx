@@ -382,18 +382,174 @@
     <value>骰宝</value>
   </data>
   <data name="Sicbo_Intro" xml:space="preserve">
-    <value>骰宝是一个中国传统的骰子游戏</value>
+    <value>骰宝是一个中国传统的骰子游戏，玩家选择对应的位置下注，如果玩家赢了则庄家按倍率赔给玩家</value>
   </data>
   <data name="Deposit_Stmt" xml:space="preserve">
     <value>充值</value>
   </data>
   <data name="Win_Stmt" xml:space="preserve">
-    <value>你赢了!</value>
+    <value>你赢了</value>
   </data>
   <data name="Lose_Stmt" xml:space="preserve">
-    <value>你输了!</value>
+    <value>你输了</value>
   </data>
   <data name="DiceNumber_Stmt" xml:space="preserve">
     <value>骰子点数是</value>
+  </data>
+  <data name="Sicbo_Small" xml:space="preserve">
+    <value>小 (1:1)</value>
+  </data>
+  <data name="Sicbo_Big" xml:space="preserve">
+    <value>大 (1:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_1" xml:space="preserve">
+    <value>对 1 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_2" xml:space="preserve">
+    <value>对 2 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_3" xml:space="preserve">
+    <value>对 3 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_4" xml:space="preserve">
+    <value>对 4 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_5" xml:space="preserve">
+    <value>对 5 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_6" xml:space="preserve">
+    <value>对 6 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_1" xml:space="preserve">
+    <value>三条 1 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_2" xml:space="preserve">
+    <value>三条 2 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_3" xml:space="preserve">
+    <value>三条 3 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_4" xml:space="preserve">
+    <value>三条 4 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_5" xml:space="preserve">
+    <value>三条 5 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_6" xml:space="preserve">
+    <value>三条 6 (180:1)</value>
+  </data>
+  <data name="Sicbo_AnyTriple" xml:space="preserve">
+    <value>三同 (30:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_4" xml:space="preserve">
+    <value>4 点 (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_5" xml:space="preserve">
+    <value>5 点 (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_6" xml:space="preserve">
+    <value>6 点 (18:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_7" xml:space="preserve">
+    <value>7 点 (12:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_8" xml:space="preserve">
+    <value>8 点 (8:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_9" xml:space="preserve">
+    <value>9 点 (7:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_10" xml:space="preserve">
+    <value>10 点 (6:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_11" xml:space="preserve">
+    <value>11 点 (6:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_12" xml:space="preserve">
+    <value>12 点 (7:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_13" xml:space="preserve">
+    <value>13 点 (8:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_14" xml:space="preserve">
+    <value>14 点 (12:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_15" xml:space="preserve">
+    <value>15 点 (18:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_16" xml:space="preserve">
+    <value>16 点 (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_17" xml:space="preserve">
+    <value>17 点 (62:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_12" xml:space="preserve">
+    <value>包含 1,2 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_13" xml:space="preserve">
+    <value>包含 1,3 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_14" xml:space="preserve">
+    <value>包含 1,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_15" xml:space="preserve">
+    <value>包含 1,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_16" xml:space="preserve">
+    <value>包含 1,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_23" xml:space="preserve">
+    <value>包含 2,3 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_24" xml:space="preserve">
+    <value>包含 2,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_25" xml:space="preserve">
+    <value>包含 2,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_26" xml:space="preserve">
+    <value>包含 2,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_34" xml:space="preserve">
+    <value>包含 3,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_35" xml:space="preserve">
+    <value>包含 3,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_36" xml:space="preserve">
+    <value>包含 3,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_45" xml:space="preserve">
+    <value>包含 4,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_46" xml:space="preserve">
+    <value>包含 4,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_56" xml:space="preserve">
+    <value>包含 5,6 (6:1)</value>
+  </data>
+    <data name="Sicbo_OneDice_1" xml:space="preserve">
+    <value>中 1 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_2" xml:space="preserve">
+    <value>中 2 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_3" xml:space="preserve">
+    <value>中 3 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_4" xml:space="preserve">
+    <value>中 4 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_5" xml:space="preserve">
+    <value>中 5 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_6" xml:space="preserve">
+    <value>中 6 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="BetOptions" xml:space="preserve">
+    <value>下注选项</value>
+  </data>
+  <data name="InitBet" xml:space="preserve">
+    <value>初始下注</value>
   </data>
 </root>

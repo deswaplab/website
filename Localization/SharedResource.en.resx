@@ -402,18 +402,174 @@ can contact me</value>
     <value>Sicbo</value>
   </data>
   <data name="Sicbo_Intro" xml:space="preserve">
-    <value>Sicbo is a traditional Chinese dice game</value>
+    <value>Sicbo is a traditional Chinese dice game, if the player win, the dealer will pay to the player instantly</value>
   </data>
   <data name="Deposit_Stmt" xml:space="preserve">
     <value>Deposit</value>
   </data>
   <data name="Win_Stmt" xml:space="preserve">
-    <value>You Win!</value>
+    <value>You Win</value>
   </data>
   <data name="Lose_Stmt" xml:space="preserve">
-    <value>You Lose!</value>
+    <value>You Lose</value>
   </data>
   <data name="DiceNumber_Stmt" xml:space="preserve">
     <value>Dice number is</value>
+  </data>
+  <data name="Sicbo_Small" xml:space="preserve">
+    <value>Small (1:1)</value>
+  </data>
+  <data name="Sicbo_Big" xml:space="preserve">
+    <value>Big (1:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_1" xml:space="preserve">
+    <value>Double 1 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_2" xml:space="preserve">
+    <value>Double 2 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_3" xml:space="preserve">
+    <value>Double 3 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_4" xml:space="preserve">
+    <value>Double 4 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_5" xml:space="preserve">
+    <value>Double 5 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificDouble_6" xml:space="preserve">
+    <value>Double 6 (10:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_1" xml:space="preserve">
+    <value>Triple 1 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_2" xml:space="preserve">
+    <value>Triple 2 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_3" xml:space="preserve">
+    <value>Triple 3 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_4" xml:space="preserve">
+    <value>Triple 4 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_5" xml:space="preserve">
+    <value>Triple 5 (180:1)</value>
+  </data>
+  <data name="Sicbo_SpecificTriple_6" xml:space="preserve">
+    <value>Triple 6 (180:1)</value>
+  </data>
+  <data name="Sicbo_AnyTriple" xml:space="preserve">
+    <value>Any Triple (30:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_4" xml:space="preserve">
+    <value>4 point (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_5" xml:space="preserve">
+    <value>5 point (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_6" xml:space="preserve">
+    <value>6 point (18:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_7" xml:space="preserve">
+    <value>7 point (12:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_8" xml:space="preserve">
+    <value>8 point (8:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_9" xml:space="preserve">
+    <value>9 point (7:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_10" xml:space="preserve">
+    <value>10 point (6:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_11" xml:space="preserve">
+    <value>11 point (6:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_12" xml:space="preserve">
+    <value>12 point (7:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_13" xml:space="preserve">
+    <value>13 point (8:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_14" xml:space="preserve">
+    <value>14 point (12:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_15" xml:space="preserve">
+    <value>15 point (18:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_16" xml:space="preserve">
+    <value>16 point (31:1)</value>
+  </data>
+  <data name="Sicbo_ThreeDiceTotal_17" xml:space="preserve">
+    <value>17 point (62:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_12" xml:space="preserve">
+    <value>combine 1,2 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_13" xml:space="preserve">
+    <value>combine 1,3 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_14" xml:space="preserve">
+    <value>combine 1,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_15" xml:space="preserve">
+    <value>combine 1,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_16" xml:space="preserve">
+    <value>combine 1,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_23" xml:space="preserve">
+    <value>combine 2,3 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_24" xml:space="preserve">
+    <value>combine 2,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_25" xml:space="preserve">
+    <value>combine 2,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_26" xml:space="preserve">
+    <value>combine 2,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_34" xml:space="preserve">
+    <value>combine 3,4 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_35" xml:space="preserve">
+    <value>combine 3,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_36" xml:space="preserve">
+    <value>combine 3,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_45" xml:space="preserve">
+    <value>combine 4,5 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_46" xml:space="preserve">
+    <value>combine 4,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_TwoDice_56" xml:space="preserve">
+    <value>combine 5,6 (6:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_1" xml:space="preserve">
+    <value>single 1 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_2" xml:space="preserve">
+    <value>single 2 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_3" xml:space="preserve">
+    <value>single 3 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_4" xml:space="preserve">
+    <value>single 4 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_5" xml:space="preserve">
+    <value>single 5 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="Sicbo_OneDice_6" xml:space="preserve">
+    <value>single 6 (1:1/2:1/3:1)</value>
+  </data>
+  <data name="BetOptions" xml:space="preserve">
+    <value>Bet Options</value>
+  </data>
+  <data name="InitBet" xml:space="preserve">
+    <value>Init Bet</value>
   </data>
 </root>

@@ -17,3 +17,5 @@ dotnet watch
 - [ ] 测试
 - [ ] 提交表单时强校验余额，减少出错机会
 - [ ] covalenthq neon api
+- [ ] 骰宝加上本地化
+- [ ] 加上etherscan/blockscout api
