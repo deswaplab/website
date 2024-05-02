@@ -11,9 +11,9 @@ using System.Text.Json.Serialization;
 
 public interface IApiClient
 {
-    Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId);
-
     Task RefreshMetadata(string contractAddress, long chainId, long tokenId);
+
+    Task<IList<UserNftBase>> GetUserNftBase(string userAddress, long chainId);
 }
 
 public record UserNftBase
@@ -218,41 +218,44 @@ public record UserBlackJackNFT : UserNftBase
 
 public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
 {
-    private readonly IApiClient openseaApiClient = new OpenseaNftApi(httpClient);
-
-    private readonly IApiClient covalentApiClient = new CovalentNftApi(httpClient, logger);
-
     // contract, metadata_url
     // 通过contract进行过滤，通过metadata_url解析出详情
-    // public abstract Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId);
-    private IApiClient GetApiClient(long chainId)
+    private IApiClient? GetApiClient(long chainId)
     {
-        if (chainId == 11155111 || chainId == 8001)
+        NetworkCore? network = NetworkConfig.GetNetwork(chainId);
+        if (network?.OpenseaApiHost is not null)
         {
-            return openseaApiClient;
+            return new OpenseaNftApi(httpClient);
         }
-        return covalentApiClient;
+        else if (network?.BlockscoutHost is not null)
+        {
+            return new BlockscoutNftApi(httpClient);
+        }
+        else if (network?.CovalentApiHost is not null)
+        {
+            return new CovalentNftApi(httpClient, logger);
+        }
+        return null;
     }
 
     public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
     {
-        // TODO: 有些网络没有刷新的方法，要注意
         var client = GetApiClient(chainId);
-        await client.RefreshMetadata(contractAddress, chainId, tokenId);
-    }
-
-    public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
-    {
-        var client = GetApiClient(chainId);
-        return await client.GetUserTokens(userAddress, chainId);
+        if (client is not null)
+        {
+            await client.RefreshMetadata(contractAddress, chainId, tokenId);
+        }
     }
 
     public async Task<IList<UserNftBase>> GetUserNftBases(string userAddress, long chainId)
     {
-        var metadatas = await GetUserTokens(userAddress, chainId);
-        NetworkCore? network = NetworkConfig.GetNetwork(chainId);
-        var allContracts = ContractConfig.GetAllContracts(network).Select(item => item.ToLower());
-        return metadatas.Where(item => allContracts.Contains(item.Contract.ToLower())).Select(item => new UserNftBase { TokenId = item.TokenId, Contract = item.Contract, ChainId = chainId, ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl) }).ToList();
+        var client = GetApiClient(chainId);
+        if (client is not null)
+        {
+            var metadatas = await client.GetUserNftBase(userAddress, chainId);
+            return metadatas;
+        }
+        return [];
     }
 }
 
@@ -392,8 +395,6 @@ public static class NftMetadataParser
     }
 }
 
-public record NFTMetadataBase(long TokenId, string Contract, string MetadataUrl);
-
 public class OpenseaNftApi(HttpClient httpClient) : IApiClient
 {
     private readonly string _openseaApiKey = "25ad74a6d36042cfa5bb92c9980f9519";
@@ -412,7 +413,7 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
         await _httpClient.PostAsync(url, null);
     }
 
-    public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
+    public async Task<IList<UserNftBase>> GetUserNftBase(string userAddress, long chainId)
     {
         var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         if (string.IsNullOrEmpty(curNetwork.OpenseaApiHost))
@@ -443,7 +444,16 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
                 break;
             }
         }
-        return curTokens.Select(item => new NFTMetadataBase(long.Parse(item.Identifier), item.Contract, item.MetadataUrl)).ToList();
+        var allContracts = ContractConfig.GetAllContracts(curNetwork).Select(item => item.ToLower());
+
+        return curTokens.Where(item => allContracts.Contains(item.Contract.ToLower()))
+            .Select(item => new UserNftBase
+            {
+                TokenId = long.Parse(item.Identifier),
+                ChainId = chainId,
+                Contract = item.Contract,
+                ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl)
+            }).ToList();
     }
 
     public class OpenseaTokensResponse
@@ -477,7 +487,7 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
         logger.LogWarning("covalent doesn't support refresh");
     }
 
-    public async Task<IList<NFTMetadataBase>> GetUserTokens(string userAddress, long chainId)
+    public async Task<IList<UserNftBase>> GetUserNftBase(string userAddress, long chainId)
     {
         var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
         if (string.IsNullOrEmpty(curNetwork.CovalentApiHost))
@@ -489,13 +499,18 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
         var authValue = Convert.ToBase64String(Encoding.ASCII.GetBytes("cqt_rQ6VwJkQBx99RQmbBk896mrFfX9G:"));
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
         var tokensResponse = await httpClient.GetFromJsonAsync<CovalentTokensResponse>(url);
-        IList<NFTMetadataBase> result = [];
+        IList<UserNftBase> result = [];
         foreach (var item in tokensResponse!.Data.Items)
         {
             var tokens = item.NFTData;
             foreach (var token in tokens)
             {
-                result.Add(new NFTMetadataBase(long.Parse(token.TokenId), item.ContractAddress, token.TokenUrl));
+                result.Add(new UserNftBase{
+                    TokenId = long.Parse(token.TokenId),
+                    ChainId = chainId,
+                    Contract = item.ContractAddress, 
+                    ImageData =  NftMetadataParser.ParseImageSvg(token.TokenUrl)
+                });
             }
         }
         return result;
@@ -530,5 +545,160 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
         [JsonPropertyName("token_url")]
         public required string TokenUrl { get; set; }
 
+    }
+}
+
+
+public class BlockscoutNftApi(HttpClient httpClient) : IApiClient
+{
+    private readonly HttpClient _httpClient = httpClient;
+
+    private readonly string DefaultImage = "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgaWQ9Imljb24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5uby1pbWFnZTwvdGl0bGU+PHBhdGggZD0iTTMwLDMuNDE0MSwyOC41ODU5LDIsMiwyOC41ODU5LDMuNDE0MSwzMGwyLTJIMjZhMi4wMDI3LDIuMDAyNywwLDAsMCwyLTJWNS40MTQxWk0yNiwyNkg3LjQxNDFsNy43OTI5LTcuNzkzLDIuMzc4OCwyLjM3ODdhMiwyLDAsMCwwLDIuODI4NCwwTDIyLDE5bDQsMy45OTczWm0wLTUuODMxOC0yLjU4NTgtMi41ODU5YTIsMiwwLDAsMC0yLjgyODQsMEwxOSwxOS4xNjgybC0yLjM3Ny0yLjM3NzFMMjYsNy40MTQxWiIvPjxwYXRoIGQ9Ik02LDIyVjE5bDUtNC45OTY2LDEuMzczMywxLjM3MzMsMS40MTU5LTEuNDE2LTEuMzc1LTEuMzc1YTIsMiwwLDAsMC0yLjgyODQsMEw2LDE2LjE3MTZWNkgyMlY0SDZBMi4wMDIsMi4wMDIsMCwwLDAsNCw2VjIyWiIvPjxyZWN0IGlkPSJfVHJhbnNwYXJlbnRfUmVjdGFuZ2xlXyIgZGF0YS1uYW1lPSImbHQ7VHJhbnNwYXJlbnQgUmVjdGFuZ2xlJmd0OyIgY2xhc3M9ImNscy0xIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiLz48L3N2Zz4K";
+
+    private readonly string RouletteDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Sb3VsZXR0ZTwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46xPC90ZXh0Pjwvc3ZnPgo=";
+
+    private readonly string SicboDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5TaWNCbzwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46yPC90ZXh0Pjwvc3ZnPgo=";
+
+    private readonly string RedEnvelopeDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5SZWQgRW52ZWxvcGU8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+npzwvdGV4dD48L3N2Zz4K";
+
+    private readonly string LotteryDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Mb3R0ZXJ5PC90ZXh0Pjx0ZXh0IHg9IjcwIiB5PSIyNDAiIHN0eWxlPSJmb250LXNpemU6MTAwcHgiPvCfjp/vuI88L3RleHQ+PC9zdmc+Cg==";
+
+    private readonly string BarterDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iNDAiIHk9IjcwIiBmb250LXNpemU9IjE0Ij5CYXJ0ZXI8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+MuzwvdGV4dD48L3N2Zz4K";
+
+    private string GetDefaultImageByAddress(NetworkCore network, string contractAddress)
+    {
+        string contractKind = ContractConfig.GetContractKind(network, contractAddress);
+        if (contractKind == "Barter")
+        {
+            return BarterDefaultImage;
+        }
+        else if (contractKind == "Lottery")
+        {
+            return LotteryDefaultImage;
+        }
+        else if (contractKind == "RedEnvelope")
+        {
+            return RedEnvelopeDefaultImage;
+        }
+        else if (contractKind == "Roulette")
+        {
+            return RouletteDefaultImage;
+        }
+        else if (contractKind == "Sicbo")
+        {
+            return SicboDefaultImage;
+        }
+        return DefaultImage;
+    }
+    public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
+    {
+        // TODO:
+        await Task.CompletedTask;
+    }
+
+    public async Task<IList<UserNftBase>> GetUserNftBase(string userAddress, long chainId)
+    {
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        if (string.IsNullOrEmpty(curNetwork.BlockscoutHost))
+        {
+            return [];
+        }
+        var allContracts = ContractConfig.GetAllContracts(curNetwork).Select(item => item.ToLower());
+
+        bool hasMore = true;
+        string next = "";
+        IList<UserNftBase> nfts = [];
+        while (hasMore)
+        {
+            string url = $"{curNetwork.BlockscoutHost}/api/v2/addresses/{userAddress}/tokens";
+            if (next != "")
+            {
+                url += $"?{next}";
+            }
+            var tokensResponse = await _httpClient.GetFromJsonAsync<BlockscoutTokensResponse>(url);
+            foreach (var item in tokensResponse!.Items)
+            {
+                if (item.TokenId is not null && item.Token.Address is not null && allContracts.Contains(item.Token.Address.ToLower()))
+                {
+                    nfts.Add(new UserNftBase
+                    {
+                        TokenId = item.TokenId.Value,
+                        ChainId = chainId,
+                        Contract = item.Token.Address,
+                        ImageData = item.TokenInstance?.ImageUrl ?? GetDefaultImageByAddress(curNetwork, item.Token.Address),
+                    });
+                }
+            }
+            if (tokensResponse.NextPageParams is not null)
+            {
+                hasMore = true;
+                var fiatValue = tokensResponse.NextPageParams.FiatValue;
+                var id = tokensResponse.NextPageParams.Id;
+                var itemsCount = tokensResponse.NextPageParams.ItemsCount;
+                var value = tokensResponse.NextPageParams.Value;
+                next = $"fiat_value={fiatValue}&id={id}&items_count={itemsCount}&value={value}";
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return nfts;
+    }
+
+    public class BlockscoutTokensResponse
+    {
+        [JsonPropertyName("items")]
+        public required IList<BlockscoutTokenItem> Items { get; set; }
+
+        [JsonPropertyName("next_page_params")]
+        public BlockscoutNextPageParams? NextPageParams { get; set; }
+    }
+
+    public class BlockscoutNextPageParams
+    {
+        [JsonPropertyName("fiat_value")]
+        public string? FiatValue { get; set; }
+
+        [JsonPropertyName("id")]
+        public required long Id { get; set; }
+
+        [JsonPropertyName("items_count")]
+        public required int ItemsCount { get; set; }
+
+        [JsonPropertyName("value")]
+        public required string Value { get; set; }
+    }
+
+    public class BlockscoutTokenItem
+    {
+        [JsonPropertyName("token")]
+        public required BlockscoutToken Token { get; set; }
+
+
+        [JsonPropertyName("token_id")]
+        public long? TokenId { get; set; }
+
+        [JsonPropertyName("token_instance")]
+        public BlockscoutTokenInstance? TokenInstance { get; set; }
+
+        [JsonPropertyName("value")]
+        public string? Value { get; set; } // BigInteger for erc20
+    }
+
+    public class BlockscoutToken
+    {
+        [JsonPropertyName("address")]
+        public string? Address { get; set; }
+
+        [JsonPropertyName("type")]
+        public string? Type { get; set; } // ERC-20, ERC-721, ERC-1155
+    }
+
+    public class BlockscoutTokenInstance
+    {
+        [JsonPropertyName("image_url")]
+        public string? ImageUrl { get; set; } // data:image/svg+xml;base64,...
     }
 }

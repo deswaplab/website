@@ -13,13 +13,16 @@ public record NetworkCore
 
     public long ChainId { get; set; }
 
-    public required string EtherscanHost { get; set; }
+    public string? EtherscanHost { get; set; }
+
+    // TODO: 如果支持blockscout，加上blockscout的地址
+    public string? BlockscoutHost { get; set; }
 
     // opensea 主界面对应的host
-    public required string OpenseaHost { get; set; }
+    public string? OpenseaHost { get; set; }
 
-    // opensea api 对应的host
-    public required string OpenseaApiHost { get; set; }
+    // opensea api 对应的host，很多链不支持opensea，应该填null
+    public string? OpenseaApiHost { get; set; }
 
     public string? CovalentApiHost { get; set; }
 
@@ -69,6 +72,7 @@ public static class NetworkConfig
         InnerName = "sepolia",
         ChainId = 11155111,
         EtherscanHost = "https://sepolia.etherscan.io",
+        BlockscoutHost = "https://eth-sepolia.blockscout.com",
         OpenseaHost = "https://testnets.opensea.io/assets/sepolia",
         OpenseaApiHost = "https://testnets-api.opensea.io/api/v2/chain/sepolia",
         Logo = "ethereum_logo.svg",
@@ -82,8 +86,8 @@ public static class NetworkConfig
         InnerName = "moonbase_alpha",
         ChainId = 1287,
         EtherscanHost = "https://moonbase.moonscan.io",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "moonbase_alpha_logo.svg",
         IsTestNet = true,
         CovalentApiHost = "https://api.covalenthq.com/v1/moonbeam-moonbase-alpha",
@@ -96,8 +100,9 @@ public static class NetworkConfig
         InnerName = "neondev",
         ChainId = 245022926,
         EtherscanHost = "https://devnet.neonscan.org",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        BlockscoutHost = "https://neon-devnet.blockscout.com",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "neon_logo.svg",
         IsTestNet = true,
         RpcUrl = "https://devnet.neonevm.org",
@@ -108,9 +113,10 @@ public static class NetworkConfig
         Name = "Manta Pacific Sepolia", // nft api 501 not implemented
         InnerName = "manta_pacific_sepolia",
         ChainId = 3441006,
-        EtherscanHost = "https://pacific-explorer.sepolia-testnet.manta.network",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        EtherscanHost = null,
+        BlockscoutHost = "https://pacific-explorer.sepolia-testnet.manta.network",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "manta_pacific_logo.svg",
         IsTestNet = true,
         CovalentApiHost = "https://api.covalenthq.com/v1/manta-testnet",
@@ -122,9 +128,10 @@ public static class NetworkConfig
         Name = "Aurora Testnet",
         InnerName = "aurora_testnet",
         ChainId = 1313161555,
-        EtherscanHost = "https://explorer.testnet.aurora.dev",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        EtherscanHost = null,
+        BlockscoutHost = "https://explorer.testnet.aurora.dev",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "aurora_logo.svg",
         IsTestNet = true,
         CovalentApiHost = "https://api.covalenthq.com/v1/aurora-testnet",
@@ -136,9 +143,10 @@ public static class NetworkConfig
         Name = "Mantle Sepolia", // nft api 501 not implemented
         InnerName = "mantle_sepolia",
         ChainId = 5003,
-        EtherscanHost = "https://explorer.sepolia.mantle.xyz",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        EtherscanHost = null,
+        BlockscoutHost = "https://explorer.sepolia.mantle.xyz",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "mantle_logo.svg",
         IsTestNet = true,
         CovalentApiHost = "https://api.covalenthq.com/v1/mantle-testnet",
@@ -151,8 +159,8 @@ public static class NetworkConfig
         InnerName = "scroll_sepolia",
         ChainId = 534351,
         EtherscanHost = "https://sepolia.scrollscan.com",
-        OpenseaHost = "",
-        OpenseaApiHost = "",
+        OpenseaHost = null,
+        OpenseaApiHost = null,
         Logo = "scroll_logo.svg",
         IsTestNet = true,
         CovalentApiHost = "https://api.covalenthq.com/v1/scroll-sepolia-testnet",

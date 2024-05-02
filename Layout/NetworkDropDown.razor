@@ -117,7 +117,8 @@
                 p2.Add("chainId", "0x"+Convert.ToString(chainId, 16));
                 p2.Add("chainName", network!.Name);
                 p2.Add("rpcUrls", new List<string> {network!.RpcUrl});
-                p2.Add("blockExplorerUrls", new List<string> {network!.EtherscanHost});
+                string explorerUrl = network?.EtherscanHost ?? network?.BlockscoutHost ?? "";
+                p2.Add("blockExplorerUrls", new List<string> {explorerUrl});
                 // TODO: optimize config more carefully
                 p2.Add("nativeCurrency", new Dictionary<string, object> {
                     {"name", "ETH"},
