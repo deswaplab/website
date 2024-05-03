@@ -79,9 +79,9 @@
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
 
-    public string OpenseaUrl => (SelectedNetwork is not null && SelectedNetwork.OpenseaHost != "") ? $"{SelectedNetwork.OpenseaHost}/{ContractAddress}/{TokenId}" : "";
+    public string OpenseaUrl => SelectedNetwork?.BuildDetailUrl(ContractAddress, TokenId) ?? "";
 
-    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost != "") ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
+    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
 
     public string MetamaskDeepLink => $"https://metamask.app.link/dapp/deswap.one/app/{NetworkName}/{ContractAddress}/{TokenId}";
 
