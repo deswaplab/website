@@ -15,7 +15,6 @@ public record NetworkCore
 
     public string? EtherscanHost { get; set; }
 
-    // TODO: 如果支持blockscout，加上blockscout的地址
     public string? BlockscoutHost { get; set; }
 
     // opensea 主界面对应的host
