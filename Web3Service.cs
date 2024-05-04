@@ -1,3 +1,4 @@
+using Nethereum.ABI;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
@@ -58,6 +59,15 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     {"type":"function","name":"bet1155","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"open","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},
     {"type":"function","name":"bettedAddressMap","inputs":[{"name":"id","type":"uint256","internalType":"uint256"},{"name":"addr","type":"address","internalType":"address"}],"outputs":[{"name":"isBeted","type":"bool","internalType":"bool"}],"stateMutability":"view"}
+]
+""";
+
+    private readonly string VoteABI = """
+[
+    {"type":"function","name":"mint","inputs":[{"name":"title","type":"string","internalType":"string"},{"name":"choices","type":"bytes","internalType":"bytes"},{"name":"choiceLength","type":"uint256","internalType":"uint256"},{"name":"expireTime","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"vote","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"answer","type":"uint8","internalType":"enum Vote.Answer"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"tokenVoter","inputs":[{"name":"","type":"uint256","internalType":"uint256"},{"name":"","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"}
 ]
 """;
 
@@ -966,6 +976,74 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         _logger.LogInformation("event length is {}", events.Count);
         return (events.First().Event.IsPlayerWin, (int)events.First().Event.DiceNumbers);
     }
+
+    // Vote
+    public async Task<long> MintVote(string title, IList<string> choices, DateTime expireTime, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(VoteABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = DefaultFee; // 0.001 fee
+        long ts = new DateTimeOffset(expireTime).ToUnixTimeSeconds();
+        var abiEncode = new ABIEncode();
+        var choiceData = abiEncode.GetABIEncoded(choices.ToArray());
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            title,
+            choiceData,
+            choices.Count,
+            ts
+        );
+        var events = receipt.DecodeAllEvents<TransferEventDTO>();
+        return (long)events.First().Event.TokenId;
+    }
+
+    public async Task<string> BurnVote(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(VoteABI, nftAddress);
+        var callsFunction = contract.GetFunction("burn");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId
+        );
+        return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<string> PlaceVote(long tokenId, int answer, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(VoteABI, nftAddress);
+        var callsFunction = contract.GetFunction("vote");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId,
+            answer
+        );
+        return receipt.TransactionHash.ToString();
+    }
+
+
+    public async Task<bool> UserVoted(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(VoteABI, nftAddress);
+        var callsFunction = contract.GetFunction("tokenVoter");
+        var result = await callsFunction.CallAsync<bool>(tokenId, _metamaskHostProvider.SelectedAccount);
+        return result;
+    }
+
 
     // blackjack
     public async Task<long> MintBlackJack(int amount, string nftAddress)

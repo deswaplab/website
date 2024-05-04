@@ -186,6 +186,23 @@ public record UserSicboNFT : UserNftBase
     }
 }
 
+public record UserVoteNFT : UserNftBase
+{
+    public long ChoiceLength { get; set; }
+
+    public static UserVoteNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserVoteNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+            ChoiceLength = NftMetadataParser.ParseLong(metadataUrl, "choiceLength"),
+        };
+    }
+}
+
 public record UserBlackJackNFT : UserNftBase
 {
     public decimal DealerBalance { get; set; }

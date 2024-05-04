@@ -261,6 +261,13 @@ public static class ContractConfig
         { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0xAC03A3475F3E76169aF6Ce11D21490a4389FE4aB") },
     };
 
+    public static readonly Dictionary<NetworkCore, NFTContract> Vote = new() {
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Vote", "0x3b8A315a925dA3bc904304B11E66618D1A167954") },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Vote", "0x415f9bcD4747BB9F20beCadD3e2E70670d8bC3C3") },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Vote", "0x238285119Ad0842051B4a46A9428139d30869B55") },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Vote", "0xC6024186e356eaa74d564475127244a96C86eA3D") },
+    };
+
     public static string GetContractKind(NetworkCore? network, string contractAddress)
     {
         if (network == null)
@@ -286,6 +293,10 @@ public static class ContractConfig
         if (Sicbo.TryGetValue(network, out var sicbo) && sicbo.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
         {
             return "Sicbo";
+        }
+        if (Vote.TryGetValue(network, out var vote) && vote.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return "Vote";
         }
 
         return "";
@@ -317,6 +328,10 @@ public static class ContractConfig
         if (Sicbo.TryGetValue(network, out var sicbo))
         {
             res.Add(sicbo.Address);
+        }
+        if (Vote.TryGetValue(network, out var vote))
+        {
+            res.Add(vote.Address);
         }
 
         return res;

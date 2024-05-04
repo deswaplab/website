@@ -56,6 +56,10 @@
                         {
                             <SicboDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         }
+                        else if (ContractKind == "Vote")
+                        {
+                            <VoteDetail NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
+                        }
                     </div>
                 </div>
                 <SingleToast />
@@ -106,6 +110,10 @@
         else if (contractKind == "Sicbo")
         {
             return Loc["Sicbo"];
+        }
+        else if (contractKind == "Vote")
+        {
+            return Loc["Vote"];
         }
         return "Unknown Contract";
     }

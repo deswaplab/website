@@ -1,0 +1,264 @@
+@page "/app/vote"
+
+@layout AppLayout
+@inject ILogger<MintVote> Logger
+@inject MetamaskHostProvider _metamaskHostProvider
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IJSRuntime JS
+@inject ToastService toastService
+@inject Web3Service _web3Service
+@inject IStringLocalizer<SharedResource> Loc
+<PageTitle>@Loc["Vote"]</PageTitle>
+
+<section class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    @Loc["Vote"]
+                </h1>
+
+                <p class="mb-5 text-xs font-thin text-gray-900 dark:text-gray-300">@Loc["Vote_Intro"]</p>
+
+                <EditForm EditContext="editContext" OnValidSubmit="Submit" FormName="MintVote" class="space-y-4 md:space-y-6">
+                    <div>
+                        <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                            @Loc["Title"]
+                        </label>
+                        <textarea id="title" rows="3"
+                                  class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                  @bind="Model!.Title"
+                                  disabled="@IsFormDisabled"></textarea>
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Title" />
+                    </div>
+
+                    <div>
+                        <div class="grid grid-cols-10 gap-2">
+                            <input type="text" disabled="@IsFormDisabled" class="col-span-9 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mb-2" @bind-value="Model!.Choices[0]" />
+                            @if (Model!.ChoiceLength >= 2 && Model!.ChoiceLength <= 3)
+                            {
+                                <button type="button" @onclick="AddChoice">
+                                    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5" />
+                                    </svg>
+                                </button>
+                            }
+                        </div>
+                        <div class="grid grid-cols-10 gap-2">
+                            <input type="text" disabled="@IsFormDisabled" class="col-span-9 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mb-2" @bind-value="Model!.Choices[1]" />
+                        </div>
+                        @for(int i = 2; i < Model!.ChoiceLength; i++)
+                        {
+                            var localIdx = i;
+                            <div class="grid grid-cols-10 gap-2">
+                                <input type="text" disabled="@IsFormDisabled" class="col-span-9 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mb-2" @bind-value="Model!.Choices[localIdx]" />
+                                @if (localIdx == Model!.ChoiceLength - 1)
+                                {
+                                    <button type="button" @onclick="RemoveChoice">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" />
+                                        </svg>
+                                    </button>
+                                }
+                            </div>
+                        }                        
+                    </div>
+
+                    <div>
+                        <label for="expireTime" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
+                        <input id="expireTime" type="date"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               placeholder="Select date"
+                               disabled="@IsFormDisabled"
+                               @bind-value="Model!.ExpireTime"
+                               @bind-value:format="yyyy-MM-dd">
+                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.ExpireTime" />
+                    </div>
+
+                    <CascadingAuthenticationState>
+                        <AuthorizeView Roles="EthereumConnected" Context="innerContext">
+                            <Authorized>
+                                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                        disabled="@IsFormDisabled">
+                                    @if (InProgress)
+                                    {
+                                        <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                                        </svg>
+                                    }
+                                    @Loc["Mint"]
+                                </button>
+                                @if (NewTokenId is not null)
+                                {
+                                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                                        <a href="@SelectedNetwork!.BuildDetailUrl(_vote!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                    </p>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <LoginButton />
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </EditForm>
+            </div>
+        </div>
+        <SingleToast />
+    </div>
+</section>
+
+@code {
+    private EditContext? editContext;
+
+    private ValidationMessageStore? messageStore;
+
+    private void HandleValidationRequested(object? sender,
+        ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+
+        if (string.IsNullOrEmpty(Model!.Title))
+        {
+            messageStore?.Add(() => Model.Title, "title can't be empty");
+        }
+        else if (Model!.Title.Length > 140)
+        {
+            messageStore?.Add(() => Model.Title, "title length should less than 140");
+        }
+
+        if (Model!.Choices.Count > 4)
+        {
+            messageStore?.Add(() => Model.Choices, "At most 4 choices");
+        }
+        else if (Model!.Choices.Count < 2)
+        {
+            messageStore?.Add(() => Model.Choices, "At least 2 choices");
+        }
+
+        if (Model!.ExpireTime <= DateTime.Now)
+        {
+            messageStore?.Add(() => Model.ExpireTime, "Expire Time should be in future");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Model ??= new()
+            {
+                Title = "",
+                Choices = ["Choice 1", "Choice 2"],
+                ChoiceLength = 2,
+                ExpireTime = DateTime.Now.AddDays(3),
+            };
+        editContext = new(Model);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+
+        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
+    {
+        await InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
+        _metamaskHostProvider.SelectedAccountChanged -= MetamaskHostProvider_SelectedAccountChanged;
+    }
+
+    public class VoteForm
+    {
+        public required string Title { get; set; }
+
+        public required IList<string> Choices { get; set; }
+
+        public int ChoiceLength { get; set; }
+
+        public DateTime ExpireTime { get; set; }
+    }
+
+    private VoteForm? Model { get; set; }
+
+    public long? NewTokenId = null;
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+
+    private NFTContract? _vote => SelectedNetwork is not null ? ContractConfig.Vote[SelectedNetwork] : null;
+
+    private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
+
+    public string ButtonDisabledClass => IsFormDisabled ? "cursor-not-allowed" : "";
+
+    private bool InProgress = false;
+
+    private void AddChoice()
+    {
+
+        if (Model!.ChoiceLength <= 3 && Model!.ChoiceLength >= 2)
+        {
+            Model!.ChoiceLength += 1;
+            Model!.Choices.Add($"Choice {Model!.ChoiceLength}");
+
+            Logger.LogInformation("added choice, {}, {}", Model!.ChoiceLength, Model!.Choices.Count);
+            StateHasChanged();
+        }
+    }
+
+    private void RemoveChoice()
+    {
+
+        if (Model!.ChoiceLength >= 3 && Model!.ChoiceLength <= 4)
+        {
+            Model!.ChoiceLength -= 1;
+            Model!.Choices.RemoveAt(Model!.ChoiceLength);
+
+            Logger.LogInformation("removed choice, {}, {}", Model!.ChoiceLength, Model!.Choices.Count);
+            StateHasChanged();
+        }
+    }
+
+    private async Task Submit()
+    {
+        Logger.LogInformation("Submit Vote, {title}, {expireTime}, {length}", Model!.Title, Model!.ExpireTime, Model!.ChoiceLength);
+        foreach(var choice in Model!.Choices)
+        {
+            Logger.LogInformation("Choice: {}", choice);
+        }
+        InProgress = true;
+        try
+        {
+            NewTokenId = await _web3Service.MintVote(
+                Model!.Title,
+                Model!.Choices,
+                Model!.ExpireTime,
+                _vote!.Address
+            );
+
+            toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+        }
+        catch (Nethereum.JsonRpc.Client.RpcResponseException e)
+        {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        }
+        finally
+        {
+            InProgress = false;
+        }
+    }
+}
