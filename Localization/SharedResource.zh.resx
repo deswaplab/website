@@ -561,4 +561,7 @@
   <data name="Vote_Intro" xml:space="preserve">
     <value>发起人mint出一个投票的NFT，分享到社交媒体，任何人都可以在规定时间内进行投票</value>
   </data>
+  <data name="Writing" xml:space="preserve">
+    <value>写作</value>
+  </data>
 </root>

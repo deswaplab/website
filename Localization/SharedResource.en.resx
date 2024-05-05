@@ -581,4 +581,7 @@ can contact me</value>
   <data name="Vote_Intro" xml:space="preserve">
     <value>Vote is like twitter's Poll but using the NFT way</value>
   </data>
+  <data name="Writing" xml:space="preserve">
+    <value>Writing</value>
+  </data>
 </root>

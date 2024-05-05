@@ -80,6 +80,14 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 ]
 """;
 
+    private readonly string WritingABI = """
+[
+    {"type":"function","name":"mint","inputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"tokenMetadata","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"},{"name":"writer","type":"address","internalType":"address"}],"stateMutability":"view"}
+]
+""";
+
     private readonly string BlackJackABI = """
 [
     {"type":"function","name":"mint","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
@@ -1042,6 +1050,41 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("tokenVoter");
         var result = await callsFunction.CallAsync<bool>(tokenId, _metamaskHostProvider.SelectedAccount);
         return result;
+    }
+
+    // Writing
+    public async Task<long> MintWriting(string title, string content, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(WritingABI, nftAddress);
+        var callsFunction = contract.GetFunction("mint");
+        var value = DefaultFee; // 0.001 fee
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            title,
+            content
+        );
+        var events = receipt.DecodeAllEvents<TransferEventDTO>();
+        return (long)events.First().Event.TokenId;
+    }
+
+    public async Task<string> BurnWriting(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(WritingABI, nftAddress);
+        var callsFunction = contract.GetFunction("burn");
+        var value = new HexBigInteger(0);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId
+        );
+        return receipt.TransactionHash.ToString();
     }
 
 
