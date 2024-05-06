@@ -461,7 +461,7 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
                 break;
             }
         }
-        var allContracts = ContractConfig.GetAllContracts(curNetwork).Select(item => item.ToLower());
+        var allContracts = ContractConfig.GetNFTContracts(curNetwork).Select(item => item.ToLower());
 
         return curTokens.Where(item => allContracts.Contains(item.Contract.ToLower()))
             .Select(item => new UserNftBase
@@ -572,40 +572,14 @@ public class BlockscoutNftApi(HttpClient httpClient) : IApiClient
 
     private readonly string DefaultImage = "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgaWQ9Imljb24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5uby1pbWFnZTwvdGl0bGU+PHBhdGggZD0iTTMwLDMuNDE0MSwyOC41ODU5LDIsMiwyOC41ODU5LDMuNDE0MSwzMGwyLTJIMjZhMi4wMDI3LDIuMDAyNywwLDAsMCwyLTJWNS40MTQxWk0yNiwyNkg3LjQxNDFsNy43OTI5LTcuNzkzLDIuMzc4OCwyLjM3ODdhMiwyLDAsMCwwLDIuODI4NCwwTDIyLDE5bDQsMy45OTczWm0wLTUuODMxOC0yLjU4NTgtMi41ODU5YTIsMiwwLDAsMC0yLjgyODQsMEwxOSwxOS4xNjgybC0yLjM3Ny0yLjM3NzFMMjYsNy40MTQxWiIvPjxwYXRoIGQ9Ik02LDIyVjE5bDUtNC45OTY2LDEuMzczMywxLjM3MzMsMS40MTU5LTEuNDE2LTEuMzc1LTEuMzc1YTIsMiwwLDAsMC0yLjgyODQsMEw2LDE2LjE3MTZWNkgyMlY0SDZBMi4wMDIsMi4wMDIsMCwwLDAsNCw2VjIyWiIvPjxyZWN0IGlkPSJfVHJhbnNwYXJlbnRfUmVjdGFuZ2xlXyIgZGF0YS1uYW1lPSImbHQ7VHJhbnNwYXJlbnQgUmVjdGFuZ2xlJmd0OyIgY2xhc3M9ImNscy0xIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiLz48L3N2Zz4K";
 
-    private readonly string RouletteDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Sb3VsZXR0ZTwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46xPC90ZXh0Pjwvc3ZnPgo=";
-
-    private readonly string SicboDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5TaWNCbzwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46yPC90ZXh0Pjwvc3ZnPgo=";
-
-    private readonly string RedEnvelopeDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5SZWQgRW52ZWxvcGU8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+npzwvdGV4dD48L3N2Zz4K";
-
-    private readonly string LotteryDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Mb3R0ZXJ5PC90ZXh0Pjx0ZXh0IHg9IjcwIiB5PSIyNDAiIHN0eWxlPSJmb250LXNpemU6MTAwcHgiPvCfjp/vuI88L3RleHQ+PC9zdmc+Cg==";
-
-    private readonly string BarterDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iNDAiIHk9IjcwIiBmb250LXNpemU9IjE0Ij5CYXJ0ZXI8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+MuzwvdGV4dD48L3N2Zz4K";
-
     private string GetDefaultImageByAddress(NetworkCore network, string contractAddress)
     {
-        string contractKind = ContractConfig.GetContractKind(network, contractAddress);
-        if (contractKind == "Barter")
+        NFTContract? contract = ContractConfig.GetNFTContract(network, contractAddress);
+        if (contract is null)
         {
-            return BarterDefaultImage;
+            return DefaultImage;
         }
-        else if (contractKind == "Lottery")
-        {
-            return LotteryDefaultImage;
-        }
-        else if (contractKind == "RedEnvelope")
-        {
-            return RedEnvelopeDefaultImage;
-        }
-        else if (contractKind == "Roulette")
-        {
-            return RouletteDefaultImage;
-        }
-        else if (contractKind == "Sicbo")
-        {
-            return SicboDefaultImage;
-        }
-        return DefaultImage;
+        return contract.DefaultImage;
     }
     public async Task RefreshMetadata(string contractAddress, long chainId, long tokenId)
     {
@@ -620,7 +594,7 @@ public class BlockscoutNftApi(HttpClient httpClient) : IApiClient
         {
             return [];
         }
-        var allContracts = ContractConfig.GetAllContracts(curNetwork).Select(item => item.ToLower());
+        var allContracts = ContractConfig.GetNFTContracts(curNetwork).Select(item => item.ToLower());
 
         bool hasMore = true;
         string next = "";

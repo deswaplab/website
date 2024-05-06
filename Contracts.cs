@@ -1,7 +1,7 @@
 namespace DeswapApp;
 
 public record ERC20Contract(string Name, string Address, int Decimals);
-public record NFTContract(string Name, string Address);
+public record NFTContract(string Name, string Address, string DefaultImage);
 
 public record NetworkCore
 {
@@ -226,127 +226,107 @@ public static class ContractConfig
         return res;
     }
 
+    private static string DefaultImage = "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgaWQ9Imljb24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZT5uby1pbWFnZTwvdGl0bGU+PHBhdGggZD0iTTMwLDMuNDE0MSwyOC41ODU5LDIsMiwyOC41ODU5LDMuNDE0MSwzMGwyLTJIMjZhMi4wMDI3LDIuMDAyNywwLDAsMCwyLTJWNS40MTQxWk0yNiwyNkg3LjQxNDFsNy43OTI5LTcuNzkzLDIuMzc4OCwyLjM3ODdhMiwyLDAsMCwwLDIuODI4NCwwTDIyLDE5bDQsMy45OTczWm0wLTUuODMxOC0yLjU4NTgtMi41ODU5YTIsMiwwLDAsMC0yLjgyODQsMEwxOSwxOS4xNjgybC0yLjM3Ny0yLjM3NzFMMjYsNy40MTQxWiIvPjxwYXRoIGQ9Ik02LDIyVjE5bDUtNC45OTY2LDEuMzczMywxLjM3MzMsMS40MTU5LTEuNDE2LTEuMzc1LTEuMzc1YTIsMiwwLDAsMC0yLjgyODQsMEw2LDE2LjE3MTZWNkgyMlY0SDZBMi4wMDIsMi4wMDIsMCwwLDAsNCw2VjIyWiIvPjxyZWN0IGlkPSJfVHJhbnNwYXJlbnRfUmVjdGFuZ2xlXyIgZGF0YS1uYW1lPSImbHQ7VHJhbnNwYXJlbnQgUmVjdGFuZ2xlJmd0OyIgY2xhc3M9ImNscy0xIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiLz48L3N2Zz4K";
+
+    private static readonly string RouletteDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Sb3VsZXR0ZTwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46xPC90ZXh0Pjwvc3ZnPgo=";
+
+    private static readonly string SicboDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5TaWNCbzwvdGV4dD48dGV4dCB4PSI3MCIgeT0iMjQwIiBzdHlsZT0iZm9udC1zaXplOjEwMHB4Ij7wn46yPC90ZXh0Pjwvc3ZnPgo=";
+
+    private static readonly string RedEnvelopeDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5SZWQgRW52ZWxvcGU8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+npzwvdGV4dD48L3N2Zz4K";
+
+    private static readonly string LotteryDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iMzAiIHk9IjcwIj5Mb3R0ZXJ5PC90ZXh0Pjx0ZXh0IHg9IjcwIiB5PSIyNDAiIHN0eWxlPSJmb250LXNpemU6MTAwcHgiPvCfjp/vuI88L3RleHQ+PC9zdmc+Cg==";
+
+    private static readonly string BarterDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iNDAiIHk9IjcwIiBmb250LXNpemU9IjE0Ij5CYXJ0ZXI8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+MuzwvdGV4dD48L3N2Zz4K";
+
     public static readonly Dictionary<NetworkCore, NFTContract> Barter = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Barter", "0x677dfb01d6F3C30EA1Ce4497775AB94EAB699981") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Barter", "0xb9afd20d69CEEdC249E32649ef10015af6C05c3F") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Barter", "0xBAA68A83fa8a0eb7c1144EE275350c3C4F5B61b0") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Barter", "0x5A4cA8E3Cd655F5Ec72a353A40aD82159A37FC58") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Barter", "0x677dfb01d6F3C30EA1Ce4497775AB94EAB699981", BarterDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Barter", "0xb9afd20d69CEEdC249E32649ef10015af6C05c3F", BarterDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Barter", "0xBAA68A83fa8a0eb7c1144EE275350c3C4F5B61b0", BarterDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Barter", "0x5A4cA8E3Cd655F5Ec72a353A40aD82159A37FC58", BarterDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Lottery = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Lottery", "0xF1a162C2d43ea2d1f2Af764cC6E564EaC2A7dC01") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Lottery", "0x5cAE158176D8c30F7038b127Da9FC845B916a99A") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Lottery", "0x86cF9996b7a8aF46E74A9FBbd28b149a2f7F33e2") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Lottery", "0xD40D28361Ef1c9FB6E672E0905548CAdD4d70AA1") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Lottery", "0xF1a162C2d43ea2d1f2Af764cC6E564EaC2A7dC01", LotteryDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Lottery", "0x5cAE158176D8c30F7038b127Da9FC845B916a99A", LotteryDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Lottery", "0x86cF9996b7a8aF46E74A9FBbd28b149a2f7F33e2", LotteryDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Lottery", "0xD40D28361Ef1c9FB6E672E0905548CAdD4d70AA1", LotteryDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> RedEnvelope = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("RedEnvelope", "0x629391548a7D4f9848e2F9377aFFC5540F4158A7") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("RedEnvelope", "0xE7cd7918C6f402cf29779DAC7F4Ba582F7448016") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("RedEnvelope", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("RedEnvelope", "0x8106ac53d21B3180471a19D359d610A19c15aD9B") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("RedEnvelope", "0x629391548a7D4f9848e2F9377aFFC5540F4158A7", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("RedEnvelope", "0xE7cd7918C6f402cf29779DAC7F4Ba582F7448016", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("RedEnvelope", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("RedEnvelope", "0x8106ac53d21B3180471a19D359d610A19c15aD9B", RedEnvelopeDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Roulette = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0xaC0f2E348A8501349c366cEfe49658918CaccA01") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x508A1f2c538Ae9f1BF1D923f0d90ff3372c9720B") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x7C38B98cc50fcA103529253F0Be1C079f7E39b82") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0xaC0f2E348A8501349c366cEfe49658918CaccA01", RouletteDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9", RouletteDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x508A1f2c538Ae9f1BF1D923f0d90ff3372c9720B", RouletteDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x7C38B98cc50fcA103529253F0Be1C079f7E39b82", RouletteDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Sicbo = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Sicbo", "0xd5F79e329bf07c8beF48F32246752Ba018CAFa1A") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Sicbo", "0x5494bC19Ce5AA656437Db2D6d151DCf47b8b9C6F") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Sicbo", "0x47CEA152577A40EB97Ef02cF6E64b5645fB1D748") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0xAC03A3475F3E76169aF6Ce11D21490a4389FE4aB") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Sicbo", "0xd5F79e329bf07c8beF48F32246752Ba018CAFa1A", SicboDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Sicbo", "0x5494bC19Ce5AA656437Db2D6d151DCf47b8b9C6F", SicboDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Sicbo", "0x47CEA152577A40EB97Ef02cF6E64b5645fB1D748", SicboDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0xAC03A3475F3E76169aF6Ce11D21490a4389FE4aB", SicboDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Vote = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Vote", "0x3b8A315a925dA3bc904304B11E66618D1A167954") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Vote", "0x415f9bcD4747BB9F20beCadD3e2E70670d8bC3C3") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Vote", "0x238285119Ad0842051B4a46A9428139d30869B55") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Vote", "0xC6024186e356eaa74d564475127244a96C86eA3D") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Vote", "0x3b8A315a925dA3bc904304B11E66618D1A167954", DefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Vote", "0x415f9bcD4747BB9F20beCadD3e2E70670d8bC3C3", DefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Vote", "0x238285119Ad0842051B4a46A9428139d30869B55", DefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Vote", "0xC6024186e356eaa74d564475127244a96C86eA3D", DefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Writing = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0x6C061bF5223fEc8d6E990bdd4b805F0E08604bF9") },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0xf6F0F9dE6b0D4e10A8F6423124Df47E4957d7205") },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x720B8eDf9f9507ae0531e31b09793f291932548c") },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0xA32dcae4b15419c35763ea8D29AeFCe85CaB4A85") },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0x6C061bF5223fEc8d6E990bdd4b805F0E08604bF9", DefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0xf6F0F9dE6b0D4e10A8F6423124Df47E4957d7205", DefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x720B8eDf9f9507ae0531e31b09793f291932548c", DefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0xA32dcae4b15419c35763ea8D29AeFCe85CaB4A85", DefaultImage) },
     };
 
-    public static string GetContractKind(NetworkCore? network, string contractAddress)
+    public static readonly IList<Dictionary<NetworkCore, NFTContract>> KnownNFTContracts = [
+        Barter,
+        Lottery,
+        RedEnvelope,
+        Roulette,
+        Sicbo,
+        Vote,
+        Writing,
+    ];
+
+    public static NFTContract? GetNFTContract(NetworkCore? network, string contractAddress)
     {
         if (network == null)
         {
-            return "";
+            return null;
         }
-        if (Barter.TryGetValue(network, out var barter) && barter.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
+        foreach (var item in KnownNFTContracts)
         {
-            return "Barter";
-        }
-        if (Lottery.TryGetValue(network, out var lottery) && lottery.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "Lottery";
-        }
-        if (RedEnvelope.TryGetValue(network, out var redEnvelope) && redEnvelope.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "RedEnvelope";
-        }
-        if (Roulette.TryGetValue(network, out var roulette) && roulette.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "Roulette";
-        }
-        if (Sicbo.TryGetValue(network, out var sicbo) && sicbo.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "Sicbo";
-        }
-        if (Vote.TryGetValue(network, out var vote) && vote.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "Vote";
-        }
-        if (Writing.TryGetValue(network, out var writing) && writing.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
-        {
-            return "Writing";
+            if (item.TryGetValue(network, out var contract) && contract.Address.Equals(contractAddress, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return contract;
+            }
         }
 
-        return "";
+        return null;
     }
 
-    public static IList<string> GetAllContracts(NetworkCore? network)
+    public static IList<string> GetNFTContracts(NetworkCore? network)
     {
         if (network == null)
         {
             return [];
         }
         var res = new List<string>();
-        if (Barter.TryGetValue(network, out var barter))
+        foreach (var item in KnownNFTContracts)
         {
-            res.Add(barter.Address);
-        }
-        if (Lottery.TryGetValue(network, out var lottery))
-        {
-            res.Add(lottery.Address);
-        }
-        if (RedEnvelope.TryGetValue(network, out var redEnvelope))
-        {
-            res.Add(redEnvelope.Address);
-        }
-        if (Roulette.TryGetValue(network, out var roulette))
-        {
-            res.Add(roulette.Address);
-        }
-        if (Sicbo.TryGetValue(network, out var sicbo))
-        {
-            res.Add(sicbo.Address);
-        }
-        if (Vote.TryGetValue(network, out var vote))
-        {
-            res.Add(vote.Address);
-        }
-        if (Writing.TryGetValue(network, out var writing))
-        {
-            res.Add(writing.Address);
+            if (item.TryGetValue(network, out var contract))
+            {
+                res.Add(contract.Address);
+            }
         }
 
         return res;

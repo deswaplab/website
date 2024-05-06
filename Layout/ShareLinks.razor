@@ -1,0 +1,36 @@
+<div class="flex flex-row items-center content-center justify-between">
+    @if (!string.IsNullOrEmpty(OpenseaUrl))
+    {
+        <CopyToClickboard TextToCopy="@OpenseaUrl" IconPath="/img/opensea_logo.svg" Name="" />
+    }
+    @if (!string.IsNullOrEmpty(EtherscanUrl))
+    {
+        <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="/img/etherscan_logo.svg" Name="" />
+    }
+    @if (!string.IsNullOrEmpty(MetamaskDeepLink))
+    {
+        <CopyToClickboard TextToCopy="@MetamaskDeepLink" IconPath="/img/metamask_logo.svg" Name="" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string ContractAddress { get; set; } = "";
+
+    [Parameter]
+    public long TokenId { get; set; }
+
+    [Parameter]
+    public string NetworkName { get; set; } = "";
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
+
+    public string OpenseaUrl => SelectedNetwork?.BuildDetailUrl(ContractAddress, TokenId) ?? "";
+
+    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
+
+    public NFTContract? contract => ContractConfig.GetNFTContract(SelectedNetwork, ContractAddress);
+
+    public string MetamaskDeepLink => contract is null ? "" : $"https://metamask.app.link/dapp/deswap.one/app/{NetworkName}/{contract.Name.ToLower()}/{ContractAddress}/{TokenId}";
+
+}
