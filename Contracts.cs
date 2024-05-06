@@ -38,9 +38,9 @@ public record NetworkCore
         return $"{OpenseaHost}/{contractAddress}/{tokenId}/sell";
     }
 
-    public string BuildDetailUrl(string contractAddress, long tokenId)
+    public string BuildDetailUrl(NFTContract contract, long tokenId)
     {
-        return $"/app/{InnerName}/{contractAddress}/{tokenId}";
+        return $"/app/{InnerName}/{contract.Name.ToLower()}/{contract.Address}/{tokenId}";
     }
 
     public string BuildNftUrl(string contractAddress, long tokenId)

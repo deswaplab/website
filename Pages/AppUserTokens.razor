@@ -65,12 +65,11 @@
     private string buildDetailUrl(string networkName, string nftContractAddress, long tokenId)
     {
         NFTContract? contract = ContractConfig.GetNFTContract(SelectedNetwork, nftContractAddress);
-        if (contract is null)
+        if (contract is null || SelectedNetwork is null)
         {
             return "/";
         }
-        string middle = contract.Name.ToLower();
-        return $"/app/{networkName}/{middle}/{nftContractAddress}/{tokenId}";
+        return SelectedNetwork.BuildDetailUrl(contract, tokenId);
     }
 
     public IList<UserNftBase>? Tokens { get; set; }

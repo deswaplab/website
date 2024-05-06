@@ -25,7 +25,7 @@
 
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
 
-    public string OpenseaUrl => SelectedNetwork?.BuildDetailUrl(ContractAddress, TokenId) ?? "";
+    public string OpenseaUrl => SelectedNetwork?.BuildNftUrl(ContractAddress, TokenId) ?? "";
 
     public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
 

@@ -181,7 +181,7 @@
                                 @if (NewTokenId is not null)
                                 {
                                     <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                                        <a href="@SelectedNetwork!.BuildDetailUrl(_roulette!.Address, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                                        <a href="@SelectedNetwork!.BuildDetailUrl(_roulette!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
                                     </p>
                                 }
                             </Authorized>

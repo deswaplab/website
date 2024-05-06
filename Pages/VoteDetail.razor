@@ -15,7 +15,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
         <Authorized>
-            <section class="bg-gray-50 dark:bg-gray-900 my-10">
+            <section class="bg-gray-50 dark:bg-gray-900 my-10" @onclick="HideVoteChoiceList">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex flex-row items-center content-center justify-between p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -65,7 +65,8 @@
                                     @if (!IsUserVoted)
                                     {
                                         <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                                @onclick="ToggleVoteChoiceList">
+                                                @onclick="ToggleVoteChoiceList"
+                                                @onclick:stopPropagation="true">
                                             @if (InVoteProgress)
                                             {
                                                 <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -245,6 +246,10 @@
                 choice,
                 Token!.Contract
             );
+
+            // refresh token info
+            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+            Token = UserVoteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
             toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
             IsUserVoted = true;
