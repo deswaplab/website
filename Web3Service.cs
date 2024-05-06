@@ -971,11 +971,22 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var contract = web3.Eth.GetContract(SicboABI, nftAddress);
         var callsFunction = contract.GetFunction("placeBet");
         var value = new HexBigInteger(0);
-        var receipt = await SendTransactionThroughMetamask(
-            callsFunction,
-            _metamaskHostProvider.SelectedNetworkChainId,
+        var gas = await callsFunction.EstimateGasAsync(
             _metamaskHostProvider.SelectedAccount,
+            null,
             value,
+            tokenId,
+            erc20Amount,
+            result
+        );
+        gas.Value *= 2; // 此处gas估计不准，容易out of gas，所以加倍
+        var receipt = await callsFunction.SendTransactionAndWaitForReceiptAsync(
+            new HexBigInteger(2),
+            _metamaskHostProvider.SelectedAccount,
+            gas,
+            value,
+            null,
+            null,
             tokenId,
             erc20Amount,
             result

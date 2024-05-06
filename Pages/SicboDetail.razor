@@ -423,11 +423,15 @@
             }
         }
 
-        // mint
+        // deposit
         try
         {
             await _web3Service.DepositSicbo(Token!.TokenId, Web3.Convert.ToWei(InputedBaseAssetAmount, _baseAssetDecimals), Token!.Contract);
             toastService.ShowToast($"Token {Token!.TokenId} {Loc["DepositSuccess_Stmt"]}", ToastLevel.Success);
+
+            // refresh NFT
+            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+            Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
@@ -446,8 +450,6 @@
             InProgress = false;
         }
 
-        // TODO: Refresh NFT
-        
         CloseDepositModal();
     }
 
@@ -504,12 +506,21 @@
             {
                 toastService.ShowToast($"{Loc["Lose_Stmt"]}, {Loc["DiceNumber_Stmt"]}: {diceNumber}", ToastLevel.Error);
             }
+
+            // refresh NFT image
+            await Task.Delay(2000);
+            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+            Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
             if (e.Message.Contains("User denied transaction signature"))
             {
                 toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+            else
+            {
+                toastService.ShowToast("Invalid input", ToastLevel.Error);
             }
         }
         catch (Exception e)
@@ -522,8 +533,6 @@
             InProgress = false;
         }
 
-        // TODO: Refresh NFT
-        
         CloseBetModal();
     }
 }

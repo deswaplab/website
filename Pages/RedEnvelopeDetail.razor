@@ -157,8 +157,13 @@
             var txHash = await _web3Service.OpenRedEnvelope(token.TokenId, token.Contract);
             toastService.ShowToast($"Token: {token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
 
-            // 刷新元数据
             await Task.Delay(1000);
+
+            // 刷新页面
+            string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
+            Token = UserRedEnvelopeNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+            // 刷新元数据
             await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);
 
         }

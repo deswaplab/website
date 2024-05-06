@@ -27,7 +27,7 @@
 
     public string OpenseaUrl => SelectedNetwork?.BuildNftUrl(ContractAddress, TokenId) ?? "";
 
-    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/address/{ContractAddress}" : "";
+    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/token/{ContractAddress}?a={TokenId}" : "";
 
     public NFTContract? contract => ContractConfig.GetNFTContract(SelectedNetwork, ContractAddress);
 
