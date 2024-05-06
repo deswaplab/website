@@ -1087,6 +1087,29 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return receipt.TransactionHash.ToString();
     }
 
+    [FunctionOutput]
+    public class WritingTokenMetadataOutputDTO : IFunctionOutputDTO
+    {
+        [Parameter("string", "title", 1)]
+        public string Title { get; set; } = "";
+
+        [Parameter("string", "content", 2)]
+        public string Content { get; set; } = "";
+
+        [Parameter("address", "writer", 3)]
+        public string Writer { get; set; } = "";
+
+    }
+
+    public async Task<string> GetWritingContent(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(WritingABI, nftAddress);
+        var callsFunction = contract.GetFunction("tokenMetadata");
+        var result = await callsFunction.CallAsync<WritingTokenMetadataOutputDTO>(tokenId);
+        return result.Content;
+    }
+
 
     // blackjack
     public async Task<long> MintBlackJack(int amount, string nftAddress)

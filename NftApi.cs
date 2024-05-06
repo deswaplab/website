@@ -203,6 +203,20 @@ public record UserVoteNFT : UserNftBase
     }
 }
 
+public record UserWritingNFT : UserNftBase
+{
+    public static UserWritingNFT FromStr(long chainId, string contractAddress, long tokenId, string metadataUrl)
+    {
+        return new UserWritingNFT
+        {
+            TokenId = tokenId,
+            ChainId = chainId,
+            Contract = contractAddress,
+            ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
+        };
+    }
+}
+
 public record UserBlackJackNFT : UserNftBase
 {
     public decimal DealerBalance { get; set; }
