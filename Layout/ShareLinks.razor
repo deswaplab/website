@@ -1,15 +1,15 @@
 <div class="flex flex-row items-center content-center justify-between">
     @if (!string.IsNullOrEmpty(OpenseaUrl))
     {
-        <CopyToClickboard TextToCopy="@OpenseaUrl" IconPath="/img/opensea_logo.svg" Name="" />
+        <CopyToClickboard TextToCopy="@OpenseaUrl" IconPath="img/opensea_logo.svg" Name="" />
     }
     @if (!string.IsNullOrEmpty(EtherscanUrl))
     {
-        <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="/img/etherscan_logo.svg" Name="" />
+        <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="img/etherscan_logo.svg" Name="" />
     }
     @if (!string.IsNullOrEmpty(MetamaskDeepLink))
     {
-        <CopyToClickboard TextToCopy="@MetamaskDeepLink" IconPath="/img/metamask_logo.svg" Name="" />
+        <CopyToClickboard TextToCopy="@MetamaskDeepLink" IconPath="img/metamask_logo.svg" Name="" />
     }
 </div>
 
