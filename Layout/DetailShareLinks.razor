@@ -7,6 +7,10 @@
     {
         <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="img/etherscan_logo.svg" Name="" />
     }
+    @if (!string.IsNullOrEmpty(BlockscoutUrl))
+    {
+        <CopyToClickboard TextToCopy="@BlockscoutUrl" IconPath="img/blockscout_logo.svg" Name="" />
+    }
     @if (!string.IsNullOrEmpty(MetamaskDeepLink))
     {
         <CopyToClickboard TextToCopy="@MetamaskDeepLink" IconPath="img/metamask_logo.svg" Name="" />
@@ -28,6 +32,8 @@
     public string OpenseaUrl => SelectedNetwork?.BuildNftUrl(ContractAddress, TokenId) ?? "";
 
     public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/token/{ContractAddress}?a={TokenId}" : "";
+
+    public string BlockscoutUrl => (SelectedNetwork is not null && SelectedNetwork.BlockscoutHost is not null) ? $"{SelectedNetwork.BlockscoutHost}/token/{ContractAddress}/instance/{TokenId}" : "";
 
     public NFTContract? contract => ContractConfig.GetNFTContract(SelectedNetwork, ContractAddress);
 

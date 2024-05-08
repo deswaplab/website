@@ -1,0 +1,30 @@
+<div class="flex flex-row items-center content-center justify-between">
+    @if (!string.IsNullOrEmpty(OpenseaUrl))
+    {
+        <CopyToClickboard TextToCopy="@OpenseaUrl" IconPath="img/opensea_logo.svg" Name="" />
+    }
+    @if (!string.IsNullOrEmpty(EtherscanUrl))
+    {
+        <CopyToClickboard TextToCopy="@EtherscanUrl" IconPath="img/etherscan_logo.svg" Name="" />
+    }
+    @if (!string.IsNullOrEmpty(BlockscoutUrl))
+    {
+        <CopyToClickboard TextToCopy="@BlockscoutUrl" IconPath="img/blockscout_logo.svg" Name="" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string ContractAddress { get; set; } = "";
+
+    [Parameter]
+    public string NetworkName { get; set; } = "";
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
+
+    public string OpenseaUrl => SelectedNetwork?.BuildNftCollectionUrl(ContractAddress) ?? "";
+
+    public string EtherscanUrl => (SelectedNetwork is not null && SelectedNetwork.EtherscanHost is not null) ? $"{SelectedNetwork.EtherscanHost}/token/{ContractAddress}" : "";
+
+    public string BlockscoutUrl => (SelectedNetwork is not null && SelectedNetwork.BlockscoutHost is not null) ? $"{SelectedNetwork.BlockscoutHost}/token/{ContractAddress}" : "";
+}

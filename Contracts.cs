@@ -52,6 +52,15 @@ public record NetworkCore
         return $"{OpenseaHost}/{contractAddress}/{tokenId}";
     }
 
+    public string BuildNftCollectionUrl(string contractAddress)
+    {
+        if (string.IsNullOrEmpty(OpenseaHost))
+        {
+            return "";
+        }
+        return $"{OpenseaHost}/{contractAddress}";
+    }
+
     public string GetEtherScanTokenBalanceUrl(string contractAddress, string userAddress)
     {
         return EtherscanHost + "/token/" + contractAddress + "?a=" + userAddress;
