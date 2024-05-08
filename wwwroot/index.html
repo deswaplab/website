@@ -4,13 +4,20 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DeswapApp</title>
-    <base href="/" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="DeswapApp.styles.css" rel="stylesheet" />
-    <link href="/_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css" rel="stylesheet" />
+    <title>Deswap is a SaaS platform on blockchain</title>
+
     <script>
+        // set base url dynamicly to deploy on ipfs
+        const re = new RegExp("/(ipfs|ipns)/(\\w+)");
+        const result = window.location.pathname.match(re);
+        if ((result !== null) && (result.length === 3)) {
+            console.log('using ipfs', result, window.location.pathname);
+            // document.getElementsByTagName('base')[0].href = result[0] + "/";
+            document.write(`<base href="${result[0]}/" />`);
+        } else {
+            document.write('<base href="/" />');
+        }
+
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -27,9 +34,15 @@
         };
     </script>
 
+    <!-- put after above js script to ensure baseUrl was set -->
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="DeswapApp.styles.css" rel="stylesheet" />
+    <link href="_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css" rel="stylesheet" />
+
     <!-- markdown editor -->
-    <script src="/_content/PSC.Blazor.Components.MarkdownEditor/js/easymde.min.js"></script>
-    <script src="/_content/PSC.Blazor.Components.MarkdownEditor/js/markdownEditor.js"></script>
+    <script src="_content/PSC.Blazor.Components.MarkdownEditor/js/easymde.min.js"></script>
+    <script src="_content/PSC.Blazor.Components.MarkdownEditor/js/markdownEditor.js"></script>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB109M85QJ"></script>
@@ -39,14 +52,6 @@
         gtag('js', new Date());
 
         gtag('config', 'G-XB109M85QJ');
-    </script>
-
-    <script type="text/javascript">
-        (function (c, l, a, r, i, t, y) {
-            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", "lhel1so1o4");
     </script>
 </head>
 

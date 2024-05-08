@@ -40,7 +40,7 @@ public record NetworkCore
 
     public string BuildDetailUrl(NFTContract contract, long tokenId)
     {
-        return $"/app/{InnerName}/{contract.Name.ToLower()}/{contract.Address}/{tokenId}";
+        return $"app/{InnerName}/{contract.Name.ToLower()}/{contract.Address}/{tokenId}";
     }
 
     public string BuildNftUrl(string contractAddress, long tokenId)
