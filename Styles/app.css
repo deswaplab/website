@@ -11,3 +11,13 @@
 	bottom: anchor(bottom);
 	inset-area: bottom;
 }
+
+#dropdownNavbarLink {
+    anchor-name: --dropdownNavbarLink;
+}
+#dropdownNavbar {
+	position-anchor: --dropdownNavbarLink;
+	right: anchor(right);
+	bottom: anchor(bottom);
+	inset-area: bottom;
+}
