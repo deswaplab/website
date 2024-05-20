@@ -4,16 +4,16 @@
 @inject NavigationManager Navigation
 @inject ILogger<LanguageSelector> Logger
 
-<button type="button" data-dropdown-toggle="language-dropdown-menu"
-    @onclick="ToggleLanguageList"
-    @onclick:stopPropagation="true"
+<button type="button"
+    id="language-anchor"
+    popovertarget="language-dropdown-menu"
     class="inline-flex items-center font-medium justify-between w-full px-4 py-2 text-sm text-gray-900 dark:text-white rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white">
     <img src=@($"img/{selectedCulture.Item2.TwoLetterISOLanguageName}_flag.svg") class="h-3.5 w-3.5 rounded-full me-2" />
 
     @selectedCulture.Item1
 </button>
 <!-- Dropdown -->
-<div class="@languageListClass z-50 absolute w-40 my-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
+<div popover class="absolute cursor-pointer w-40 my-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700"
     id="language-dropdown-menu">
     <ul class="py-2 font-medium" role="none">
         @foreach (var entry in allCultures)
@@ -39,15 +39,6 @@
 </div>
 
 @code {
-    private bool showLanguageList = false;
-
-    private string languageListClass => showLanguageList ? "" : "hidden";
-
-    private void ToggleLanguageList()
-    {
-        showLanguageList = !showLanguageList;
-    }
-
     private (string, CultureInfo) selectedCulture => (allCultures.First(x => x.Value.Equals(CultureInfo.CurrentCulture)).Key, CultureInfo.CurrentCulture);
     
     private string? selectedCulturyDisplayName {get; set;}
@@ -64,7 +55,5 @@
             await JS.InvokeVoidAsync("blazorCulture.set", value.Name);
             Navigation.NavigateTo(Navigation.Uri, forceLoad:true);
         }
-        showLanguageList = false;
     }
-
 }

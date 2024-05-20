@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#language-anchor {
+	anchor-name: --language-anchor;
+}
+#language-dropdown-menu {
+	position-anchor: --language-anchor;
+	right: anchor(right);
+	bottom: anchor(bottom);
+	inset-area: bottom;
+}
