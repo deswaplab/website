@@ -29,6 +29,15 @@
             get: () => window.localStorage['BlazorCulture'],
             set: (value) => window.localStorage['BlazorCulture'] = value
         };
+
+        // move sicbo target to mouse
+        function moveTarget(clientX, clientY) {
+            var target = document.getElementById('sicbo-target');
+            var xposition = (clientX - target.offsetLeft - target.offsetWidth/2);
+            var yposition = (clientY - target.offsetTop - target.offsetHeight/2);
+            target.style.transform = "translate("+ xposition + "px," + yposition + "px)";
+            console.log("in moveTarget", clientX, clientY, xposition, yposition);
+        }
     </script>
 
     <!-- put after above js script to ensure baseUrl was set -->

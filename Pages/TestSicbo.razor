@@ -1,0 +1,91 @@
+@page "/app/testsicbo"
+@layout AppLayout
+
+@inject ILogger<TestSicbo> Logger
+@inject IJSRuntime JS
+
+<PageTitle>sicbo</PageTitle>
+
+<section class="bg-gray-50 dark:bg-gray-900 my-10">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div id="sicbo-target-box">
+        <img src="img/sicbo_desk.png" alt="sicbo" usemap="#image-map" />
+            <map name="image-map">
+                <area @onclick="ClickSmall" title="small" coords="36,40,202,252" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_1))" title="double-1" coords="209,95,274,245" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_2))" title="double-2" coords="275,96,341,244" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_3))" title="double-3" coords="348,96,416,248" shape="rect">
+                
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_1))" title="triple-1" coords="420,82,559,135" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_2))" title="triple-2" coords="420,144,559,191" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_3))" title="triple-3" coords="422,206,558,248" shape="rect">
+                
+                <area @onclick="@(e => ClickBoard(e, DiceResult.AnyTriple))" title="santong" coords="564,35,662,248" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_4))" title="triple-4" coords="669,81,807,132" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_5))" title="triple-5" coords="672,143,807,195" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_6))" title="triple-6" coords="672,203,808,248" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_4))" title="double-4" coords="816,95,879,244" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_5))" title="double-5" coords="889,97,954,245" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_6))" title="double-6" coords="960,97,1023,249" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.Big))" title="big" coords="1028,38,1215,253" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_4))" title="4 points" coords="34,256,117,381" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_5))" title="5 points" coords="120,254,203,384" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_6))" title="6 points" coords="206,255,287,379" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_7))" title="7 points" coords="289,260,369,380" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_8))" title="8 points" coords="372,258,455,383" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_9))" title="9 points" coords="457,258,538,379" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_10))" title="10 points" coords="540,259,625,379" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_11))" title="11 points" coords="624,258,707,381" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_12))" title="12 points" coords="710,255,792,379" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_13))" title="13 points" coords="794,255,876,380" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_14))" title="14 points" coords="876,256,959,381" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_15))" title="15 points" coords="964,258,1046,379" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_16))" title="16 points" coords="1046,259,1128,384" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_17))" title="17 points" coords="1130,255,1216,384" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_12))" title="1&2" coords="38,385,104,534" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_13))" title="1&3" coords="107,386,184,533" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_14))" title="1&4" coords="186,385,265,533" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_15))" title="1&5" coords="269,386,346,534" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_16))" title="1&6" coords="346,385,422,527" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_23))" title="2&3" coords="425,388,503,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_24))" title="2&4" coords="507,386,582,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_25))" title="2&5" coords="587,386,664,532" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_26))" title="2&6" coords="665,384,742,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_34))" title="3&4" coords="744,384,825,531" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_35))" title="3&5" coords="825,385,901,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_36))" title="3&6" coords="902,387,981,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_45))" title="4&5" coords="985,386,1063,528" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_46))" title="4&6" coords="1064,384,1142,526" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_56))" title="5&6" coords="1145,384,1217,528" shape="rect">
+
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_1))" title="1" coords="35,532,225,599" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_2))" title="2" coords="226,532,424,599" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_3))" title="3" coords="427,531,625,603" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_4))" title="4" coords="627,534,822,601" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_5))" title="5" coords="822,534,1026,601" shape="rect">
+                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_6))" title="6" coords="1026,535,1217,601" shape="rect">
+            </map>
+        </div>
+        <div id="sicbo-target"></div>
+    </div>
+</section>
+
+@code {
+    private async Task ClickBoard(MouseEventArgs e, DiceResult dice)
+    {
+        Logger.LogInformation($"clicked {dice}");
+        await JS.InvokeVoidAsync("moveTarget", e.ClientX, e.ClientY);
+    }
+
+    private async Task ClickSmall(MouseEventArgs e)
+    {
+        Logger.LogInformation("clicked small");
+        await JS.InvokeVoidAsync("moveTarget", e.ClientX, e.ClientY);
+    }
+}
