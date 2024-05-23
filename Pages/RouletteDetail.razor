@@ -1,3 +1,5 @@
+@using System.Numerics
+
 @inject HttpClient Http
 @inject ILogger<RouletteDetail> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
@@ -24,7 +26,7 @@
                             </h1>
                             <DetailShareLinks NetworkName="@NetworkName" ContractAddress="@ContractAddress" TokenId="@TokenId" />
                         </div>
-                        <div class="mx-auto flex flex-col items-center py-2 max-w-sm bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                        <div class="flex flex-col items-center py-2 bg-white rounded-lg shadow dark:text-white dark:bg-gray-800 dark:border-gray-700">
                             @if (Token is null)
                             {
                                 <img class="rounded-t-lg"
@@ -33,7 +35,33 @@
                             }
                             else
                             {
-                                if (!string.IsNullOrEmpty(NftUrl))
+                                if (ftPieData.Count > 0)
+                                {
+                                    <ApexChart TItem="BetPieFtData" Options=ftOptions>
+
+                                    <ApexPointSeries TItem="BetPieFtData"
+                                        Items="ftPieData"
+                                        SeriesType="SeriesType.Donut"
+                                        Name="Gross Value"
+                                        XValue="@(e => e.Address)"
+                                        YAggregate="@(e => e.Sum(e => (decimal)e.Amount))"
+                                        OrderByDescending="e=>e.Y" />
+                                    </ApexChart>
+                                }
+                                else if (nftPieData.Count > 0)
+                                {
+                                    <ApexChart TItem="BetPieNftData">
+
+                                    <ApexPointSeries TItem="BetPieNftData"
+                                        Items="nftPieData"
+                                        SeriesType="SeriesType.Donut"
+                                        Name="Gross Value"
+                                        XValue="@(e => e.Address)"
+                                        YAggregate="@(e => e.Sum(e => (decimal)e.Amount))"
+                                        OrderByDescending="e=>e.Y" />
+                                    </ApexChart>
+                                }
+                                else if (!string.IsNullOrEmpty(NftUrl))
                                 {
                                     <a href="@NftUrl" target="_blank">
                                         <img class="rounded-t-lg"
@@ -199,10 +227,42 @@
 
     public bool IsUserOwner => _metamaskHostProvider.SelectedAccount.Equals(Owner, StringComparison.CurrentCultureIgnoreCase);
 
+    public string[] BetPlayers = [];
+
+    public decimal[] FtBets = [];
+
+    public long[] NftBets = [];
+
+    public class BetPieFtData
+    {
+        public required string Address { get; set; }
+        public decimal Amount { get; set; }
+    }
+
+    private List<BetPieFtData> ftPieData = [];
+
+    public class BetPieNftData
+    {
+        public required string Address { get; set; }
+        public long Amount { get; set; }
+    }
+
+    private List<BetPieNftData> nftPieData { get; set; } = [];
+
+    private ApexChartOptions<BetPieFtData> ftOptions;
+
     protected override void OnInitialized()
     {
         _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
         _metamaskHostProvider.SelectedAccountChanged += MetamaskHostProvider_SelectedAccountChanged;
+
+        ftOptions = new ApexChartOptions<BetPieFtData>
+        {
+            Theme = new Theme
+            {
+                Mode = Mode.Light,
+            }
+        };
     }
 
     private async Task MetamaskHostProvider_SelectedAccountChanged(string account)
@@ -242,6 +302,13 @@
         }
     }
 
+    public string Truncate(string? value, int maxLength, string truncationSuffix = "…")
+    {
+        return value?.Length > maxLength
+            ? value.Substring(0, maxLength) + truncationSuffix
+            : "";
+    }
+
     private async Task initTokens()
     {
         if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
@@ -254,6 +321,11 @@
 
             UserBetted = await _web3Service.UserBettedRoulette(TokenId, ContractAddress);
 
+            var betPlayers = await _web3Service.GetTokenBetPlayers(TokenId, ContractAddress);
+            BetPlayers = betPlayers.ToArray();
+            var rawBets = await _web3Service.GetTokenBetAmounts(TokenId, ContractAddress);
+            Logger.LogInformation("raw bets: {}, players: {}", rawBets, betPlayers);
+
             if (Token!.AssetKind == "ERC20")
             {
                 _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
@@ -261,6 +333,27 @@
                 _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
                 InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
                 Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
+                FtBets = rawBets.Select(e => Web3.Convert.FromWei(e, _baseAssetDecimals)).ToArray();
+                for (var i = 0; i < BetPlayers.Length; i++)
+                {
+                    ftPieData.Add(new BetPieFtData
+                    {
+                        Address = Truncate(BetPlayers[i], 10),
+                        Amount = FtBets[i]
+                    });
+                }
+            }
+            else
+            {
+                NftBets = rawBets.Select(e => (long)e).ToArray();
+                for (var i = 0; i < BetPlayers.Length; i++)
+                {
+                    nftPieData.Add(new BetPieNftData
+                    {
+                        Address = Truncate(BetPlayers[i], 10),
+                        Amount = NftBets[i]
+                    });
+                }
             }
         }
     }

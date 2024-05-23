@@ -1,0 +1,80 @@
+@page "/app/chart"
+@layout AppLayout
+
+<PageTitle>apex chart</PageTitle>
+
+<section class="bg-gray-50 dark:bg-gray-900 my-10">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex flex-row items-center content-center justify-between p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    Roulette
+                </h1>
+            </div>
+            <div class="flex flex-col items-center py-2 bg-white rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                <ApexChart TItem="MyData">
+
+                <ApexPointSeries TItem="MyData"
+                    Items="Data"
+                    SeriesType="SeriesType.Donut"
+                    Name="Gross Value"
+                    XValue="@(e => e.Address)"
+                    YAggregate="@(e => e.Sum(e => (decimal)e.Amount))"
+                    OrderByDescending="e=>e.Y" />
+                </ApexChart>
+
+                <div class="flex flex-row items-center justify-center gap-2 p-5">
+                    <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        PlaceBet
+                    </button>
+                    <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        Open
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<MyData> Data { get; set; } = new();
+
+    private ApexChartOptions<MyData> options { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        Data.Add(new MyData { Address = "0x..user1", Amount = 12 });
+        Data.Add(new MyData { Address = "0x..user2", Amount = 43 });
+        Data.Add(new MyData { Address = "0x..user3", Amount = 112 });
+        Data.Add(new MyData { Address = "0x..user4", Amount = 112 });
+        Data.Add(new MyData { Address = "0x..user5", Amount = 403 });
+        Data.Add(new MyData { Address = "0x..user6", Amount = 11 });
+        Data.Add(new MyData { Address = "0x..user7", Amount = 2 });
+        Data.Add(new MyData { Address = "0x..user8", Amount = 8 });
+        Data.Add(new MyData { Address = "0x..user9", Amount = 50 });
+
+        options.PlotOptions = new PlotOptions
+        {
+            Pie = new PlotOptionsPie
+            {
+                Donut = new PlotOptionsDonut
+                {
+                    Labels = new DonutLabels
+                    {
+                        Total = new DonutLabelTotal { FontSize="24px", Color = "red", Formatter = @"function (w) {return w.globals.seriesTotals.reduce((a, b) => { return (a + b) }, 0)}" }
+                    }
+                }
+            }
+        };
+    }
+
+    public class MyData
+    {
+        public required string Address { get; set; }
+        public int Amount { get; set; }
+    }
+
+
+}

@@ -74,6 +74,16 @@ public record NetworkCore
 
 public static class NetworkConfig
 {
+    public static NetworkCore Local { get; } = new()
+    {
+        Name = "Local Testnet",
+        InnerName = "local",
+        ChainId = 31337,
+        Logo = "ethereum_logo.svg",
+        IsTestNet = true,
+        RpcUrl = "http://127.0.0.1:8545",
+    };
+
     public static NetworkCore EthereumSepolia { get; } = new()
     {
         Name = "Sepolia",
@@ -207,6 +217,7 @@ public static class ContractConfig
     };
 
     public static readonly Dictionary<NetworkCore, ERC20Contract> Tusdc = new() {
+        { NetworkConfig.Local,     new ERC20Contract("TUSDC", "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5", 6) },
         { NetworkConfig.EthereumSepolia,     new ERC20Contract("TUSDC", "0xb53ff72177708cd6A643544B7caD9a2768aCC8E5", 6) },
         { NetworkConfig.MoonBaseAlpha,       new ERC20Contract("TUSDC", "0x0EBB63025caE604fd9230A2fdc811a84394A7861", 6) },
         { NetworkConfig.MantaPacificSepolia, new ERC20Contract("TUSDC", "0x7EDaec7d9db23D4Af62eA2FF71F7104279347f14", 6) },
@@ -269,10 +280,11 @@ public static class ContractConfig
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Roulette = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0xaC0f2E348A8501349c366cEfe49658918CaccA01", RouletteDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9", RouletteDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x508A1f2c538Ae9f1BF1D923f0d90ff3372c9720B", RouletteDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x7C38B98cc50fcA103529253F0Be1C079f7E39b82", RouletteDefaultImage) },
+        { NetworkConfig.Local,               new NFTContract("Roulette", "0x9EDcDf3cac168bA983bD3b0321B5337BD265Afc8", RouletteDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0x9EDcDf3cac168bA983bD3b0321B5337BD265Afc8", RouletteDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0x238285119Ad0842051B4a46A9428139d30869B55", RouletteDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x37d0d06a35d9538AC16C02c50911Fc0Fc3298a71", RouletteDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x8C5D92347289638A72175fea9be8617F0491d36F", RouletteDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Sicbo = new() {

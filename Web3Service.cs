@@ -58,7 +58,9 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     {"type":"function","name":"bet721","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"bet1155","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"open","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},
-    {"type":"function","name":"bettedAddressMap","inputs":[{"name":"id","type":"uint256","internalType":"uint256"},{"name":"addr","type":"address","internalType":"address"}],"outputs":[{"name":"isBeted","type":"bool","internalType":"bool"}],"stateMutability":"view"}
+    {"type":"function","name":"bettedAddressMap","inputs":[{"name":"id","type":"uint256","internalType":"uint256"},{"name":"addr","type":"address","internalType":"address"}],"outputs":[{"name":"isBeted","type":"bool","internalType":"bool"}],"stateMutability":"view"},
+    {"type":"function","name":"getTokenBetAmounts","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256[]","internalType":"uint256[]"}],"stateMutability":"view"},
+    {"type":"function","name":"getTokenBetPlayers","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address[]","internalType":"address[]"}],"stateMutability":"view"}
 ]
 """;
 
@@ -793,6 +795,34 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("bettedAddressMap");
         var result = await callsFunction.CallAsync<bool>(tokenId, _metamaskHostProvider.SelectedAccount);
         return result;
+    }
+
+    public async Task<List<BigInteger>> GetTokenBetAmounts(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
+        var callsFunction = contract.GetFunction("getTokenBetAmounts");
+        try {
+            var result = await callsFunction.CallAsync<List<BigInteger>>(tokenId);
+            return result;
+        } catch (Exception e) {
+            _logger.LogError("error, {}", e);
+            return [];
+        }
+    }
+
+    public async Task<List<string>> GetTokenBetPlayers(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
+        var callsFunction = contract.GetFunction("getTokenBetPlayers");
+        try {
+            var result = await callsFunction.CallAsync<List<string>>(tokenId);
+            return result;
+        } catch (Exception e) {
+            _logger.LogError("error, {}", e);
+            return [];
+        }
     }
 
     public async Task<long> MintRoulette20(string erc20Address, BigInteger erc20Amount, int ownerFeeBp, string nftAddress)
