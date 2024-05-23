@@ -6,6 +6,7 @@
 @inject NftApi _nftApi
 @inject IStringLocalizer<SharedResource> Loc
 @inject IMetamaskInterop _metamaskInterop;
+@inject IJSRuntime JS
 
 @page "/app/{NetworkName}/sicbo/{ContractAddress}/{TokenId:long}"
 @layout AppLayout
@@ -17,6 +18,158 @@
         <Authorized>
             <section class="bg-gray-50 dark:bg-gray-900 my-10">
                 <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                    @if (!IsUserOwner)
+                    {
+                    <div id="sicbo-target-box">
+                        <img src="img/sicbo_desk.png" alt="sicbo" usemap="#image-map" />
+                            <map name="image-map">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.Small))" title="small" coords="36,40,202,252" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_1))" title="double-1" coords="209,95,274,245" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_2))" title="double-2" coords="275,96,341,244" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_3))" title="double-3" coords="348,96,416,248" shape="rect">
+                                
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_1))" title="triple-1" coords="420,82,559,135" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_2))" title="triple-2" coords="420,144,559,191" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_3))" title="triple-3" coords="422,206,558,248" shape="rect">
+                                
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.AnyTriple))" title="santong" coords="564,35,662,248" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_4))" title="triple-4" coords="669,81,807,132" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_5))" title="triple-5" coords="672,143,807,195" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificTriple_6))" title="triple-6" coords="672,203,808,248" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_4))" title="double-4" coords="816,95,879,244" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_5))" title="double-5" coords="889,97,954,245" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.SpecificDouble_6))" title="double-6" coords="960,97,1023,249" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.Big))" title="big" coords="1028,38,1215,253" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_4))" title="4 points" coords="34,256,117,381" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_5))" title="5 points" coords="120,254,203,384" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_6))" title="6 points" coords="206,255,287,379" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_7))" title="7 points" coords="289,260,369,380" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_8))" title="8 points" coords="372,258,455,383" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_9))" title="9 points" coords="457,258,538,379" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_10))" title="10 points" coords="540,259,625,379" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_11))" title="11 points" coords="624,258,707,381" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_12))" title="12 points" coords="710,255,792,379" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_13))" title="13 points" coords="794,255,876,380" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_14))" title="14 points" coords="876,256,959,381" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_15))" title="15 points" coords="964,258,1046,379" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_16))" title="16 points" coords="1046,259,1128,384" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.ThreeDiceTotal_17))" title="17 points" coords="1130,255,1216,384" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_12))" title="1&2" coords="38,385,104,534" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_13))" title="1&3" coords="107,386,184,533" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_14))" title="1&4" coords="186,385,265,533" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_15))" title="1&5" coords="269,386,346,534" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_16))" title="1&6" coords="346,385,422,527" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_23))" title="2&3" coords="425,388,503,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_24))" title="2&4" coords="507,386,582,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_25))" title="2&5" coords="587,386,664,532" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_26))" title="2&6" coords="665,384,742,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_34))" title="3&4" coords="744,384,825,531" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_35))" title="3&5" coords="825,385,901,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_36))" title="3&6" coords="902,387,981,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_45))" title="4&5" coords="985,386,1063,528" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_46))" title="4&6" coords="1064,384,1142,526" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.TwoDice_56))" title="5&6" coords="1145,384,1217,528" shape="rect">
+
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_1))" title="1" coords="35,532,225,599" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_2))" title="2" coords="226,532,424,599" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_3))" title="3" coords="427,531,625,603" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_4))" title="4" coords="627,534,822,601" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_5))" title="5" coords="822,534,1026,601" shape="rect">
+                                <area @onclick="@(e => ClickBoard(e, DiceResult.OneDice_6))" title="6" coords="1026,535,1217,601" shape="rect">
+                            </map>
+                        </div>
+                        <div id="sicbo-target"></div>
+
+                        <div class="flex flex-row items-center justify-center gap-2 p-5">
+                            <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                popovertarget="bet-modal">
+                                @Loc["Bet_Stmt"]
+                            </button>
+                        </div>
+                        <div popover id="bet-modal" calss="bg-white dark:bg-gray-700">
+                            <!-- Modal content -->
+                            <div class="mx-auto bg-white rounded-lg shadow dark:bg-gray-700">
+                                <!-- Modal header -->
+                                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                        @Loc["Bet_Stmt"]
+                                    </h3>
+                                    <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
+                                        popovertarget="bet-modal" popovertargetaction="hide">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                        </svg>
+                                        <span class="sr-only">Close</span>
+                                    </button>
+                                </div>
+                                <!-- Modal body -->
+                                <div class="p-4 md:p-5">
+                                    <form class="space-y-4">
+                                        <div>
+                                            <label for="baseAssetAddressBet" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                                <span>@Loc["Address"]</span>
+                                                <span>
+                                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
+                                                </span>
+                                            </label>
+                                            <input id="baseAssetAddressBet" type="text" 
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                                value="@Token.BaseAssetAddress"
+                                                disabled=true />
+                                        </div>
+                        
+                                        <div>
+                                            <label for="baseAssetAmountBet" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                                <span>ERC20</span>
+                                                @if (_userBaseAssetBalance is not null && _userBaseAssetBalance > 0)
+                                                {
+                                                <span>
+                                                    <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_userBaseAssetBalance</a>
+                                                </span>
+                                                }
+                                            </label>
+                                            <input id="baseAssetAmountBet" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                                @bind-value="@InputedBaseAssetAmount" />
+                                        </div>
+
+                                        <div>
+                                            <label for="betOptions" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                                @Loc["BetOptions"]
+                                            </label>
+                                            <select id="betOptions"
+                                                @bind-value="@InputedDiceResult"
+                                                @bind-value:event="onchange"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                @foreach(int item in Enum.GetValues(typeof(DiceResult)))
+                                                {
+                                                    <option value="@item">@Loc["Sicbo_" + @Enum.GetName(typeof(DiceResult), item)]</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <button type="button" class="@BetButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                            @onclick="HandleBet">
+                                            @if (InProgress)
+                                            {
+                                                <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                                </svg>
+                                            }
+                                            @Loc["Bet_Stmt"]
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex flex-row items-center content-center justify-between p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -49,170 +202,82 @@
                                 }
 
                                 <div class="flex flex-row items-center justify-center gap-2 p-5">
-                                    @if (IsUserOwner)
-                                    {
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                            @onclick="OpenDepositModal">
-                                            @Loc["Deposit_Stmt"]
-                                        </button>
+                                    <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                        popovertarget="deposit-modal">
+                                        @Loc["Deposit_Stmt"]
+                                    </button>
 
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                            @onclick="HandleBurn">
-                                            @Loc["Burn_Stmt"]
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                            @onclick="OpenBetModal">
-                                            @Loc["Bet_Stmt"]
-                                        </button>
-                                    }
+                                    <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                        @onclick="HandleBurn">
+                                        @Loc["Burn_Stmt"]
+                                    </button>
                                 </div>
 
-                                <div id="deposit-modal" tabindex="-1" aria-hidden="true" class="@ShowDepositModalClass overflow-y-auto overflow-x-auto fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                                    <div class="relative mx-auto p-4 w-full max-w-md max-h-full">
-                                        <!-- Modal content -->
-                                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                            <!-- Modal header -->
-                                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                                    @Loc["Deposit_Stmt"]
-                                                </h3>
-                                                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
-                                                        @onclick="CloseDepositModal">
-                                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                                    </svg>
-                                                    <span class="sr-only">Close</span>
-                                                </button>
-                                            </div>
-                                            <!-- Modal body -->
-                                            <div class="p-4 md:p-5">
-                                                <form class="space-y-4">
-                                                    <div>
-                                                        <label for="baseAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                            <span>@Loc["Address"]</span>
-                                                            <span>
-                                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
-                                                            </span>
-                                                        </label>
-                                                        <input id="baseAssetAddress" type="text" 
-                                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                                            value="@Token.BaseAssetAddress"
-                                                            disabled=true />
-                                                    </div>
-                                    
-                                                    <div>
-                                                        <label for="baseAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                            <span>ERC20</span>
-                                                            @if (_userBaseAssetBalance is not null && _userBaseAssetBalance > 0)
-                                                            {
-                                                            <span>
-                                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_userBaseAssetBalance</a>
-                                                            </span>
-                                                            }
-                                                        </label>
-                                                        <input id="baseAssetAmount" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
-                                                            @bind-value="@InputedBaseAssetAmount" />
-                                                    </div>
-                                                    <button type="button" class="@DepositButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                                        @onclick="HandleDeposit">
-                                                        @if (InProgress)
-                                                        {
-                                                            <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                                            </svg>
-                                                        }
-                                                        @Loc["Deposit_Stmt"]
-                                                    </button>
-                                                </form>
-                                            </div>
+                                <div popover id="deposit-modal" calss="bg-white dark:bg-gray-700">
+                                    <!-- Modal content -->
+                                    <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+                                        <!-- Modal header -->
+                                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                                @Loc["Deposit_Stmt"]
+                                            </h3>
+                                            <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
+                                                    popovertarget="deposit-modal" popovertargetaction="hide">
+                                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                </svg>
+                                                <span class="sr-only">Close</span>
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div id="bet-modal" tabindex="-1" aria-hidden="true" class="@ShowBetModalClass overflow-y-auto overflow-x-auto fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                                    <div class="relative mx-auto p-4 w-full max-w-md max-h-full">
-                                        <!-- Modal content -->
-                                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                            <!-- Modal header -->
-                                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                                                    @Loc["Bet_Stmt"]
-                                                </h3>
-                                                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
-                                                        @onclick="CloseBetModal">
-                                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                                    </svg>
-                                                    <span class="sr-only">Close</span>
-                                                </button>
-                                            </div>
-                                            <!-- Modal body -->
-                                            <div class="p-4 md:p-5">
-                                                <form class="space-y-4">
-                                                    <div>
-                                                        <label for="baseAssetAddressBet" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                            <span>@Loc["Address"]</span>
-                                                            <span>
-                                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
-                                                            </span>
-                                                        </label>
-                                                        <input id="baseAssetAddressBet" type="text" 
-                                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                                            value="@Token.BaseAssetAddress"
-                                                            disabled=true />
-                                                    </div>
-                                    
-                                                    <div>
-                                                        <label for="baseAssetAmountBet" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                            <span>ERC20</span>
-                                                            @if (_userBaseAssetBalance is not null && _userBaseAssetBalance > 0)
-                                                            {
-                                                            <span>
-                                                                <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_userBaseAssetBalance</a>
-                                                            </span>
-                                                            }
-                                                        </label>
-                                                        <input id="baseAssetAmountBet" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
-                                                            @bind-value="@InputedBaseAssetAmount" />
-                                                    </div>
-
-                                                    <div>
-                                                        <label for="betOptions" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                            @Loc["BetOptions"]
-                                                        </label>
-                                                        <select id="betOptions"
-                                                            @bind-value="@InputedDiceResult"
-                                                            @bind-value:event="onchange"
-                                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                            @foreach(int item in Enum.GetValues(typeof(DiceResult)))
-                                                            {
-                                                                <option value="@item">@Loc["Sicbo_" + @Enum.GetName(typeof(DiceResult), item)]</option>
-                                                            }
-                                                        </select>
-                                                    </div>
-                                                    <button type="button" class="@BetButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                                        @onclick="HandleBet">
-                                                        @if (InProgress)
+                                        <!-- Modal body -->
+                                        <div class="p-4 md:p-5">
+                                            <form class="space-y-4">
+                                                <div>
+                                                    <label for="baseAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                                        <span>@Loc["Address"]</span>
+                                                        <span>
+                                                            <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
+                                                        </span>
+                                                    </label>
+                                                    <input id="baseAssetAddress" type="text" 
+                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                                        value="@Token.BaseAssetAddress"
+                                                        disabled=true />
+                                                </div>
+                                
+                                                <div>
+                                                    <label for="baseAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
+                                                        <span>ERC20</span>
+                                                        @if (_userBaseAssetBalance is not null && _userBaseAssetBalance > 0)
                                                         {
-                                                            <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                                            </svg>
+                                                        <span>
+                                                            <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.BaseAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Balance"]: @_userBaseAssetBalance</a>
+                                                        </span>
                                                         }
-                                                        @Loc["Bet_Stmt"]
-                                                    </button>
-                                                </form>
-                                            </div>
+                                                    </label>
+                                                    <input id="baseAssetAmount" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                                                        @bind-value="@InputedBaseAssetAmount" />
+                                                </div>
+                                                <button type="button" class="@DepositButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                    @onclick="HandleDeposit">
+                                                    @if (InProgress)
+                                                    {
+                                                        <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                                        </svg>
+                                                    }
+                                                    @Loc["Deposit_Stmt"]
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             }
                         </div>
                     </div>
+                    }
+                    
                 </div>
                 <SingleToast />
             </section>
@@ -534,5 +599,12 @@
         }
 
         CloseBetModal();
+    }
+
+    private async Task ClickBoard(MouseEventArgs e, DiceResult dice)
+    {
+        Logger.LogInformation($"clicked {dice}");
+        await JS.InvokeVoidAsync("moveTarget", e.ClientX, e.ClientY);
+        InputedDiceResult = (int)dice;
     }
 }
