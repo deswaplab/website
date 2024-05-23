@@ -49,13 +49,75 @@
                                 }
 
                                 <div class="flex flex-row items-center justify-center gap-2 p-5">
-                                    @if (Token.Drawable())
+                                    @if (CanDrawFromChain)
                                     {
                                         <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @DrawButtonDisabledClass"
                                                 @onclick="async () => await HandleDraw()"
                                                 disabled=@DrawButtonDisabled>
                                             @Loc["Draw_Stmt"]
                                         </button>
+                                    }
+                                    @if (_metamaskHostProvider.SelectedAccount != Token?.Writer && WriterBalance > 0)
+                                    {
+                                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 @DrawButtonDisabledClass"
+                                                popovertarget="buy-modal">
+                                            @Loc["Buy"] (@Loc["Holds"]: @Balance)
+                                        </button>
+
+                                        <div popover id="buy-modal" calss="bg-white dark:bg-gray-700">
+                                            <!-- Modal content -->
+                                            <div class="rounded-lg bg-white dark:bg-gray-700">
+                                                <!-- Modal header -->
+                                                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                                                        @Loc["Buy"]
+                                                    </h3>
+                                                    <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal"
+                                                        popovertarget="buy-modal" popovertargetaction="hide">
+                                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                        </svg>
+                                                        <span class="sr-only">Close</span>
+                                                    </button>
+                                                </div>
+                                                <!-- Modal body -->
+                                                <div class="p-4 md:p-5">
+                                                    <form class="space-y-4">
+                                                        <div>
+                                                            <label for="defaultPrice" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                                @Loc["DefaultPrice"]
+                                                            </label>
+                                                            <input id="defaultPrice" type="number" 
+                                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+                                                                @bind-value="DefaultPrice"
+                                                                disabled=true />
+                                                        </div>
+
+                                                        <div>
+                                                            <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                                @Loc["Amount"]
+                                                            </label>
+                                                            <input id="amount" type="number"
+                                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                                @bind-value="BuyAmount"/>
+                                                        </div>
+
+                                                        <button type="button" class="@BuyButtonClass w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                                            disabled=@InProgress
+                                                            @onclick="HandleBuy">
+                                                            @if (InProgress)
+                                                            {
+                                                                <svg aria-hidden="true" class="inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                                                </svg>
+                                                            }
+                                                            @Loc["Buy"]
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     }
                                 </div>
                             }
@@ -91,6 +153,8 @@
 
     public int Balance { get; set;}
 
+    public int WriterBalance { get; set; } = 0;
+
     public bool IsUserOwner => Balance > 0;
 
     protected override void OnInitialized()
@@ -119,6 +183,8 @@
         await InvokeAsync(() => this.StateHasChanged());
     }
 
+    private bool CanDrawFromChain = false;
+
     private async Task initTokens()
     {
         if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
@@ -126,6 +192,12 @@
             string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
             Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
             Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+            CanDrawFromChain = await _web3Service.CanDrawLottery(TokenId, ContractAddress);
+            WriterBalance = await _web3Service.Erc1155BalanceOf(Token.Writer, ContractAddress, TokenId);
+            // 取得 Token 的价格
+            var metadata = await _web3Service.GetLotteryTokenMetadata(TokenId, ContractAddress);
+            DefaultPrice = Web3.Convert.FromWei(metadata.DefaultPrice, 18); // Hardcode to 18 decimals
+            Logger.LogInformation("init tokens, defaultPrice: {}, writerBalance: {}", DefaultPrice, WriterBalance);
         }
     }
 
@@ -153,8 +225,8 @@
         DrawButtonDisabled = true;
         try
         {
-            var txHash = await _web3Service.DrawLottery(Token!.TokenId, Token!.Contract);
-            toastService.ShowToast($"Token: {Token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
+            var winner = await _web3Service.DrawLottery(Token!.TokenId, Token!.Contract);
+            toastService.ShowToast($"Winner: {winner}", ToastLevel.Success);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
@@ -166,6 +238,40 @@
         finally
         {
             DrawButtonDisabled = false;
+        }
+    }
+
+    private bool InProgress = false;
+
+    private string BuyButtonClass => InProgress ? "cursor-not-allowed" : "";
+
+    private int BuyAmount = 1;
+
+    private decimal DefaultPrice = 0;
+
+    private async Task HandleBuy()
+    {
+        if (BuyAmount > WriterBalance)
+        {
+            toastService.ShowToast($"At most {WriterBalance}", ToastLevel.Error);
+            return;
+        }
+        InProgress = true;
+        try
+        {
+            var txHash = await _web3Service.BuyLottery(Token!.TokenId, BuyAmount, DefaultPrice, Token!.Contract);
+            toastService.ShowToast($"Token: {Token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
+        }
+        catch (Nethereum.JsonRpc.Client.RpcResponseException e)
+        {
+            if (e.Message.Contains("User denied transaction signature"))
+            {
+                toastService.ShowToast(Loc["TxCancelled_Stmt"], ToastLevel.Error);
+            }
+        }
+        finally
+        {
+            InProgress = false;
         }
     }
 }

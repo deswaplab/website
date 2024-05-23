@@ -171,25 +171,50 @@
                     </div>
                     }
 
-                    <div>
-                        <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
-                        <input id="maturityDate" type="date" 
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                            placeholder="Select date"
-                            disabled="@IsFormDisabled"
-                            @bind-value="Model!.MaturityDate"
-                            @bind-value:format="yyyy-MM-dd">
-                        <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.MaturityDate" />
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="maturityDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Select Maturity Date"]</label>
+                            <input id="maturityDate" type="date" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                placeholder="Select date"
+                                disabled="@IsFormDisabled"
+                                @bind-value="Model!.MaturityDate"
+                                @bind-value:format="yyyy-MM-dd">
+                            <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.MaturityDate" />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MintAmount"]</label>
+                            <input id="amount" type="number"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                disabled="@IsFormDisabled"
+                                required @bind-value="Model!.Erc1155Amount"
+                                min="1" max="10000" step="1">
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MintAmount"]</label>
-                        <input id="amount" type="number"
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="defaultPrice" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Lottery_DefaultPrice"]</label>
+                            <input id="defaultPrice" type="number"
                             class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             disabled="@IsFormDisabled"
-                            required @bind-value="Model!.Erc1155Amount"
-                            min="1" max="10000" step="1">
+                            required @bind-value="Model!.DefaultPrice"
+                            min="0.00001" max="10" step="0.00001">
+                            <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.DefaultPrice" />
+                        </div>
+
+                        <div class="relative z-0 w-full mb-2 group">
+                            <label for="soldBp" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Lottery_SoldPercent"]</label>
+                            <input id="soldBp" type="number"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                disabled="@IsFormDisabled"
+                                required @bind-value="Model!.SoldPercent"
+                                min="50" max="100" step="1">
+                            <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.SoldPercent" />
+                        </div>
                     </div>
+
                     <CascadingAuthenticationState>
                         <AuthorizeView Roles="EthereumConnected" Context="innerContext">
                             <Authorized>
@@ -288,6 +313,14 @@
         {
             messageStore?.Add(() => Model.Erc1155Amount, "At least 1");
         }
+        if (Model!.SoldPercent < 50 || Model!.SoldPercent > 100)
+        {
+            messageStore?.Add(() => Model.SoldPercent, "Between 50~100");
+        }
+        if (Model!.DefaultPrice < 0 || Model!.DefaultPrice > 10)
+        {
+            messageStore?.Add(() => Model.DefaultPrice, "Between 0~10");
+        }
     }
 
     protected override void OnInitialized()
@@ -300,8 +333,10 @@
             Erc721Id = 0,
             Erc1155Id = 0,
             Erc1155Value = 1,
-            MaturityDate = DateOnly.FromDateTime(DateTime.Now).AddDays(3),
+            MaturityDate = DateOnly.FromDateTime(DateTime.Now).AddDays(30),
             Erc1155Amount = 100,
+            DefaultPrice = 0.002m,
+            SoldPercent = 80,
         };
         editContext = new(Model);
         editContext.OnValidationRequested += HandleValidationRequested;
@@ -348,6 +383,10 @@
         public DateOnly MaturityDate { get; set; }
 
         public int Erc1155Amount { get; set; }
+
+        public decimal DefaultPrice { get; set; }
+
+        public int SoldPercent { get; set; }
     }
 
     private LotteryForm? Model { get; set; }
@@ -498,6 +537,8 @@
                 Web3.Convert.ToWei(Model.Erc20Amount, _erc20Decimals), 
                 new DateTimeOffset(Model.MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 Model.Erc1155Amount,
+                0.01m,
+                7000,
                 _lottery.Address
             );
 
@@ -578,6 +619,8 @@
                 Model!.Erc721Id,
                 new DateTimeOffset(Model.MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 Model!.Erc1155Amount,
+                0.01m,
+                7000,
                 _lottery!.Address
             );
 
@@ -625,6 +668,8 @@
                 Model!.Erc1155Value,
                 new DateTimeOffset(Model.MaturityDate.ToDateTime(TimeOnly.MinValue)).ToUnixTimeSeconds(),
                 Model!.Erc1155Amount,
+                0.01m,
+                7000,
                 _lottery!.Address
             );
 

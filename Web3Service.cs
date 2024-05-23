@@ -35,9 +35,12 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     private readonly string LotteryABI = """
 [
     {"type":"function","name":"draw","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},
-    {"type":"function","name":"mint20","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint64","internalType":"uint64"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
-    {"type":"function","name":"mint721","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint64","internalType":"uint64"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
-    {"type":"function","name":"mint1155","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint64","internalType":"uint64"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"}
+    {"type":"function","name":"mint20","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"price","type":"uint256","internalType":"uint256"},{"name":"soldBp","type":"uint96","internalType":"uint96"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"mint721","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"price","type":"uint256","internalType":"uint256"},{"name":"soldBp","type":"uint96","internalType":"uint96"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"mint1155","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"drawTime","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"price","type":"uint256","internalType":"uint256"},{"name":"soldBp","type":"uint96","internalType":"uint96"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"canDraw","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},
+    {"type":"function","name":"buy","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"payable"},
+    {"type":"function","name":"tokenMetadata","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"drawTime","type":"uint256","internalType":"uint256"},{"name":"writer","type":"address","internalType":"address"},{"name":"tokenCount","type":"uint256","internalType":"uint256"},{"name":"isDrawed","type":"bool","internalType":"bool"},{"name":"assetKind","type":"uint8","internalType":"enum Util.AssetKind"},{"name":"defaultPrice","type":"uint256","internalType":"uint256"},{"name":"soldBp","type":"uint96","internalType":"uint96"},{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"baseAssetTokenId","type":"uint256","internalType":"uint256"}],"stateMutability":"view"}
 ]
 """;
 
@@ -664,12 +667,13 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
 
-    public async Task<long> MintLottery20(string baseAssetAddress, BigInteger baseAssetAmount, long maturityUnix, int amount, string nftAddress)
+    public async Task<long> MintLottery20(string baseAssetAddress, BigInteger baseAssetAmount, long maturityUnix, int amount, decimal defaultPrice, int soldPercent, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
         var callsFunction = contract.GetFunction("mint20");
         var value = DefaultFee;
+        var priceInWei = Web3.Convert.ToWei(defaultPrice);
         var receipt = await SendTransactionThroughMetamask(
             callsFunction,
             _metamaskHostProvider.SelectedNetworkChainId,
@@ -678,18 +682,21 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             baseAssetAddress,
             baseAssetAmount,
             maturityUnix,
-            amount
+            amount,
+            priceInWei,
+            soldPercent * 100
         );
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
         return (long)events.First().Event.Id;
     }
 
-    public async Task<long> MintLottery721(string baseAssetAddress, BigInteger baseAssetId, long maturityUnix, int amount, string nftAddress)
+    public async Task<long> MintLottery721(string baseAssetAddress, BigInteger baseAssetId, long maturityUnix, int amount, decimal defaultPrice, int soldPercent, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
         var callsFunction = contract.GetFunction("mint721");
         var value = DefaultFee;
+        var priceInWei = Web3.Convert.ToWei(defaultPrice);
         var receipt = await SendTransactionThroughMetamask(
             callsFunction,
             _metamaskHostProvider.SelectedNetworkChainId,
@@ -698,18 +705,21 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             baseAssetAddress,
             baseAssetId,
             maturityUnix,
-            amount
+            amount,
+            priceInWei,
+            soldPercent * 100
         );
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
         return (long)events.First().Event.Id;
     }
 
-    public async Task<long> MintLottery1155(string baseAssetAddress, BigInteger baseAssetId, long baseAssetAmount, long maturityUnix, int amount, string nftAddress)
+    public async Task<long> MintLottery1155(string baseAssetAddress, BigInteger baseAssetId, long baseAssetAmount, long maturityUnix, int amount, decimal defaultPrice, int soldPercent, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
         var callsFunction = contract.GetFunction("mint1155");
         var value = DefaultFee;
+        var priceInWei = Web3.Convert.ToWei(defaultPrice);
         var receipt = await SendTransactionThroughMetamask(
             callsFunction,
             _metamaskHostProvider.SelectedNetworkChainId,
@@ -719,12 +729,26 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
             baseAssetId,
             baseAssetAmount,
             maturityUnix,
-            amount
+            amount,
+            priceInWei,
+            soldPercent * 100
         );
         var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
         return (long)events.First().Event.Id;
     }
 
+    [Event("Drawed")]
+    public class DrawedEventDTO : IEventDTO
+    {
+
+        [Parameter("address", "winner", 1, true)]
+        public string Winner { get; set; } = "";
+
+        [Parameter("uint256", "tokenId", 2, true)]
+        public BigInteger TokenId { get; set; }
+    }
+
+    // return winner address
     public async Task<string> DrawLottery(long tokenId, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
@@ -732,7 +756,71 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("draw");
         var value = new HexBigInteger(0);
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
+        var events = receipt.DecodeAllEvents<DrawedEventDTO>();
+        return events.First().Event.Winner;
+    }
+
+    public async Task<string> BuyLottery(long tokenId, int amount, decimal defaultPrice, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
+        var callsFunction = contract.GetFunction("buy");
+        var priceInWei = Web3.Convert.ToWei(defaultPrice);
+        var value = new HexBigInteger(priceInWei * amount);
+        var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId, amount);
         return receipt.TransactionHash.ToString();
+    }
+
+    public async Task<bool> CanDrawLottery(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
+        var callsFunction = contract.GetFunction("canDraw");
+        var result = await callsFunction.CallAsync<bool>(tokenId);
+        return result;
+    }
+
+    [FunctionOutput]
+    public class LotteryTokenMetadataOutputDTO : IFunctionOutputDTO
+    {
+        [Parameter("uint256", "drawTime", 1)]
+        public long DrawTime { get; set; }
+
+        [Parameter("address", "writer", 2)]
+        public string Writer { get; set; } = "";
+
+        [Parameter("uint256", "tokenCount", 3)]
+        public long TokenCount { get; set; }
+
+        [Parameter("bool", "isDrawed", 4)]
+        public bool IsDrawed { get; set; }
+
+        [Parameter("uint256", "assetKind", 5)]
+        public int AssetKind { get; set; }
+
+        [Parameter("uint256", "defaultPrice", 6)]
+        public BigInteger DefaultPrice { get; set; }
+
+        [Parameter("uint256", "soldBp", 7)]
+        public int SoldBp { get; set; }
+
+        [Parameter("address", "baseAssetAddress", 8)]
+        public string BaseAssetAddress { get; set; } = "";
+
+        [Parameter("uint256", "baseAssetAmount", 9)]
+        public BigInteger BaseAssetAmount { get; set; }
+
+        [Parameter("uint256", "baseAssetTokenId", 10)]
+        public BigInteger BaseAssetTokenId { get; set; }
+    }
+
+    public async Task<LotteryTokenMetadataOutputDTO> GetLotteryTokenMetadata(long tokenId, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(LotteryABI, nftAddress);
+        var callsFunction = contract.GetFunction("tokenMetadata");
+        var result = await callsFunction.CallAsync<LotteryTokenMetadataOutputDTO>(tokenId);
+        return result;
     }
 
     // mint a red envelope

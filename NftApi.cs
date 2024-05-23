@@ -85,13 +85,13 @@ public record UserOptionNFT : UserNftBase
 
 public record UserLotteryNFT : UserNftBase
 {
-    public required string Status { get; set; }
-
     public DateTimeOffset DrawTime { get; set; }
 
     public decimal BaseAssetAmount { get; set; }
 
     public required string AssetKind { get; set; }
+
+    public required string Writer { get; set; }
 
     public long BaseAssetTokenId { get; set; }
 
@@ -112,10 +112,10 @@ public record UserLotteryNFT : UserNftBase
             TokenId = tokenId,
             ChainId = chainId,
             Contract = contractAddress,
-            Status = NftMetadataParser.ParseString(metadataUrl, "status"), // open|close
             ImageData = NftMetadataParser.ParseImageSvg(metadataUrl),
             DrawTime = NftMetadataParser.ParseMaturityDate(metadataUrl, "drawTime"),
             AssetKind = assetKind,
+            Writer = NftMetadataParser.ParseString(metadataUrl, "writer"),
             BaseAssetAmount = assetKind == "ERC20" ? NftMetadataParser.ParseAmount(metadataUrl, "baseAssetAmount") : 0,
             BaseAssetTokenId = (assetKind == "ERC721" || assetKind == "ERC1155") ? NftMetadataParser.ParseLong(metadataUrl, "baseAssetTokenId") : 0,
         };

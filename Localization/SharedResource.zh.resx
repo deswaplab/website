@@ -279,6 +279,18 @@
   <data name="Lottery" xml:space="preserve">
     <value>彩票</value>
   </data>
+  <data name="Lottery_DefaultPrice" xml:space="preserve">
+    <value>默认售价(原生代币)</value>
+  </data>
+  <data name="Lottery_SoldPercent" xml:space="preserve">
+    <value>售出可开奖比例(%)</value>
+  </data>
+  <data name="Buy" xml:space="preserve">
+    <value>购买</value>
+  </data>
+  <data name="Holds" xml:space="preserve">
+    <value>持有</value>
+  </data>
   <data name="RedEnvelope" xml:space="preserve">
     <value>红包</value>
   </data>

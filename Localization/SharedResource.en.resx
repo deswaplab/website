@@ -279,6 +279,18 @@
   <data name="Lottery" xml:space="preserve">
     <value>Lottery</value>
   </data>
+  <data name="Lottery_DefaultPrice" xml:space="preserve">
+    <value>Default Price(Native Coin)</value>
+  </data>
+  <data name="Lottery_SoldPercent" xml:space="preserve">
+    <value>Sold Percent(%)</value>
+  </data>
+  <data name="Buy" xml:space="preserve">
+    <value>Buy</value>
+  </data>
+  <data name="Holds" xml:space="preserve">
+    <value>Holds</value>
+  </data>
   <data name="RedEnvelope" xml:space="preserve">
     <value>RedEnvelope</value>
   </data>
