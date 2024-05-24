@@ -7,13 +7,13 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-// 发查询请求的客户端，不同网络可以使用不同的api，如ethereum走opensea，moonbeam走covan
-
 public interface IApiClient
 {
     Task RefreshMetadata(string contractAddress, long chainId, long tokenId);
 
     Task<IList<UserNftBase>> GetUserNftBase(string userAddress, long chainId);
+
+    Task<IList<UserNftBase>> GetContractNftBase(string contractAddress, long chainId);
 }
 
 public record UserNftBase
@@ -293,6 +293,23 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger, StateContaine
         }
         return [];
     }
+
+    public async Task<IList<UserNftBase>> GetContractNftBase(string contractAddress, long chainId)
+    {
+        var cachedTokens = container.GetContractNfts(contractAddress);
+        if (cachedTokens.Count > 0)
+        {
+            return cachedTokens;
+        }
+        var client = GetApiClient(chainId);
+        if (client is not null)
+        {
+            var metadatas = await client.GetContractNftBase(contractAddress, chainId);
+            container.SetContractNfts(contractAddress, metadatas);
+            return metadatas;
+        }
+        return [];
+    }
 }
 
 // NFT metadata 统一用opensea格式，所以可以统一方式解析
@@ -492,6 +509,32 @@ public class OpenseaNftApi(HttpClient httpClient) : IApiClient
             }).ToList();
     }
 
+    // 取合约下的token列表
+    public async Task<IList<UserNftBase>> GetContractNftBase(string contractAddress, long chainId)
+    {
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        if (string.IsNullOrEmpty(curNetwork.OpenseaApiHost))
+        {
+            return [];
+        }
+
+        IList<OpenseaNft> curTokens = [];
+        string url = $"{curNetwork.OpenseaApiHost}/contract/{contractAddress}/nfts?limit=200";
+        _httpClient.DefaultRequestHeaders.Add("x-api-key", _openseaApiKey);
+        var tokensResponse = await _httpClient.GetFromJsonAsync<OpenseaTokensResponse>(url);
+        curTokens = [.. curTokens, .. tokensResponse!.Nfts];
+        var allContracts = ContractConfig.GetNFTContracts(curNetwork).Select(item => item.ToLower());
+
+        return curTokens.Where(item => allContracts.Contains(item.Contract.ToLower()))
+            .Select(item => new UserNftBase
+            {
+                TokenId = long.Parse(item.Identifier),
+                ChainId = chainId,
+                Contract = item.Contract,
+                ImageData = NftMetadataParser.ParseImageSvg(item.MetadataUrl)
+            }).ToList();
+    }
+
     public class OpenseaTokensResponse
     {
         [JsonPropertyName("nfts")]
@@ -550,6 +593,12 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
             }
         }
         return result;
+    }
+
+    public async Task<IList<UserNftBase>> GetContractNftBase(string contractAddress, long chainId)
+    {
+        await Task.CompletedTask;
+        return [];
     }
 
     public class CovalentTokensResponse
@@ -625,7 +674,7 @@ public class BlockscoutNftApi(HttpClient httpClient) : IApiClient
             {
                 url += $"?{next}";
             }
-            var tokensResponse = await _httpClient.GetFromJsonAsync<BlockscoutTokensResponse>(url);
+            var tokensResponse = await _httpClient.GetFromJsonAsync<BlockscoutUserTokensResponse>(url);
             foreach (var item in tokensResponse!.Items)
             {
                 if (item.TokenId is not null && item.Token.Address is not null && allContracts.Contains(item.Token.Address.ToLower()))
@@ -657,7 +706,51 @@ public class BlockscoutNftApi(HttpClient httpClient) : IApiClient
         return nfts;
     }
 
-    public class BlockscoutTokensResponse
+    public async Task<IList<UserNftBase>> GetContractNftBase(string contractAddress, long chainId)
+    {
+        var curNetwork = NetworkConfig.GetNetwork(chainId) ?? throw new Exception($"invalid chainId, {chainId}");
+        if (string.IsNullOrEmpty(curNetwork.BlockscoutHost))
+        {
+            return [];
+        }
+        var allContracts = ContractConfig.GetNFTContracts(curNetwork).Select(item => item.ToLower());
+
+        IList<UserNftBase> nfts = [];
+        string url = $"{curNetwork.BlockscoutHost}/api/v2/tokens/{contractAddress}/instances";
+        var tokensResponse = await _httpClient.GetFromJsonAsync<BlockscoutContractTokensResponse>(url);
+        foreach (var item in tokensResponse!.Items)
+        {
+            if (item.Id is not null && item.ImageUrl is not null)
+            {
+                nfts.Add(new UserNftBase
+                {
+                    TokenId = long.Parse(item.Id),
+                    ChainId = chainId,
+                    Contract = contractAddress,
+                    ImageData = item.ImageUrl,
+                });
+            }
+        }
+        return nfts;
+    }
+
+    public class BlockscoutContractTokensResponse
+    {
+        [JsonPropertyName("items")]
+        public required IList<BlockscoutContractTokenItem> Items { get; set; }
+    }
+
+    public class BlockscoutContractTokenItem
+    {
+        [JsonPropertyName("id")]
+        public string? Id { get; set; }
+
+        [JsonPropertyName("image_url")]
+        public string? ImageUrl { get; set; }
+    }
+
+
+    public class BlockscoutUserTokensResponse
     {
         [JsonPropertyName("items")]
         public required IList<BlockscoutTokenItem> Items { get; set; }

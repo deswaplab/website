@@ -381,6 +381,9 @@
   <data name="My Tokens" xml:space="preserve">
     <value>我的代币</value>
   </data>
+  <data name="Tokens" xml:space="preserve">
+    <value>代币列表</value>
+  </data>
   <data name="Select Asset Kind" xml:space="preserve">
     <value>选择资产类型</value>
   </data>

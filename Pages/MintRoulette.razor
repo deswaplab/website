@@ -169,6 +169,7 @@
                     </div>
                     }
 
+                    <div class="flex flex-row items-center justify-between">
                     <CascadingAuthenticationState>
                         <AuthorizeView Roles="EthereumConnected" Context="innerContext">
                             <Authorized>
@@ -183,19 +184,22 @@
                                         </svg>
                                     }
                                     @Loc["Mint"]
-                                </button>
-                                @if (NewTokenId is not null)
-                                {
-                                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                                        <a href="@SelectedNetwork!.BuildDetailUrl(_roulette!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
-                                    </p>
-                                }
+                                </button>                                
                             </Authorized>
                             <NotAuthorized>
                                 <LoginButton />
                             </NotAuthorized>
                         </AuthorizeView>
                     </CascadingAuthenticationState>
+                    <p class="mt-2 text-sm text-blue-600 dark:text-blue-500"><a href="@ContractTokensUrl">@Loc["Tokens"]</a></p>
+
+                    </div>
+                    @if (NewTokenId is not null)
+                    {
+                        <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                            <a href="@SelectedNetwork!.BuildDetailUrl(_roulette!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                        </p>
+                    }
                 </EditForm>
             </div>
         </div>
@@ -321,6 +325,8 @@
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private NFTContract? _roulette => SelectedNetwork is not null ? ContractConfig.Roulette[SelectedNetwork] : null;
+
+    private string ContractTokensUrl => _roulette is not null ? $"/app/{_roulette.Address}/tokens" : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

@@ -1,5 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ILogger<AppUserTokens> Logger
+@inject ILogger<UserProfile> Logger
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
@@ -7,7 +7,7 @@
 @inject IStringLocalizer<SharedResource> Loc
 
 
-@page "/app/user/tokens"
+@page "/app/profile"
 @layout AppLayout
 
 <PageTitle>@Loc["My Tokens"]</PageTitle>

@@ -71,6 +71,7 @@
                         <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Erc20Amount" />
                     </div>
 
+                    <div class="flex flex-row items-center justify-between">
                     <CascadingAuthenticationState>
                         <AuthorizeView Roles="EthereumConnected" Context="innerContext">
                             <Authorized>
@@ -86,18 +87,20 @@
                                     }
                                     @Loc["Mint"]
                                 </button>
-                                @if (NewTokenId is not null)
-                                {
-                                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                                        <a href="@SelectedNetwork!.BuildDetailUrl(_sicbo!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
-                                    </p>
-                                }
                             </Authorized>
                             <NotAuthorized>
                                 <LoginButton />
                             </NotAuthorized>
                         </AuthorizeView>
                     </CascadingAuthenticationState>
+                    <p class="mt-2 text-sm text-blue-600 dark:text-blue-500"><a href="@ContractTokensUrl">@Loc["Tokens"]</a></p>
+                    </div>
+                    @if (NewTokenId is not null)
+                    {
+                        <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                            <a href="@SelectedNetwork!.BuildDetailUrl(_sicbo!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+                        </p>
+                    }
                 </EditForm>
             </div>
         </div>
@@ -187,6 +190,8 @@
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private NFTContract? _sicbo => SelectedNetwork is not null ? ContractConfig.Sicbo[SelectedNetwork] : null;
+
+    private string ContractTokensUrl => _sicbo is not null ? $"/app/{_sicbo.Address}/tokens" : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

@@ -401,6 +401,9 @@ can contact me</value>
   <data name="My Tokens" xml:space="preserve">
     <value>My Tokens</value>
   </data>
+  <data name="Tokens" xml:space="preserve">
+    <value>Tokens List</value>
+  </data>
   <data name="Select Asset Kind" xml:space="preserve">
     <value>Select Asset Kind</value>
   </data>

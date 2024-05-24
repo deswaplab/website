@@ -14,7 +14,7 @@
     <div class="flex flex-col items-stretch md:mx-96 px-6 mt-8">
         <MarkdownEditor @bind-Value="@markdownValue" MaxHeight="800px" Theme="none" />
     </div>
-    <div class="flex flex-col items-center mx-auto px-6 mb-8">
+    <div class="flex flex-row items-center justify-between">
     <CascadingAuthenticationState>
         <AuthorizeView Roles="EthereumConnected" Context="innerContext">
             <Authorized>
@@ -30,19 +30,20 @@
                 }
                 @Loc["Mint"]
                 </button>
-                @if (NewTokenId is not null)
-                {
-                    <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                        <a href="@SelectedNetwork!.BuildDetailUrl(_writing!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
-                    </p>
-                }
             </Authorized>
             <NotAuthorized>
                 <LoginButton />
             </NotAuthorized>
         </AuthorizeView>
     </CascadingAuthenticationState>
+    <p class="mt-2 text-sm text-blue-600 dark:text-blue-500"><a href="@ContractTokensUrl">@Loc["Tokens"]</a></p>
     </div>
+    @if (NewTokenId is not null)
+    {
+        <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+            <a href="@SelectedNetwork!.BuildDetailUrl(_writing!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+        </p>
+    }
 </section>
 
 @code {
@@ -75,6 +76,8 @@
     public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
 
     private NFTContract? _writing => SelectedNetwork is not null ? ContractConfig.Writing[SelectedNetwork] : null;
+
+    private string ContractTokensUrl => _writing is not null ? $"/app/{_writing.Address}/tokens" : "";
 
     private bool InProgress = false;
 
