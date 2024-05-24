@@ -247,7 +247,7 @@ public record UserBlackJackNFT : UserNftBase
 
 }
 
-public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
+public class NftApi(HttpClient httpClient, ILogger<NftApi> logger, StateContainer container)
 {
     // contract, metadata_url
     // 通过contract进行过滤，通过metadata_url解析出详情
@@ -280,10 +280,15 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger)
 
     public async Task<IList<UserNftBase>> GetUserNftBases(string userAddress, long chainId)
     {
+        if (container.CachedNfts.Count > 0)
+        {
+            return container.CachedNfts;
+        }
         var client = GetApiClient(chainId);
         if (client is not null)
         {
             var metadatas = await client.GetUserNftBase(userAddress, chainId);
+            container.CachedNfts = metadatas;
             return metadatas;
         }
         return [];

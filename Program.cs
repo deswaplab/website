@@ -31,6 +31,7 @@ builder.Services.AddScoped<NftApi>();
 builder.Services.AddSingleton<AuthenticationStateProvider, EthereumAuthenticationStateProvider>();
 builder.Services.AddSingleton<ToastService>();
 builder.Services.AddScoped<IClipboardService, ClipboardService>();
+builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddLocalization();
 
