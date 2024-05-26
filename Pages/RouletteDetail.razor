@@ -5,7 +5,6 @@
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject Web3Service _web3Service
 @inject ToastService toastService
-@inject NftApi _nftApi
 @inject IStringLocalizer<SharedResource> Loc
 @inject IMetamaskInterop _metamaskInterop;
 
@@ -296,8 +295,10 @@
     {
         if (firstRender)
         {
-            Logger.LogInformation("first render");
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
@@ -311,49 +312,46 @@
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+        string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+        Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+        Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
+
+        UserBetted = await _web3Service.UserBettedRoulette(TokenId, ContractAddress);
+
+        var betPlayers = await _web3Service.GetTokenBetPlayers(TokenId, ContractAddress);
+        BetPlayers = betPlayers.ToArray();
+        var rawBets = await _web3Service.GetTokenBetAmounts(TokenId, ContractAddress);
+        Logger.LogInformation("raw bets: {}, players: {}", rawBets, betPlayers);
+
+        if (Token!.AssetKind == "ERC20")
         {
-            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
-            Token = UserRouletteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-
-            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
-            Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
-
-            UserBetted = await _web3Service.UserBettedRoulette(TokenId, ContractAddress);
-
-            var betPlayers = await _web3Service.GetTokenBetPlayers(TokenId, ContractAddress);
-            BetPlayers = betPlayers.ToArray();
-            var rawBets = await _web3Service.GetTokenBetAmounts(TokenId, ContractAddress);
-            Logger.LogInformation("raw bets: {}, players: {}", rawBets, betPlayers);
-
-            if (Token!.AssetKind == "ERC20")
+            _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
+            var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Token!.BaseAssetAddress);
+            _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
+            InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
+            Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
+            FtBets = rawBets.Select(e => Web3.Convert.FromWei(e, _baseAssetDecimals)).ToArray();
+            for (var i = 0; i < BetPlayers.Length; i++)
             {
-                _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
-                var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Token!.BaseAssetAddress);
-                _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
-                InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
-                Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
-                FtBets = rawBets.Select(e => Web3.Convert.FromWei(e, _baseAssetDecimals)).ToArray();
-                for (var i = 0; i < BetPlayers.Length; i++)
+                ftPieData.Add(new BetPieFtData
                 {
-                    ftPieData.Add(new BetPieFtData
-                    {
-                        Address = Truncate(BetPlayers[i], 10),
-                        Amount = FtBets[i]
-                    });
-                }
+                    Address = Truncate(BetPlayers[i], 10),
+                    Amount = FtBets[i]
+                });
             }
-            else
+        }
+        else
+        {
+            NftBets = rawBets.Select(e => (long)e).ToArray();
+            for (var i = 0; i < BetPlayers.Length; i++)
             {
-                NftBets = rawBets.Select(e => (long)e).ToArray();
-                for (var i = 0; i < BetPlayers.Length; i++)
+                nftPieData.Add(new BetPieNftData
                 {
-                    nftPieData.Add(new BetPieNftData
-                    {
-                        Address = Truncate(BetPlayers[i], 10),
-                        Amount = NftBets[i]
-                    });
-                }
+                    Address = Truncate(BetPlayers[i], 10),
+                    Amount = NftBets[i]
+                });
             }
         }
     }
@@ -405,7 +403,8 @@
     
         CloseModal();
         await Task.Delay(1000);
-        await _nftApi.RefreshMetadata(Token!.Contract, Token!.ChainId, Token!.TokenId);
+
+        await initTokens();
     }
 
     private async Task Bet20()

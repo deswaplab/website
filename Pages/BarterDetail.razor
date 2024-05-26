@@ -200,22 +200,20 @@
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            try {
-                string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
-                Token = UserOptionNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-                Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        Logger.LogInformation("init tokens, contractAddress: {}, tokenId: {}", ContractAddress, TokenId);
+        try {
+            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+            Token = UserOptionNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
 
-                if (Token.QuoteAssetKind == "ERC20")
-                {
-                    var metadata = await _web3Service.GetBarterTokenMetadata(TokenId, ContractAddress);
-                    Token.QuoteAssetAmountWei = metadata.QuoteAssetAmount;
-                    Logger.LogInformation("after chain id, {}, {}, {}", metadata.QuoteAssetKind, metadata.QuoteAssetAddress, metadata.QuoteAssetAmount);
-                }
-            } catch {
-                Logger.LogError("fetch token failed");
+            if (Token.QuoteAssetKind == "ERC20")
+            {
+                var metadata = await _web3Service.GetBarterTokenMetadata(TokenId, ContractAddress);
+                Token.QuoteAssetAmountWei = metadata.QuoteAssetAmount;
+                Logger.LogInformation("after chain id, {}, {}, {}", metadata.QuoteAssetKind, metadata.QuoteAssetAddress, metadata.QuoteAssetAmount);
             }
+        } catch {
+            Logger.LogError("fetch token failed");
         }
     }
 
@@ -229,7 +227,10 @@
     {
         if (firstRender)
         {
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }

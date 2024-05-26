@@ -168,24 +168,23 @@
     {
         if (firstRender)
         {
-            Logger.LogInformation("first render");
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
-            Token = UserVoteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+        Token = UserVoteNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
-            IsUserVoted = await _web3Service.UserVoted(TokenId, ContractAddress);
+        IsUserVoted = await _web3Service.UserVoted(TokenId, ContractAddress);
 
-            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
-            Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
-        }
+        Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
     }
 
     private bool InBurnProgress = false;

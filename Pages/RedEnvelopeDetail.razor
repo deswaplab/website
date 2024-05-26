@@ -121,13 +121,10 @@
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-            Token = UserRedEnvelopeNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
+        Token = UserRedEnvelopeNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
-            Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-        }
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
     }
 
     public void Dispose()
@@ -140,7 +137,10 @@
     {
         if (firstRender)
         {
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
@@ -160,8 +160,7 @@
             await Task.Delay(1000);
 
             // 刷新页面
-            string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-            Token = UserRedEnvelopeNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+            await initTokens();
 
             // 刷新元数据
             await _nftApi.RefreshMetadata(token.Contract, token.ChainId, token.TokenId);

@@ -346,28 +346,27 @@
     {
         if (firstRender)
         {
-            Logger.LogInformation("first render");
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
-            Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+        Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
-            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
-            Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
+        Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
 
-            _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
-            var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Token!.BaseAssetAddress);
-            _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
-            InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
-            Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
-        }
+        _baseAssetDecimals = await _web3Service.Erc20Decimals(Token!.BaseAssetAddress);
+        var balanceInWei = await _web3Service.Erc20BalanceOf(_metamaskHostProvider.SelectedAccount, Token!.BaseAssetAddress);
+        _userBaseAssetBalance = Web3.Convert.FromWei(balanceInWei, _baseAssetDecimals);
+        InputedBaseAssetAmount = _userBaseAssetBalance ?? 0;
+        Logger.LogInformation("user balance: {}, {}", _userBaseAssetBalance, _baseAssetDecimals);
     }
 
     private bool IsShowDepositModal = false;

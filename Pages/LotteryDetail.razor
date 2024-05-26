@@ -187,18 +187,16 @@
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
-            Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
-            Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
-            CanDrawFromChain = await _web3Service.CanDrawLottery(TokenId, ContractAddress);
-            WriterBalance = await _web3Service.Erc1155BalanceOf(Token.Writer, ContractAddress, TokenId);
-            // 取得 Token 的价格
-            var metadata = await _web3Service.GetLotteryTokenMetadata(TokenId, ContractAddress);
-            DefaultPrice = Web3.Convert.FromWei(metadata.DefaultPrice, 18); // Hardcode to 18 decimals
-            Logger.LogInformation("init tokens, defaultPrice: {}, writerBalance: {}", DefaultPrice, WriterBalance);
-        }
+        Logger.LogInformation("init tokens, contractAddress: {}, tokenId: {}", ContractAddress, TokenId);
+        string metadataUri = await _web3Service.GetUri(ContractAddress, TokenId);
+        Token = UserLotteryNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        Balance = await _web3Service.Erc1155BalanceOf(_metamaskHostProvider.SelectedAccount, ContractAddress, TokenId);
+        CanDrawFromChain = await _web3Service.CanDrawLottery(TokenId, ContractAddress);
+        WriterBalance = await _web3Service.Erc1155BalanceOf(Token.Writer, ContractAddress, TokenId);
+        // 取得 Token 的价格
+        var metadata = await _web3Service.GetLotteryTokenMetadata(TokenId, ContractAddress);
+        DefaultPrice = Web3.Convert.FromWei(metadata.DefaultPrice, 18); // Hardcode to 18 decimals
+        Logger.LogInformation("init tokens, defaultPrice: {}, writerBalance: {}", DefaultPrice, WriterBalance);
     }
 
     public void Dispose()
@@ -211,7 +209,10 @@
     {
         if (firstRender)
         {
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
@@ -261,6 +262,7 @@
         {
             var txHash = await _web3Service.BuyLottery(Token!.TokenId, BuyAmount, DefaultPrice, Token!.Contract);
             toastService.ShowToast($"Token: {Token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
+            await initTokens(); // refresh page
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {

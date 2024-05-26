@@ -69,17 +69,14 @@
 
     private async Task initTokens()
     {
-        if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
-        {
-            string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
-            Token = UserWritingNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+        string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
+        Token = UserWritingNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
-            rawContent = await _web3Service.GetWritingContent(TokenId, ContractAddress);
-            Logger.LogInformation("content: {}", rawContent);
+        rawContent = await _web3Service.GetWritingContent(TokenId, ContractAddress);
+        Logger.LogInformation("content: {}", rawContent);
 
-            Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
-            Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
-        }
+        Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
+        Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
     }
 
     protected override void OnInitialized()
@@ -118,8 +115,10 @@
     {
         if (firstRender)
         {
-            Logger.LogInformation("first render");
-            await initTokens();
+            if (Token is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            {
+                await initTokens();
+            }
             await InvokeAsync(() => this.StateHasChanged());
         }
     }
