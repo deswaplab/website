@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @inject ILogger<AppLayout> Logger
+@inject IStringLocalizer<SharedResource> Loc
 
 <div class="page">
     <AppNav />
@@ -22,7 +23,13 @@
                         <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Resources</h2>
                         <ul class="text-gray-600 dark:text-gray-400">
                             <li class="mb-4">
-                                <a href="https://github.com/deswaplab" class="hover:underline">Github</a>
+                                <a target="_blank" href="https://github.com/deswaplab" class="hover:underline">Github</a>
+                            </li>
+                            <li class="mb-4">
+                                <a target="_self" href="app/vote" class="hover:underline">@Loc["Vote"]</a>
+                            </li>
+                            <li class="mb-4">
+                                <a target="_self" href="app/writing" class="hover:underline">@Loc["Writing"]</a>
                             </li>
                         </ul>
                     </div>
