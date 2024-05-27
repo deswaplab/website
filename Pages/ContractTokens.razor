@@ -1,10 +1,9 @@
-@page "/app/{ContractAddress}/tokens"
+@page "/app/{NetworkName}/{ContractAddress}"
 @layout AppLayout
 
 @inject ILogger<ContractTokens> Logger
 @inject IJSRuntime JS
 @inject IStringLocalizer<SharedResource> Loc
-@inject MetamaskHostProvider _metamaskHostProvider
 @inject NftApi _nftApi
 
 
@@ -44,7 +43,10 @@
     [Parameter]
     public string ContractAddress { get; set; } = "";
 
-    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetwork(_metamaskHostProvider.SelectedNetworkChainId);
+    [Parameter]
+    public string NetworkName { get; set; } = "";
+
+    public NetworkCore? SelectedNetwork => NetworkConfig.GetNetworkByName(NetworkName);
 
     private string buildDetailUrl(string networkName, string nftContractAddress, long tokenId)
     {
@@ -54,22 +56,6 @@
             return "/";
         }
         return SelectedNetwork.BuildDetailUrl(contract, tokenId);
-    }
-
-    protected override void OnInitialized()
-    {
-        _metamaskHostProvider.NetworkChanged += MetamaskHostProvider_NetworkChainIdChanged;
-    }
-
-    private async Task MetamaskHostProvider_NetworkChainIdChanged(long chainId)
-    {
-        await fetchTokens(ContractAddress, chainId);
-        await InvokeAsync(() => this.StateHasChanged());
-    }
-
-    public void Dispose()
-    {
-        _metamaskHostProvider.NetworkChanged -= MetamaskHostProvider_NetworkChainIdChanged;
     }
 
     public IList<UserNftBase>? Tokens { get; set; }
@@ -83,9 +69,9 @@
     {
         if (firstRender)
         {
-            if (Tokens is null && _metamaskHostProvider.SelectedNetworkChainId > 0)
+            if (SelectedNetwork is not null)
             {
-                await fetchTokens(ContractAddress, _metamaskHostProvider.SelectedNetworkChainId);
+                await fetchTokens(ContractAddress, SelectedNetwork.ChainId);
                 await InvokeAsync(() => this.StateHasChanged());
             }
         }

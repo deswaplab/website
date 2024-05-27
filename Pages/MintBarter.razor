@@ -351,7 +351,7 @@
 
     private NFTContract? _barter => SelectedNetwork is not null ? ContractConfig.Barter[SelectedNetwork!] : null;
 
-    private string ContractTokensUrl => _barter is not null ? $"/app/{_barter.Address}/tokens" : "";
+    private string ContractTokensUrl => (SelectedNetwork is not null && _barter is not null) ? SelectedNetwork.BuildContractTokensUrl(_barter!) : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

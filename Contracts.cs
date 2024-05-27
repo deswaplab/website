@@ -43,6 +43,11 @@ public record NetworkCore
         return $"app/{InnerName}/{contract.Name.ToLower()}/{contract.Address}/{tokenId}";
     }
 
+    public string BuildContractTokensUrl(NFTContract contract)
+    {
+        return $"app/{InnerName}/{contract.Address}";
+    }
+
     public string BuildNftUrl(string contractAddress, long tokenId)
     {
         if (string.IsNullOrEmpty(OpenseaHost))

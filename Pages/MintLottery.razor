@@ -401,7 +401,7 @@
 
     private NFTContract? _lottery => SelectedNetwork is not null ? ContractConfig.Lottery[SelectedNetwork!] : null;
 
-    private string ContractTokensUrl => _lottery is not null ? $"/app/{_lottery.Address}/tokens" : "";
+    private string ContractTokensUrl => (SelectedNetwork is not null && _lottery is not null) ? SelectedNetwork.BuildContractTokensUrl(_lottery!) : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

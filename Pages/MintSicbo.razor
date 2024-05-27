@@ -191,7 +191,7 @@
 
     private NFTContract? _sicbo => SelectedNetwork is not null ? ContractConfig.Sicbo[SelectedNetwork] : null;
 
-    private string ContractTokensUrl => _sicbo is not null ? $"/app/{_sicbo.Address}/tokens" : "";
+    private string ContractTokensUrl => (SelectedNetwork is not null && _sicbo is not null) ? SelectedNetwork.BuildContractTokensUrl(_sicbo!) : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 

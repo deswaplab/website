@@ -308,7 +308,7 @@
 
     public string? Owner { get; set; }
 
-    public bool IsUserOwner => _metamaskHostProvider.SelectedAccount.Equals(Owner, StringComparison.CurrentCultureIgnoreCase);
+    public bool IsUserOwner => Owner is null ? false : _metamaskHostProvider.SelectedAccount.Equals(Owner, StringComparison.CurrentCultureIgnoreCase);
 
     protected override void OnInitialized()
     {

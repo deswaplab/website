@@ -77,7 +77,7 @@
 
     private NFTContract? _writing => SelectedNetwork is not null ? ContractConfig.Writing[SelectedNetwork] : null;
 
-    private string ContractTokensUrl => _writing is not null ? $"/app/{_writing.Address}/tokens" : "";
+    private string ContractTokensUrl => (SelectedNetwork is not null && _writing is not null) ? SelectedNetwork.BuildContractTokensUrl(_writing!) : "";
 
     private bool InProgress = false;
 

@@ -319,7 +319,7 @@
 
     private NFTContract? _redenvelope => SelectedNetwork is not null ? ContractConfig.RedEnvelope[SelectedNetwork] : null;
 
-    private string ContractTokensUrl => _redenvelope is not null ? $"/app/{_redenvelope.Address}/tokens" : "";
+    private string ContractTokensUrl => (SelectedNetwork is not null && _redenvelope is not null) ? SelectedNetwork.BuildContractTokensUrl(_redenvelope!) : "";
 
     private bool IsFormDisabled => InProgress || SelectedNetwork is null || string.IsNullOrEmpty(_metamaskHostProvider.SelectedAccount);
 
