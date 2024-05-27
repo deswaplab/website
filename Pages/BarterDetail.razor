@@ -68,7 +68,7 @@
                                 </div>
 
                                 <!-- Exercise Modal -->
-                                <div id="exercise-modal" calss="bg-white dark:bg-gray-700">
+                                <div popover id="exercise-modal" calss="bg-white dark:bg-gray-700">
                                     <!-- Modal content -->
                                     <div class="rounded-lg bg-white dark:bg-gray-700">
                                         <!-- Modal header -->
@@ -89,7 +89,7 @@
                                             <form class="space-y-4">
                                                 <div>
                                                     <label for="quoteAssetAddress" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white flex flex-row justify-between">
-                                                        <span>Address</span>
+                                                        <span>@Loc["You Pay"]</span>
                                                         <span>
                                                             <a class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="@SelectedNetwork!.GetEtherScanTokenBalanceUrl(Token!.QuoteAssetAddress, _metamaskHostProvider.SelectedAccount)" target="_blank">@Loc["Token"]</a>
                                                         </span>
@@ -102,7 +102,7 @@
                                                 @if (Token.QuoteAssetKind == "ERC20")
                                                 {
                                                 <div>
-                                                    <label for="quoteAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                                    <label for="quoteAssetAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["Amount"] (Wei)</label>
                                                     <input id="quoteAssetAmount" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
                                                         value="@Token.QuoteAssetAmountWei"
                                                         disabled=true />
@@ -111,7 +111,7 @@
                                                 else
                                                 {
                                                 <div>
-                                                    <label for="quoteAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quote Asset</label>
+                                                    <label for="quoteAssetId" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ID</label>
                                                     <input id="quoteAssetId" type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
                                                         @bind-value="@Token.QuoteAssetTokenId"
                                                         disabled=true />

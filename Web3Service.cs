@@ -1027,6 +1027,17 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         return receipt.TransactionHash.ToString();
     }
 
+    [Event("Opened")]
+    public class OpenedEventDTO : IEventDTO
+    {
+
+        [Parameter("address", "winner", 1, true)]
+        public string Winner { get; set; } = "";
+
+        [Parameter("uint256", "tokenId", 2, true)]
+        public BigInteger TokenId { get; set; }
+    }
+
     public async Task<string> OpenRoulette(long tokenId, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
@@ -1034,7 +1045,9 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var callsFunction = contract.GetFunction("open");
         var value = new HexBigInteger(0);
         var receipt = await SendTransactionThroughMetamask(callsFunction, _metamaskHostProvider.SelectedNetworkChainId, _metamaskHostProvider.SelectedAccount, value, tokenId);
-        return receipt.TransactionHash.ToString();
+        // return winner address
+        var events = receipt.DecodeAllEvents<OpenedEventDTO>();
+        return events.First().Event.Winner;
     }
 
     // Sicbo

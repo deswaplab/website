@@ -20,5 +20,4 @@ dotnet publish -p:CompressionEnabled=false
 - [ ] 提交表单时强校验余额，减少出错机会
 - [ ] 手机上添加未知网络时，会报错，切换不过去
 - [ ] 详情页切换到popover后，弹出变窄了，需要排查下
-- [ ] Roulette 弹窗改为popover
 - [ ] 是否可以把彩票的buy改为自动去opensea挂单？

@@ -386,9 +386,9 @@
             await Bet1155();
         }
     
-        await Task.Delay(1000);
+        await Task.Delay(3000);
 
-        await JS.InvokeVoidAsync("hidePopover", "buy-modal"); // hide popover
+        await JS.InvokeVoidAsync("hidePopover", "bet-modal"); // hide popover
 
         await initTokens();
     }
@@ -520,11 +520,15 @@
         InProgress = true;
         try
         {
-            var txHash = await _web3Service.OpenRoulette(
+            var winner = await _web3Service.OpenRoulette(
                 Token!.TokenId,
                 Token!.Contract
             );
-            toastService.ShowToast($"Token: {Token!.TokenId} {Loc["TxSuccess_Stmt"]}", ToastLevel.Success);
+            toastService.ShowToast($"Winner: {winner}", ToastLevel.Success);
+
+            await Task.Delay(1000);
+
+            await initTokens();
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
