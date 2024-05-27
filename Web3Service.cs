@@ -890,10 +890,13 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
         var callsFunction = contract.GetFunction("getTokenBetAmounts");
-        try {
+        try
+        {
             var result = await callsFunction.CallAsync<List<BigInteger>>(tokenId);
             return result;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             _logger.LogError("error, {}", e);
             return [];
         }
@@ -904,10 +907,13 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(RouletteABI, nftAddress);
         var callsFunction = contract.GetFunction("getTokenBetPlayers");
-        try {
+        try
+        {
             var result = await callsFunction.CallAsync<List<string>>(tokenId);
             return result;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             _logger.LogError("error, {}", e);
             return [];
         }
@@ -1382,7 +1388,7 @@ public enum DiceResult
 {
     Small = 0,
     Big,
-    
+
     SpecificDouble_1, // 对1
     SpecificDouble_2,
     SpecificDouble_3,
@@ -1398,7 +1404,7 @@ public enum DiceResult
     SpecificTriple_6,
 
     AnyTriple, // 三同
-    
+
     ThreeDiceTotal_4, // 三个骰子的点数之和为4
     ThreeDiceTotal_5, // 三个骰子的点数之和为5
     ThreeDiceTotal_6, // 三个骰子的点数之和为6

@@ -6,6 +6,9 @@
 npm install -g tailwindcss --upgrade
 npx tailwindcss -i .\Styles\app.css -o .\wwwroot\css\app.css --watch
 dotnet watch
+
+# for ipfs build, disable compression to reduce size
+dotnet publish -p:CompressionEnabled=false
 ```
 
 ## Tasks

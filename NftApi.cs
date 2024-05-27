@@ -591,11 +591,12 @@ public class CovalentNftApi(HttpClient httpClient, ILogger<NftApi> logger) : IAp
             var tokens = item.NFTData;
             foreach (var token in tokens)
             {
-                result.Add(new UserNftBase{
+                result.Add(new UserNftBase
+                {
                     TokenId = long.Parse(token.TokenId),
                     ChainId = chainId,
-                    Contract = item.ContractAddress, 
-                    ImageData =  NftMetadataParser.ParseImageSvg(token.TokenUrl)
+                    Contract = item.ContractAddress,
+                    ImageData = NftMetadataParser.ParseImageSvg(token.TokenUrl)
                 });
             }
         }
