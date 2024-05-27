@@ -6,6 +6,7 @@
 @inject NftApi _nftApi
 @inject IStringLocalizer<SharedResource> Loc
 @inject IMetamaskInterop _metamaskInterop;
+@inject IJSRuntime JS
 
 @page "/app/{NetworkName}/lottery/{ContractAddress}/{TokenId:long}"
 @layout AppLayout
@@ -263,6 +264,10 @@
             var txHash = await _web3Service.BuyLottery(Token!.TokenId, BuyAmount, DefaultPrice, Token!.Contract);
             toastService.ShowToast($"Token: {Token.TokenId} {Loc["MintSuccess_Stmt"]}", ToastLevel.Success);
             await initTokens(); // refresh page
+
+            await JS.InvokeVoidAsync("hidePopover", "buy-modal"); // hide popover
+
+            await _nftApi.RefreshMetadata(Token!.Contract, Token!.ChainId, Token!.TokenId);
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {

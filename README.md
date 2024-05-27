@@ -18,8 +18,5 @@ dotnet watch
 - [ ] 手机上添加未知网络时，会报错，切换不过去
 - [ ] 详情页切换到popover后，弹出变窄了，需要排查下
 - [ ] Roulette 弹窗改为popover
-- [ ] popover 点击后自动关闭(hide)
 - [ ] 列表页url优化，和详情页统一
-- [ ] 彩票刷新元数据
 - [ ] 是否可以把彩票的buy改为自动去opensea挂单？
-- [ ] 加上 PWA 支持

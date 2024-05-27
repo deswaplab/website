@@ -496,6 +496,8 @@
             // refresh NFT
             string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
             Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+
+            await JS.InvokeVoidAsync("hidePopover", "deposit-modal"); // hide popover
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
@@ -575,6 +577,9 @@
             await Task.Delay(2000);
             string metadataUri = await _web3Service.GetTokenUri(ContractAddress, TokenId);
             Token = UserSicboNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
+            
+            // Hide popover
+            await JS.InvokeVoidAsync("hidePopover", "bet-modal");
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {

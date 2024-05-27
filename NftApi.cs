@@ -274,7 +274,14 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger, StateContaine
         var client = GetApiClient(chainId);
         if (client is not null)
         {
-            await client.RefreshMetadata(contractAddress, chainId, tokenId);
+            try
+            {
+                await client.RefreshMetadata(contractAddress, chainId, tokenId);
+            }
+            catch
+            {
+                logger.LogWarning("refresh metadata failed, contract: {}, tokenId: {}", contractAddress, tokenId);
+            }
         }
     }
 

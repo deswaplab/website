@@ -44,7 +44,12 @@
             var xposition = (clientX - target.offsetLeft - target.offsetWidth/2);
             var yposition = (clientY - target.offsetTop - target.offsetHeight/2);
             target.style.transform = "translate("+ xposition + "px," + yposition + "px)";
-            console.log("in moveTarget", clientX, clientY, xposition, yposition);
+        }
+
+        // manually close popover
+        function hidePopover(popoverId) {
+            const popover = document.getElementById(popoverId);
+            popover.hidePopover();
         }
     </script>
 </head>

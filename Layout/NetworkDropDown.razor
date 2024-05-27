@@ -6,6 +6,7 @@
 @inject MetamaskHostProvider _metamaskHostProvider
 @inject ILogger<NetworkDropDown> Logger
 @inject IStringLocalizer<SharedResource> Loc
+@inject IJSRuntime JS
 
 <CascadingAuthenticationState>
     <AuthorizeView Roles="EthereumConnected">
@@ -111,5 +112,6 @@
                 await _metamaskInterop.SendAsync(new RpcRequestMessage(null, "wallet_addEthereumChain", p3));
             }
         }
+        await JS.InvokeVoidAsync("hidePopover", "dropdownNavbar"); // hide popover
     }
 }
