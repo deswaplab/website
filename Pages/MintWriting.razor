@@ -14,7 +14,7 @@
     <div class="flex flex-col items-stretch md:mx-96 px-6 mt-8">
         <MarkdownEditor @bind-Value="@markdownValue" MaxHeight="800px" Theme="none" />
     </div>
-    <div class="flex flex-row items-center justify-between">
+    <div class="flex flex-row mx-auto px-6 py-8 max-w-md items-center justify-between">
     <CascadingAuthenticationState>
         <AuthorizeView Roles="EthereumConnected" Context="innerContext">
             <Authorized>
@@ -40,9 +40,11 @@
     </div>
     @if (NewTokenId is not null)
     {
+        <div class="mx-auto px-6 py-8 max-w-md">
         <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
             <a href="@SelectedNetwork!.BuildDetailUrl(_writing!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
         </p>
+        </div>
     }
 </section>
 
