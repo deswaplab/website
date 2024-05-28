@@ -19,7 +19,6 @@
     <PackageReference Include="Nethereum.Metamask.Blazor" Version="4.20.0" />
     <PackageReference Include="Nethereum.UI" Version="4.20.0" />
     <PackageReference Include="Nethereum.Web3" Version="4.20.0" />
-    <PackageReference Include="PSC.Blazor.Components.MarkdownEditor" Version="8.0.0" />
     <PackageReference Include="Markdig" Version="0.37.0" />
   </ItemGroup>
 
