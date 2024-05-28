@@ -204,6 +204,8 @@
             );
 
             toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+
+            await JS.InvokeVoidAsync("localStorage.removeItem", "writingContent");
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
