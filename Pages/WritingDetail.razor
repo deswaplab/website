@@ -1,4 +1,5 @@
 @using Markdig
+@using System.Text.RegularExpressions
 
 @inject HttpClient Http
 @inject ILogger<WritingDetail> Logger
@@ -8,6 +9,7 @@
 @inject NftApi _nftApi
 @inject IStringLocalizer<SharedResource> Loc
 @inject IMetamaskInterop _metamaskInterop;
+@inject NavigationManager Navigation
 
 @page "/app/{NetworkName}/writing/{ContractAddress}/{TokenId:long}"
 @layout AppLayout
@@ -20,12 +22,13 @@
             <main class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900 antialiased text-base text-gray-500 dark:text-gray-400">
                 <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
                     <article class="mx-auto w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
-                        @((MarkupString)htmlContent)
+                        @((MarkupString)processMarkdownContent())
                     </article>
                 </div>
-                @if (IsUserOwner)
-                {
-                <div class="flex flex-row items-center justify-center gap-2 p-5">
+                
+                <div class="flex flex-row items-center mx-auto max-w-md justify-start gap-2 p-5">
+                    @if (IsUserOwner)
+                    {
                     <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         @onclick="HandleBurn">
                         @if (InBurnProgress)
@@ -37,8 +40,19 @@
                         }
                         @Loc["Burn_Stmt"]
                     </button>
+                    }
+                    @if (hasIpfsLink)
+                    {
+                    <select id="ipfs_gateway" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        @bind="@_selectedIpfsGateway"
+                        >
+                        <option value="https://ipfs.io">ipfs.io</option>
+                        <option value="https://gateway.pinata.cloud">pinata</option>
+                        <option value="https://cloudflare-ipfs.com">cloudflare</option>
+                        <option value="http://127.0.0.1:8080">local</option>
+                    </select>
+                    }
                 </div>
-                }
             </main>
         </Authorized>
         <NotAuthorized>
@@ -59,7 +73,22 @@
 
     private string rawContent = "";
 
-    private string htmlContent => Markdown.ToHtml(rawContent);
+    private string? _selectedIpfsGateway = "https://ipfs.io";
+
+    private bool hasIpfsLink = false;
+
+    private string processMarkdownContent()
+    {
+        Logger.LogInformation("process markdown content, gateway: {}", _selectedIpfsGateway);
+        string pattern = @"ipfs://(.*?)";
+        string replacement = $"{_selectedIpfsGateway}/ipfs/$1";
+        string newContent = Regex.Replace(rawContent, pattern, replacement);
+        if (newContent != rawContent)
+        {
+            hasIpfsLink = true;
+        }
+        return Markdown.ToHtml(newContent);
+    }
 
     public UserWritingNFT? Token { get; set; }
 
@@ -73,7 +102,6 @@
         Token = UserWritingNFT.FromStr(_metamaskHostProvider.SelectedNetworkChainId, ContractAddress, TokenId, metadataUri);
 
         rawContent = await _web3Service.GetWritingContent(TokenId, ContractAddress);
-        Logger.LogInformation("content: {}", rawContent);
 
         Owner = await _web3Service.Erc721OwnerOf(ContractAddress, TokenId);
         Logger.LogInformation($"first render Owner: {Owner}, {_metamaskHostProvider.SelectedAccount}");
@@ -136,6 +164,10 @@
             );
 
             toastService.ShowToast(Loc["TxSuccess_Stmt"], ToastLevel.Success);
+
+            await Task.Delay(3000);
+
+            Navigation.NavigateTo("/app/writing");
         }
         catch (Nethereum.JsonRpc.Client.RpcResponseException e)
         {
