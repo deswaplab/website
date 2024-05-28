@@ -25,5 +25,3 @@ dotnet publish -p:CompressionEnabled=false
 - [ ] 思考如何改进writing，使得更符合开放互联网概念
 - [ ] Writing 评论点赞功能经济模型
 - [ ] 普通人可以创建自己的公众号，将作品投递到这个公众号里
-- [ ] Writing Editor 优化，使用自定义的编辑器
-- [ ] Writing 自动同步到 local storage，发布后自动清 local storage

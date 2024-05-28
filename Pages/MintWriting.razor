@@ -31,7 +31,7 @@
                 @if (currentTab == "editor")
                 {
                 <label for="editor" class="sr-only">Publish post</label>
-                <textarea id="editor" rows="30" class="block w-full px-0 text-sm text-gray-800 bg-white border-0 focus:ring-0 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400" placeholder="Write an article..." required
+                <textarea id="editor" rows="30" class="block w-full px-2 text-sm text-gray-800 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-400" placeholder="Write an article..." required
                     @bind-value=markdownValue
                     @bind-value:event="onchange"
                     @bind-value:after="syncToLocalStorage"
@@ -39,7 +39,7 @@
                 }
                 else
                 {
-                    <div class="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white">
+                    <div class="block w-full px-2 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white">
                         @((MarkupString)getHtmlValue())
                     </div>
                 }
