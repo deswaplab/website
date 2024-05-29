@@ -291,12 +291,19 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger, StateContaine
         {
             return container.CachedNfts;
         }
-        var client = GetApiClient(chainId);
-        if (client is not null)
+        try
         {
-            var metadatas = await client.GetUserNftBase(userAddress, chainId);
-            container.CachedNfts = metadatas;
-            return metadatas;
+            var client = GetApiClient(chainId);
+            if (client is not null)
+            {
+                var metadatas = await client.GetUserNftBase(userAddress, chainId);
+                container.CachedNfts = metadatas;
+                return metadatas;
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("get user nft failed, user: {}, chainId: {}, error: {}", userAddress, chainId, e.Message);
         }
         return [];
     }
@@ -308,12 +315,19 @@ public class NftApi(HttpClient httpClient, ILogger<NftApi> logger, StateContaine
         {
             return cachedTokens;
         }
-        var client = GetApiClient(chainId);
-        if (client is not null)
+        try
         {
-            var metadatas = await client.GetContractNftBase(contractAddress, chainId);
-            container.SetContractNfts(contractAddress, metadatas);
-            return metadatas;
+            var client = GetApiClient(chainId);
+            if (client is not null)
+            {
+                var metadatas = await client.GetContractNftBase(contractAddress, chainId);
+                container.SetContractNfts(contractAddress, metadatas);
+                return metadatas;
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("get contract nft failed, contract: {}, chainId: {}, error: {}", contractAddress, chainId, e.Message);
         }
         return [];
     }
