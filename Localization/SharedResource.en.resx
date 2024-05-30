@@ -599,4 +599,13 @@ can contact me</value>
   <data name="Writing" xml:space="preserve">
     <value>Writing</value>
   </data>
+  <data name="Collect" xml:space="preserve">
+    <value>Collect</value>
+  </data>
+  <data name="MaxCollectors" xml:space="preserve">
+    <value>Max Collectors</value>
+  </data>
+  <data name="CollectPrice" xml:space="preserve">
+    <value>Collect Price</value>
+  </data>
 </root>

@@ -307,10 +307,10 @@ public static class ContractConfig
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Writing = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0x6C061bF5223fEc8d6E990bdd4b805F0E08604bF9", DefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0xf6F0F9dE6b0D4e10A8F6423124Df47E4957d7205", DefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x720B8eDf9f9507ae0531e31b09793f291932548c", DefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0xA32dcae4b15419c35763ea8D29AeFCe85CaB4A85", DefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0x5D6af050cdb996c9A1331240463BEA27d53be477", DefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0x77c37e2CA418B02514d9570D3B22731bee26e2A6", DefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x69c8615DeA13601B924B414CBE1bA9b7bD40Af5e", DefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0x24a53C9836E60fF788C9064CbE136859458e00b6", DefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract>[] KnownNFTContracts = [

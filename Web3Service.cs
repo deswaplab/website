@@ -87,9 +87,10 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
     private readonly string WritingABI = """
 [
-    {"type":"function","name":"mint","inputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"mint","inputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"},{"name":"amount","type":"uint256","internalType":"uint256"},{"name":"price","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
     {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
-    {"type":"function","name":"tokenMetadata","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"},{"name":"writer","type":"address","internalType":"address"}],"stateMutability":"view"}
+    {"type":"function","name":"tokenMetadata","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"title","type":"string","internalType":"string"},{"name":"content","type":"string","internalType":"string"},{"name":"writer","type":"address","internalType":"address"},{"name":"defaultPrice","type":"uint256","internalType":"uint256"},{"name":"tokenCount","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},
+    {"type":"function","name":"collect","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"payable"}
 ]
 """;
 
@@ -1201,22 +1202,43 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
     }
 
     // Writing
-    public async Task<long> MintWriting(string title, string content, string nftAddress)
+    public async Task<long> MintWriting(string title, string content, int amount, decimal collectPrice, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(WritingABI, nftAddress);
         var callsFunction = contract.GetFunction("mint");
         var value = DefaultFee; // 0.001 fee
+        var priceInWei = Web3.Convert.ToWei(collectPrice);
         var receipt = await SendTransactionThroughMetamask(
             callsFunction,
             _metamaskHostProvider.SelectedNetworkChainId,
             _metamaskHostProvider.SelectedAccount,
             value,
             title,
-            content
+            content,
+            amount,
+            priceInWei
         );
-        var events = receipt.DecodeAllEvents<TransferEventDTO>();
-        return (long)events.First().Event.TokenId;
+        var events = receipt.DecodeAllEvents<TransferSingleEventDTO>();
+        return (long)events.First().Event.Id;
+    }
+
+    public async Task<string> CollectWriting(long tokenId, int amount, decimal defaultPrice, string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(WritingABI, nftAddress);
+        var callsFunction = contract.GetFunction("collect");
+        var priceInWei = Web3.Convert.ToWei(defaultPrice);
+        var value = new HexBigInteger(priceInWei * amount);
+        var receipt = await SendTransactionThroughMetamask(
+            callsFunction,
+            _metamaskHostProvider.SelectedNetworkChainId,
+            _metamaskHostProvider.SelectedAccount,
+            value,
+            tokenId,
+            amount
+        );
+        return receipt.TransactionHash.ToString();
     }
 
     public async Task<string> BurnWriting(long tokenId, string nftAddress)
@@ -1247,15 +1269,20 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         [Parameter("address", "writer", 3)]
         public string Writer { get; set; } = "";
 
+        [Parameter("uint256", "defaultPrice", 4)]
+        public BigInteger CollectPrice { get; set; }
+
+        [Parameter("uint256", "tokenCount", 5)]
+        public int TokenCount { get; set; }
     }
 
-    public async Task<string> GetWritingContent(long tokenId, string nftAddress)
+    public async Task<WritingTokenMetadataOutputDTO> GetWritingContent(long tokenId, string nftAddress)
     {
         var web3 = await _metamaskHostProvider.GetWeb3Async();
         var contract = web3.Eth.GetContract(WritingABI, nftAddress);
         var callsFunction = contract.GetFunction("tokenMetadata");
         var result = await callsFunction.CallAsync<WritingTokenMetadataOutputDTO>(tokenId);
-        return result.Content;
+        return result;
     }
 
 

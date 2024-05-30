@@ -46,6 +46,22 @@
             </div>
         </div>
         <div class="flex flex-row mx-auto px-6 py-8 max-w-md items-center justify-between">
+            <div>
+                <label for="maxCollectors" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["MaxCollectors"]</label>
+                <input id="maxCollectors" type="number"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    required @bind-value="maxCollectors"
+                    min="1" max="100000" step="1">
+            </div>
+            <div>
+                <label for="collectPrice" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@Loc["CollectPrice"]</label>
+                <input id="collectPrice" type="number"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    required @bind-value="collectPrice"
+                    min="0.0001" max="100000" step="0.0001">
+            </div>
+        </div>
+        <div class="flex flex-row mx-auto px-6 py-8 max-w-md items-center justify-between">
             <CascadingAuthenticationState>
                 <AuthorizeView Roles="EthereumConnected" Context="innerContext">
                     <Authorized>
@@ -68,15 +84,15 @@
                 </AuthorizeView>
             </CascadingAuthenticationState>
             <p class="mt-2 text-sm text-blue-600 dark:text-blue-500"><a href="@ContractTokensUrl">@Loc["Tokens"]</a></p>
+        </div>
+        @if (NewTokenId is not null)
+        {
+            <div class="mx-auto px-6 py-8 max-w-md">
+            <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
+                <a href="@SelectedNetwork!.BuildDetailUrl(_writing!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
+            </p>
             </div>
-            @if (NewTokenId is not null)
-            {
-                <div class="mx-auto px-6 py-8 max-w-md">
-                <p id="helper-text-explanation" class="mt-2 text-sm text-blue-600 dark:text-blue-500">
-                    <a href="@SelectedNetwork!.BuildDetailUrl(_writing!, NewTokenId!.Value)">@Loc["MintSucceedGoTrade_Stmt"]</a>
-                </p>
-                </div>
-            }
+        }
         </form>
     </div>
 </section>
@@ -94,6 +110,10 @@
     }
 
     private string? _selectedIpfsGateway = "https://ipfs.io";
+
+    private int maxCollectors = 1000;
+
+    private decimal collectPrice = 0.0001m;
 
     private string getHtmlValue()
     {
@@ -200,6 +220,8 @@
             NewTokenId = await _web3Service.MintWriting(
                 parseTitle(markdownValue),
                 markdownValue,
+                maxCollectors,
+                collectPrice,
                 _writing!.Address
             );
 

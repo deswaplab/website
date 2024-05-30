@@ -579,4 +579,13 @@
   <data name="Writing" xml:space="preserve">
     <value>写作</value>
   </data>
+  <data name="Collect" xml:space="preserve">
+    <value>收藏</value>
+  </data>
+  <data name="MaxCollectors" xml:space="preserve">
+    <value>最大收藏数</value>
+  </data>
+  <data name="CollectPrice" xml:space="preserve">
+    <value>收藏价格</value>
+  </data>
 </root>
