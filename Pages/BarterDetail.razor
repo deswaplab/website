@@ -17,7 +17,7 @@
     <AuthorizeView Roles="EthereumConnected">
         <Authorized>
             <section class="bg-gray-50 dark:bg-gray-900 my-10">
-                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
                     <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex flex-row items-center content-center justify-between p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -167,8 +167,6 @@
 
     private bool InProgress = false;
 
-    private NFTContract? _barter => ContractConfig.Barter[SelectedNetwork!];
-
     public bool IsUserOwner => !string.IsNullOrEmpty(Owner) && Owner.Equals(_metamaskHostProvider.SelectedAccount, StringComparison.CurrentCultureIgnoreCase);
 
     protected override void OnInitialized()
@@ -250,15 +248,15 @@
     private async Task Exercise_FT()
     {
         InProgress = true;
-        var allowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+        var allowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.QuoteAssetAddress);
         if (allowanceInWei < Token!.QuoteAssetAmountWei)
         {
             // approve
             try {
-                await _web3Service.Erc20Approve(_barter!.Address, Token!.QuoteAssetAmountWei.Value, Token!.QuoteAssetAddress);
+                await _web3Service.Erc20Approve(Token!.Contract, Token!.QuoteAssetAmountWei.Value, Token!.QuoteAssetAddress);
                 await Task.Delay(1000);
                 // check allowance again
-                var newAllowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+                var newAllowanceInWei = await _web3Service.GetAllowance(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.QuoteAssetAddress);
                 if (newAllowanceInWei < Token!.QuoteAssetAmountWei)
                 {
                     toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);
@@ -293,17 +291,17 @@
 
     private async Task Exercise_NFT()
     {
-        Logger.LogInformation("exercise nft token, addr: {}, nft: {}, id: {}", _barter!.Address, Token!.QuoteAssetAddress, Token!.QuoteAssetTokenId);
+        Logger.LogInformation("exercise nft token, addr: {}, nft: {}, id: {}", Token!.Contract, Token!.QuoteAssetAddress, Token!.QuoteAssetTokenId);
         InProgress = true;
 
         // approve nft
         try {
-            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+            var isApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.QuoteAssetAddress);
             if (!isApproved)
             {
-                await _web3Service.Erc1155SetApprovalForAll(_barter!.Address, true, Token!.QuoteAssetAddress);
+                await _web3Service.Erc1155SetApprovalForAll(Token!.Contract, true, Token!.QuoteAssetAddress);
                 await Task.Delay(1000);
-                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, _barter!.Address, Token!.QuoteAssetAddress);
+                var newIsApproved = await _web3Service.Erc1155IsApprovedForAll(_metamaskHostProvider.SelectedAccount, Token!.Contract, Token!.QuoteAssetAddress);
                 if (!newIsApproved)
                 {
                     toastService.ShowToast(Loc["InsufficientAllowance_Stmt"], ToastLevel.Error);

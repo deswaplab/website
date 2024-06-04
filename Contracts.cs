@@ -264,53 +264,52 @@ public static class ContractConfig
     private static readonly string BarterDefaultImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDI5MCA1MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHN0eWxlPnRleHR7Zm9udC1zaXplOjEycHg7ZmlsbDojZmZmfTwvc3R5bGU+PGNsaXBQYXRoIGlkPSJjb3JuZXJzIj48cmVjdCB3aWR0aD0iMjkwIiBoZWlnaHQ9IjUwMCIgcng9IjQyIiByeT0iNDIiLz48L2NsaXBQYXRoPjxnIGNsaXAtcGF0aD0idXJsKCNjb3JuZXJzKSI+PHBhdGggZD0iTTAgMGgyOTB2NTAwSDB6Ii8+PC9nPjx0ZXh0IGNsYXNzPSJoMSIgeD0iNDAiIHk9IjcwIiBmb250LXNpemU9IjE0Ij5CYXJ0ZXI8L3RleHQ+PHRleHQgeD0iNzAiIHk9IjI0MCIgc3R5bGU9ImZvbnQtc2l6ZToxMDBweCI+8J+MuzwvdGV4dD48L3N2Zz4K";
 
     public static readonly Dictionary<NetworkCore, NFTContract> Barter = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Barter", "0x677dfb01d6F3C30EA1Ce4497775AB94EAB699981", BarterDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Barter", "0xb9afd20d69CEEdC249E32649ef10015af6C05c3F", BarterDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Barter", "0xBAA68A83fa8a0eb7c1144EE275350c3C4F5B61b0", BarterDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Barter", "0x5A4cA8E3Cd655F5Ec72a353A40aD82159A37FC58", BarterDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Barter", "0xdfd52faeb40dea6e7271375e7e8554af22debb80", BarterDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Barter", "0x0069801981cecb1bb6b2cc56d12aca2946300617", BarterDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Barter", "0xc8b067ed68d04cdcecca0cba98a0abd38e1c74a9", BarterDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Barter", "0x4af8106d145b20f7abc17d3cc9af02be66e942a2", BarterDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Lottery = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Lottery", "0xbeB8F9252843AE522D381F735DB54ee73A18Fb51", LotteryDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Lottery", "0x720B8eDf9f9507ae0531e31b09793f291932548c", LotteryDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Lottery", "0xcA0f639B825F48413b13195B24CF4ba283703c57", LotteryDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Lottery", "0x11462F7860dAd01Cc28dCbcaE2A6b3e3E4697d89", LotteryDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Lottery", "0x6a3297a6f0760776ac38c7fcbe82a83d8c44eec8", LotteryDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Lottery", "0xc8b067ed68d04cdcecca0cba98a0abd38e1c74a9", LotteryDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Lottery", "0xd40d28361ef1c9fb6e672e0905548cadd4d70aa1", LotteryDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Lottery", "0x0190883430ccb9ce35ab76c9e14c04842e323183", LotteryDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> RedEnvelope = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("RedEnvelope", "0x629391548a7D4f9848e2F9377aFFC5540F4158A7", RedEnvelopeDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("RedEnvelope", "0xE7cd7918C6f402cf29779DAC7F4Ba582F7448016", RedEnvelopeDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("RedEnvelope", "0xCeA52909295CAABEFF8Dc7820bDF9Bf8403683D9", RedEnvelopeDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("RedEnvelope", "0x8106ac53d21B3180471a19D359d610A19c15aD9B", RedEnvelopeDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("RedEnvelope", "0x7daeb128f63b77f655e626a818886b0b98f909f4", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("RedEnvelope", "0xd40d28361ef1c9fb6e672e0905548cadd4d70aa1", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("RedEnvelope", "0x8106ac53d21b3180471a19d359d610a19c15ad9b", RedEnvelopeDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("RedEnvelope", "0x81736a220a681da9a944ee916b94363e2bf1b895", RedEnvelopeDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Roulette = new() {
-        { NetworkConfig.Local,               new NFTContract("Roulette", "0x9EDcDf3cac168bA983bD3b0321B5337BD265Afc8", RouletteDefaultImage) },
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0x9EDcDf3cac168bA983bD3b0321B5337BD265Afc8", RouletteDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0x238285119Ad0842051B4a46A9428139d30869B55", RouletteDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x37d0d06a35d9538AC16C02c50911Fc0Fc3298a71", RouletteDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x8C5D92347289638A72175fea9be8617F0491d36F", RouletteDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Roulette", "0x4e9c39f01e4b8deee89415c8d3a49f1da7d63042", RouletteDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Roulette", "0x8106ac53d21b3180471a19d359d610a19c15ad9b", RouletteDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Roulette", "0x0be3d90fe9555e14d61004d626497ee9b41b402f", RouletteDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Roulette", "0x993b85354689c27acceb5d6e4f2a1c16674f3ca6", RouletteDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Sicbo = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Sicbo", "0xd5F79e329bf07c8beF48F32246752Ba018CAFa1A", SicboDefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Sicbo", "0x5494bC19Ce5AA656437Db2D6d151DCf47b8b9C6F", SicboDefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Sicbo", "0x47CEA152577A40EB97Ef02cF6E64b5645fB1D748", SicboDefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0xAC03A3475F3E76169aF6Ce11D21490a4389FE4aB", SicboDefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Sicbo", "0x5b16f86ba0d7edcbe678bcef579fee27abaa4f13", SicboDefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Sicbo", "0x0be3d90fe9555e14d61004d626497ee9b41b402f", SicboDefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Sicbo", "0x5a4ca8e3cd655f5ec72a353a40ad82159a37fc58", SicboDefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Sicbo", "0x75b2f67384a66173c4b1fe167512b7a522531b34", SicboDefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Vote = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Vote", "0x3b8A315a925dA3bc904304B11E66618D1A167954", DefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Vote", "0x415f9bcD4747BB9F20beCadD3e2E70670d8bC3C3", DefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Vote", "0x238285119Ad0842051B4a46A9428139d30869B55", DefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Vote", "0xC6024186e356eaa74d564475127244a96C86eA3D", DefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Vote", "0x7979ebe399c2faea4e01583784b34d6e1f1dfdcd", DefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Vote", "0x5a4ca8e3cd655f5ec72a353a40ad82159a37fc58", DefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Vote", "0xc54a5127d9b434debd5b3e5613cfa1c8478d7dda", DefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Vote", "0x693cd34c5eec26bacb80f4b19f9d75c0cd4048e2", DefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract> Writing = new() {
-        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0x5D6af050cdb996c9A1331240463BEA27d53be477", DefaultImage) },
-        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0x77c37e2CA418B02514d9570D3B22731bee26e2A6", DefaultImage) },
-        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x69c8615DeA13601B924B414CBE1bA9b7bD40Af5e", DefaultImage) },
-        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0x24a53C9836E60fF788C9064CbE136859458e00b6", DefaultImage) },
+        { NetworkConfig.EthereumSepolia,     new NFTContract("Writing", "0xfed304ecd9c45ced0893710eeafdfeb7a332b2cd", DefaultImage) },
+        { NetworkConfig.MoonBaseAlpha,       new NFTContract("Writing", "0xc54a5127d9b434debd5b3e5613cfa1c8478d7dda", DefaultImage) },
+        { NetworkConfig.MantaPacificSepolia, new NFTContract("Writing", "0x7c38b98cc50fca103529253f0be1c079f7e39b82", DefaultImage) },
+        { NetworkConfig.MantleSepolia,       new NFTContract("Writing", "0x5c19c863d930c28b503701c3bcdb61852edda122", DefaultImage) },
     };
 
     public static readonly Dictionary<NetworkCore, NFTContract>[] KnownNFTContracts = [

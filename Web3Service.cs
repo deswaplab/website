@@ -11,6 +11,24 @@ namespace DeswapApp;
 
 public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3Service> logger)
 {
+    private readonly string BaseABI = """
+[
+    {
+  "type": "function",
+  "name": "contractKind",
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "",
+      "type": "string",
+      "internalType": "string"
+    }
+  ],
+  "stateMutability": "pure"
+}
+]
+""";
+
     private readonly string BarterABI = """
 [
     {"type":"function","name":"mint_ft2ft","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAddress","type":"address","internalType":"address"},{"name":"quoteAssetAmount","type":"uint256","internalType":"uint256"},{"name":"maturityDate","type":"uint64","internalType":"uint64"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
@@ -1282,6 +1300,16 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var contract = web3.Eth.GetContract(WritingABI, nftAddress);
         var callsFunction = contract.GetFunction("tokenMetadata");
         var result = await callsFunction.CallAsync<WritingTokenMetadataOutputDTO>(tokenId);
+        return result;
+    }
+
+    // base ABI, contractKind
+    public async Task<string> GetContractKind(string nftAddress)
+    {
+        var web3 = await _metamaskHostProvider.GetWeb3Async();
+        var contract = web3.Eth.GetContract(BaseABI, nftAddress);
+        var callsFunction = contract.GetFunction("contractKind");
+        var result = await callsFunction.CallAsync<string>();
         return result;
     }
 
