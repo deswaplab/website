@@ -31,14 +31,14 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
     private readonly string BarterABI = """
 [
-    {"type":"function","name":"mint_ft2ft","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAddress","type":"address","internalType":"address"},{"name":"quoteAssetAmount","type":"uint256","internalType":"uint256"},{"name":"maturityDate","type":"uint64","internalType":"uint64"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
-    {"type":"function","name":"mint_nft2nft","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAddress","type":"address","internalType":"address"},{"name":"maturityDate","type":"uint64","internalType":"uint64"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"mint_ft2ft","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAddress","type":"address","internalType":"address"},{"name":"quoteAssetAmount","type":"uint256","internalType":"uint256"},{"name":"maturityDate","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"mint_nft2nft","inputs":[{"name":"baseAssetAddress","type":"address","internalType":"address"},{"name":"baseAssetId","type":"uint256","internalType":"uint256"},{"name":"quoteAssetAddress","type":"address","internalType":"address"},{"name":"maturityDate","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
     {"type":"function","name":"exercise_ft2ft","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"exercise_nft2nft","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"assetTokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"burn","inputs":[{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
     {"type":"function","name":"tokenMetadata","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[
         {"name":"writer","type":"address","internalType":"address"},
-        {"name":"maturityDate","type":"uint64","internalType":"uint64"},
+        {"name":"maturityDate","type":"uint256","internalType":"uint256"},
         {"name":"baseAssetKind","type":"uint8","internalType":"enum Util.AssetKind"},
         {"name":"baseAssetAddress","type":"address","internalType":"address"},
         {"name":"baseAssetAmount","type":"uint256","internalType":"uint256"},
@@ -491,6 +491,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
 
     private async Task<TransactionReceipt> SendTransactionThroughMetamask(Function callsFunction, long chainId, string from, HexBigInteger value, params object[] functionInput)
     {
+        _logger.LogInformation("before SendTransactionThroughMetamask estimateGas, {}, chainId={} from={}, value={}, functionInput={}", callsFunction.ContractAddress, chainId, from, value, functionInput);
         var gas = await callsFunction.EstimateGasAsync(
             from,
             null,
@@ -557,7 +558,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         [Parameter("address", "writer", 1)]
         public string Writer { get; set; } = "";
 
-        [Parameter("uint64", "maturityDate", 2)]
+        [Parameter("uint256", "maturityDate", 2)]
         public long MaturityDate { get; set; }
 
         [Parameter("uint8", "baseAssetKind", 3)]
@@ -601,6 +602,7 @@ public class Web3Service(MetamaskHostProvider metamaskHostProvider, ILogger<Web3
         var contract = web3.Eth.GetContract(BarterABI, nftAddress);
         var callsFunction = contract.GetFunction("mint_ft2ft");
         var value = DefaultFee;
+        _logger.LogInformation("debug1, {}", value);
         var receipt = await SendTransactionThroughMetamask(
             callsFunction,
             _metamaskHostProvider.SelectedNetworkChainId,
