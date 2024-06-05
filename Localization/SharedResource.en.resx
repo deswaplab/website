@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,79 +26,79 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -119,493 +119,638 @@
   </resheader>
   <data name="Home" xml:space="preserve">
     <value>Home</value>
+    <comment/>
   </data>
   <data name="Governor" xml:space="preserve">
     <value>Governor</value>
+    <comment/>
   </data>
   <data name="FAQ" xml:space="preserve">
     <value>FAQ</value>
+    <comment/>
   </data>
   <data name="App" xml:space="preserve">
     <value>APP</value>
+    <comment/>
   </data>
   <data name="Mint" xml:space="preserve">
     <value>Mint</value>
+    <comment/>
   </data>
   <data name="Collections" xml:space="preserve">
     <value>Collections</value>
+    <comment/>
   </data>
   <data name="Toggle light mode" xml:space="preserve">
     <value>Toggle light mode</value>
+    <comment/>
   </data>
   <data name="Toggle dark mode" xml:space="preserve">
     <value>Toggle dark mode</value>
+    <comment/>
   </data>
   <data name="Select Token Pair" xml:space="preserve">
     <value>Select Token Pair</value>
+    <comment/>
   </data>
   <data name="Select Options Kind" xml:space="preserve">
     <value>Select Options Kind</value>
+    <comment/>
   </data>
   <data name="Call" xml:space="preserve">
     <value>Call</value>
+    <comment/>
   </data>
   <data name="Put" xml:space="preserve">
     <value>Put</value>
+    <comment/>
   </data>
   <data name="You Pay" xml:space="preserve">
     <value>You Pay</value>
+    <comment/>
   </data>
   <data name="You Will Get" xml:space="preserve">
     <value>You Will Get</value>
+    <comment/>
   </data>
   <data name="Select Maturity Date" xml:space="preserve">
     <value>Select Maturity Date</value>
+    <comment/>
   </data>
   <data name="Check Allowance" xml:space="preserve">
     <value>Check Allowance</value>
+    <comment/>
   </data>
   <data name="Approve" xml:space="preserve">
     <value>Approve</value>
+    <comment/>
   </data>
   <data name="InvalidNetwork_Stmt" xml:space="preserve">
     <value>Unsupported network, please change in metamask</value>
+    <comment/>
   </data>
   <data name="InsufficientBalance_Stmt" xml:space="preserve">
     <value>balance not enough, please trasfer some</value>
+    <comment/>
   </data>
   <data name="InvalidForm_Stmt" xml:space="preserve">
     <value>invalid form, please check your input</value>
+    <comment/>
   </data>
   <data name="InsufficientAllowance_Stmt" xml:space="preserve">
     <value>allowance not enough, please try approve</value>
+    <comment/>
   </data>
   <data name="ApproveSuccess_Stmt" xml:space="preserve">
     <value>approved success, goto mint now</value>
+    <comment/>
   </data>
   <data name="TxCancelled_Stmt" xml:space="preserve">
     <value>you cancelled this transaction</value>
+    <comment/>
   </data>
   <data name="OptionsMinted_Stmt" xml:space="preserve">
     <value>Options minted, goto trade now</value>
+    <comment/>
   </data>
   <data name="MaturityTooEarly_Stmt" xml:space="preserve">
     <value>Maturity Date must at least be</value>
+    <comment/>
   </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
+    <comment/>
   </data>
   <data name="Contract Address" xml:space="preserve">
     <value>Contract Address</value>
+    <comment/>
   </data>
   <data name="Category" xml:space="preserve">
     <value>Category</value>
+    <comment/>
   </data>
   <data name="Network" xml:space="preserve">
     <value>Network</value>
+    <comment/>
   </data>
   <data name="Barter" xml:space="preserve">
     <value>Barter</value>
+    <comment/>
   </data>
   <data name="List_Stmt" xml:space="preserve">
     <value>List</value>
+    <comment/>
   </data>
   <data name="Open_Stmt" xml:space="preserve">
     <value>Open</value>
+    <comment/>
   </data>
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>Exercise</value>
+    <comment/>
   </data>
   <data name="Draw_Stmt" xml:space="preserve">
     <value>Draw</value>
+    <comment/>
   </data>
   <data name="Burn_Stmt" xml:space="preserve">
     <value>Burn</value>
+    <comment/>
   </data>
   <data name="InsufficientBalanceToExercise_Stmt" xml:space="preserve">
     <value>insufficient balance to exercise</value>
+    <comment/>
   </data>
   <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
     <value>after approve still insufficient balance to exercise</value>
+    <comment/>
   </data>
   <data name="My Options NFT" xml:space="preserve">
     <value>My Options NFT</value>
+    <comment/>
   </data>
   <data name="My Lottery NFT" xml:space="preserve">
     <value>My Lottery NFT</value>
+    <comment/>
   </data>
   <data name="My RedEnvelope NFT" xml:space="preserve">
     <value>My RedEnvelope NFT</value>
+    <comment/>
   </data>
   <data name="My Roulette NFT" xml:space="preserve">
     <value>My Roulette NFT</value>
+    <comment/>
   </data>
   <data name="My BlackJack NFT" xml:space="preserve">
     <value>My BlackJack NFT</value>
+    <comment/>
   </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>exercised successfully</value>
+    <comment/>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>burned successfully</value>
+    <comment/>
   </data>
   <data name="MintSuccess_Stmt" xml:space="preserve">
     <value>mint successfully</value>
+    <comment/>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>Wrap your cryptos</value>
+    <comment/>
   </data>
   <data name="SloganDetail" xml:space="preserve">
     <value>We provide a lot of tools to wrap your cryptos, with our help, your assets will get more liquidity.</value>
+    <comment/>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
     <value>Connect Wallet</value>
+    <comment/>
   </data>
   <data name="InstallMetamask_Stmt" xml:space="preserve">
     <value>Please install Metamask</value>
+    <comment/>
   </data>
   <data name="Balance" xml:space="preserve">
     <value>Balance</value>
+    <comment/>
   </data>
   <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
     <value>Balance not enough? Get some from uniswap or binance</value>
+    <comment/>
   </data>
   <data name="RecommendPrice_Stmt" xml:space="preserve">
     <value>Recommend a price for me</value>
+    <comment/>
   </data>
   <data name="MintAmount" xml:space="preserve">
     <value>Shares to mint</value>
+    <comment/>
   </data>
   <data name="Lottery" xml:space="preserve">
     <value>Lottery</value>
+    <comment/>
   </data>
   <data name="Lottery_DefaultPrice" xml:space="preserve">
     <value>Default Price(Native Coin)</value>
+    <comment/>
   </data>
   <data name="Lottery_SoldPercent" xml:space="preserve">
     <value>Sold Percent(%)</value>
+    <comment/>
   </data>
   <data name="Buy" xml:space="preserve">
     <value>Buy</value>
+    <comment/>
   </data>
   <data name="Holds" xml:space="preserve">
     <value>Holds</value>
+    <comment/>
   </data>
   <data name="RedEnvelope" xml:space="preserve">
     <value>RedEnvelope</value>
+    <comment/>
   </data>
   <data name="RedEnvelope Kind" xml:space="preserve">
     <value>RedEnvelope Kind</value>
+    <comment/>
   </data>
   <data name="Bet_Stmt" xml:space="preserve">
     <value>Bet</value>
+    <comment/>
   </data>
   <data name="Roulette" xml:space="preserve">
     <value>Roulette</value>
+    <comment/>
   </data>
   <data name="TxSuccess_Stmt" xml:space="preserve">
     <value>Tx Success</value>
+    <comment/>
   </data>
   <data name="Lottery_Intro" xml:space="preserve">
     <value>First choose the asset you want to deposit, choose a draw date, then click the mint button you will get your Lottery NFT, you can trade it on any NFT marketplaces.</value>
+    <comment/>
   </data>
   <data name="Barter_Intro" xml:space="preserve">
     <value>First choose the asset you want to deposit, then choose the target asset you want to receive, then click the mint button you will get your Barter NFT, you can trade it on any NFT marketplaces.</value>
+    <comment/>
   </data>
   <data name="RedEnvelope_Intro" xml:space="preserve">
     <value>Choose some amount of asset you want to deposit, then click the mint button, list it on NFT marketplaces, only the owner of the NFT can open it.</value>
+    <comment/>
   </data>
   <data name="Roulette_Intro" xml:space="preserve">
-    <value>To mint your roulette table, you have to do the initial bet, after that other people can follow you place more bets. 
-    Every round of game, each can only bet once. When a new round is begin, you can place bet again.</value>
+    <value>To mint your roulette table, you have to do the initial bet, after that other people can follow you place more bets.     Every round of game, each can only bet once. When a new round is begin, you can place bet again.</value>
+    <comment/>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
     <value>Mint your Barter NFT</value>
+    <comment/>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
-    <value>Barter means trading one thing using another thing without using money. 
-    In web3 world, we use uniswap to trade ERC20 token using another ERC20 token, we use NFT marketplace like opensea to trade NFT using a FT like ETH or WETH. 
-    The Barter NFT is a place to trade NFT by another NFT. In NFT world, one big problem is lack of liquidity, famous NFT projects are too expensive, unfamous NFT projects are too cheap that no one want to buy.
-    The Barter NFT is to solve this problem, you don't need to pay you ETH to buy a NFT, you just need to trade your NFT to get another NFT.
-    </value>
+    <value>Barter means trading one thing using another thing without using money.     In web3 world, we use uniswap to trade ERC20 token using another ERC20 token, we use NFT marketplace like opensea to trade NFT using a FT like ETH or WETH.     The Barter NFT is a place to trade NFT by another NFT. In NFT world, one big problem is lack of liquidity, famous NFT projects are too expensive, unfamous NFT projects are too cheap that no one want to buy.    The Barter NFT is to solve this problem, you don't need to pay you ETH to buy a NFT, you just need to trade your NFT to get another NFT.    </value>
+    <comment/>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
     <value>Mint your Lottery NFT</value>
+    <comment/>
   </data>
   <data name="Cta2_Intro" xml:space="preserve">
-    <value>
-    If you deposit a certain amount of assets, you can get a lottery NFT. 
-    After the buyer buys the redemption rights in the NFT market, the lottery can be drawn after the lottery day. 
-    In the end, one lucky person will get the assets you deposited. The deposited assets can be ERC20/ERC721/ERC1155 tokens,
-    the lottery NFT is a ERC1155 token, the more shares you own, the more chance you win.
-    </value>
+    <value>    If you deposit a certain amount of assets, you can get a lottery NFT.     After the buyer buys the redemption rights in the NFT market, the lottery can be drawn after the lottery day.     In the end, one lucky person will get the assets you deposited. The deposited assets can be ERC20/ERC721/ERC1155 tokens,    the lottery NFT is a ERC1155 token, the more shares you own, the more chance you win.    </value>
+    <comment/>
   </data>
   <data name="Cta3_Header" xml:space="preserve">
     <value>Mint your red envelope NFT</value>
+    <comment/>
   </data>
   <data name="Cta3_Intro" xml:space="preserve">
-    <value>
-    red envelope is a Chinese tradition, people put some money in a red envelope and give it to others as a gift, the receiver can only open it once, and the money inside is a surprise.
-    Here you deposit some ERC20/ERC1155 tokens will mint a ERC1155 red envelope NFT, it is designed that every address can only buy once and open once, 
-    if you choose to buy more than 1, you would see errors. Currently there are many meme coins in the web3 world, if one day those coins loose value, 
-    you can use them to mint red envelope NFTs and send them to your friends for free.
-    </value>
+    <value>    red envelope is a Chinese tradition, people put some money in a red envelope and give it to others as a gift, the receiver can only open it once, and the money inside is a surprise.    Here you deposit some ERC20/ERC1155 tokens will mint a ERC1155 red envelope NFT, it is designed that every address can only buy once and open once,     if you choose to buy more than 1, you would see errors. Currently there are many meme coins in the web3 world, if one day those coins loose value,     you can use them to mint red envelope NFTs and send them to your friends for free.    </value>
+    <comment/>
   </data>
   <data name="Cta4_Header" xml:space="preserve">
     <value>Play the Roulette NFT game</value>
+    <comment/>
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
-    <value>
-    The roulette NFT is a game, everyone can place bet into a roulette, the owner of the roulette NFT can draw the prize and tax some fees, the prize is the sum of all the bets.
-    The placed bets can be ERC20/ERC721/ERC1155 tokens. the roulette is fairy game, the owner can't cheat, the owner can't know the result before the draw.
-    </value>
+    <value>    The roulette NFT is a game, everyone can place bet into a roulette, the owner of the roulette NFT can draw the prize and tax some fees, the prize is the sum of all the bets.    The placed bets can be ERC20/ERC721/ERC1155 tokens. the roulette is fairy game, the owner can't cheat, the owner can't know the result before the draw.    </value>
+    <comment/>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
     <value>Democratization</value>
+    <comment/>
   </data>
   <data name="Feature1_Intro" xml:space="preserve">
     <value>In Web2 world, it's almost impossible for a normal person the run a options exchange or a lottery company, but in Web3 world, with the help of Deswap, you can do these with little cost. If you are good enough, you can get rich. I believe democracy will eventually defeat autocracy.</value>
+    <comment/>
   </data>
   <data name="Feature2_Header" xml:space="preserve">
     <value>Privacy</value>
+    <comment/>
   </data>
   <data name="Feature2_Intro" xml:space="preserve">
     <value>We don't track your privacy, we don't need your account, your email, your phone number... As long as you have a web3 wallet installed, you can get started.</value>
+    <comment/>
   </data>
   <data name="Feature3_Header" xml:space="preserve">
     <value>DAO</value>
+    <comment/>
   </data>
   <data name="Feature3_Intro" xml:space="preserve">
     <value>We are a DAO, no one owns the platform, and no one can destroy it. With more people using it, our community will become better.</value>
+    <comment/>
   </data>
   <data name="Features" xml:space="preserve">
     <value>Features</value>
+    <comment/>
   </data>
   <data name="Governor_Intro" xml:space="preserve">
-    <value>Currently Deswap is my personal side project, I designed the website, wrote the code,
-I'm planning to build a DAO to governor the platform in the future. Anyone want to corporate
-can contact me</value>
+    <value>Currently Deswap is my personal side project, I designed the website, wrote the code,I'm planning to build a DAO to governor the platform in the future. Anyone want to corporatecan contact me</value>
+    <comment/>
   </data>
   <data name="BlackJack" xml:space="preserve">
     <value>BlackJack</value>
+    <comment/>
   </data>
   <data name="BlackJack_Intro" xml:space="preserve">
     <value>mint a BlackJack NFT means you own this desk, you are the dealer, you can then sell those NFTs and invite BlackJack NFT holders to come to play with you.</value>
+    <comment/>
   </data>
   <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
     <value>mint succeed, go to trade.</value>
+    <comment/>
   </data>
   <data name="Docs" xml:space="preserve">
     <value>Docs</value>
+    <comment/>
   </data>
   <data name="My Tokens" xml:space="preserve">
     <value>My Tokens</value>
+    <comment/>
   </data>
   <data name="Tokens" xml:space="preserve">
     <value>Tokens List</value>
+    <comment/>
   </data>
   <data name="Select Asset Kind" xml:space="preserve">
     <value>Select Asset Kind</value>
+    <comment/>
   </data>
   <data name="Amount" xml:space="preserve">
     <value>Amount</value>
+    <comment/>
   </data>
   <data name="Address" xml:space="preserve">
     <value>Address</value>
+    <comment/>
   </data>
   <data name="Sicbo" xml:space="preserve">
     <value>Sicbo</value>
+    <comment/>
   </data>
   <data name="Sicbo_Intro" xml:space="preserve">
     <value>Sicbo is a traditional Chinese dice game, if the player win, the dealer will pay to the player instantly</value>
+    <comment/>
   </data>
   <data name="Deposit_Stmt" xml:space="preserve">
     <value>Deposit</value>
+    <comment/>
   </data>
   <data name="Win_Stmt" xml:space="preserve">
     <value>You Win</value>
+    <comment/>
   </data>
   <data name="Lose_Stmt" xml:space="preserve">
     <value>You Lose</value>
+    <comment/>
   </data>
   <data name="DiceNumber_Stmt" xml:space="preserve">
     <value>Dice number is</value>
+    <comment/>
   </data>
   <data name="Sicbo_Small" xml:space="preserve">
     <value>Small (1:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_Big" xml:space="preserve">
     <value>Big (1:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_1" xml:space="preserve">
     <value>Double 1 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_2" xml:space="preserve">
     <value>Double 2 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_3" xml:space="preserve">
     <value>Double 3 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_4" xml:space="preserve">
     <value>Double 4 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_5" xml:space="preserve">
     <value>Double 5 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_6" xml:space="preserve">
     <value>Double 6 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_1" xml:space="preserve">
     <value>Triple 1 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_2" xml:space="preserve">
     <value>Triple 2 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_3" xml:space="preserve">
     <value>Triple 3 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_4" xml:space="preserve">
     <value>Triple 4 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_5" xml:space="preserve">
     <value>Triple 5 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_6" xml:space="preserve">
     <value>Triple 6 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_AnyTriple" xml:space="preserve">
     <value>Any Triple (30:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_4" xml:space="preserve">
     <value>4 point (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_5" xml:space="preserve">
     <value>5 point (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_6" xml:space="preserve">
     <value>6 point (18:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_7" xml:space="preserve">
     <value>7 point (12:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_8" xml:space="preserve">
     <value>8 point (8:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_9" xml:space="preserve">
     <value>9 point (7:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_10" xml:space="preserve">
     <value>10 point (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_11" xml:space="preserve">
     <value>11 point (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_12" xml:space="preserve">
     <value>12 point (7:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_13" xml:space="preserve">
     <value>13 point (8:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_14" xml:space="preserve">
     <value>14 point (12:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_15" xml:space="preserve">
     <value>15 point (18:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_16" xml:space="preserve">
     <value>16 point (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_17" xml:space="preserve">
     <value>17 point (62:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_12" xml:space="preserve">
     <value>combine 1,2 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_13" xml:space="preserve">
     <value>combine 1,3 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_14" xml:space="preserve">
     <value>combine 1,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_15" xml:space="preserve">
     <value>combine 1,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_16" xml:space="preserve">
     <value>combine 1,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_23" xml:space="preserve">
     <value>combine 2,3 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_24" xml:space="preserve">
     <value>combine 2,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_25" xml:space="preserve">
     <value>combine 2,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_26" xml:space="preserve">
     <value>combine 2,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_34" xml:space="preserve">
     <value>combine 3,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_35" xml:space="preserve">
     <value>combine 3,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_36" xml:space="preserve">
     <value>combine 3,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_45" xml:space="preserve">
     <value>combine 4,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_46" xml:space="preserve">
     <value>combine 4,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_56" xml:space="preserve">
     <value>combine 5,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_1" xml:space="preserve">
     <value>single 1 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_2" xml:space="preserve">
     <value>single 2 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_3" xml:space="preserve">
     <value>single 3 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_4" xml:space="preserve">
     <value>single 4 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_5" xml:space="preserve">
     <value>single 5 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_6" xml:space="preserve">
     <value>single 6 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="BetOptions" xml:space="preserve">
     <value>Bet Options</value>
+    <comment/>
   </data>
   <data name="InitBet" xml:space="preserve">
     <value>Init Bet</value>
+    <comment/>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Title</value>
+    <comment/>
   </data>
   <data name="Vote" xml:space="preserve">
     <value>Vote</value>
+    <comment/>
   </data>
   <data name="Vote_Intro" xml:space="preserve">
     <value>Vote is like twitter's Poll but using the NFT way</value>
+    <comment/>
   </data>
   <data name="Writing" xml:space="preserve">
     <value>Writing</value>
+    <comment/>
   </data>
   <data name="Collect" xml:space="preserve">
     <value>Collect</value>
+    <comment/>
   </data>
   <data name="MaxCollectors" xml:space="preserve">
     <value>Max Collectors</value>
+    <comment/>
   </data>
   <data name="CollectPrice" xml:space="preserve">
     <value>Collect Price</value>
+    <comment/>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>Fixed</value>
+    <comment/>
+  </data>
+  <data name="Random" xml:space="preserve">
+    <value>Random</value>
+    <comment/>
   </data>
 </root>

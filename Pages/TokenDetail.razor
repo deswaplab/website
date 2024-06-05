@@ -9,7 +9,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 
-@page "/app/{NetworkName}/{ContractAddress}/{TokenId:long}"
+@page "/{NetworkName}/{ContractAddress}/{TokenId:long}"
 @layout AppLayout
 
 <PageTitle>Navigating...</PageTitle>
@@ -53,7 +53,7 @@
             var knowContract = ContractConfig.GetNFTContract(SelectedNetwork, ContractAddress);
             if (knowContract is not null)
             {
-                string url = $"/app/{NetworkName}/{knowContract.Name.ToLower()}/{ContractAddress}/{TokenId}";
+                string url = $"/{NetworkName}/{knowContract.Name.ToLower()}/{ContractAddress}/{TokenId}";
                 Logger.LogInformation("known contract, navigation to: {}", url);
                 Navigation.NavigateTo(url);
             }
@@ -62,7 +62,7 @@
                 try
                 {
                     string contractKind = await _web3Service.GetContractKind(ContractAddress);
-                    string url = $"/app/{NetworkName}/{contractKind}/{ContractAddress}/{TokenId}/{contractKind}";
+                    string url = $"/{NetworkName}/{contractKind}/{ContractAddress}/{TokenId}/{contractKind}";
                     Logger.LogInformation("unknown contract, navigation to: {}", url);
                     Navigation.NavigateTo(url);
                 }

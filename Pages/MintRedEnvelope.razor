@@ -1,4 +1,4 @@
-@page "/app/redenvelope"
+@page "/redenvelope"
 
 @layout AppLayout
 @inject ILogger<MintRedEnvelope> Logger
@@ -156,8 +156,8 @@
                                 disabled="@IsFormDisabled"
                                 @bind="Model!.Kind"
                                 >
-                                <option value="@RedEnvelopeKind.Fixed">Fixed</option>
-                                <option value="@RedEnvelopeKind.Random">Random</option>
+                                <option value="@RedEnvelopeKind.Fixed">@Loc["Fixed"]</option>
+                                <option value="@RedEnvelopeKind.Random">@Loc["Random"]</option>
                             </select>
                             <ValidationMessage class="mt-2 text-sm text-red-600 dark:text-red-500" For="() => Model!.Kind" />
                         </div>

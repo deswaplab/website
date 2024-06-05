@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,79 +26,79 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -119,473 +119,638 @@
   </resheader>
   <data name="Home" xml:space="preserve">
     <value>首页</value>
+    <comment/>
   </data>
   <data name="Governor" xml:space="preserve">
     <value>治理</value>
+    <comment/>
   </data>
   <data name="FAQ" xml:space="preserve">
     <value>问题</value>
+    <comment/>
   </data>
   <data name="APP" xml:space="preserve">
     <value>应用</value>
+    <comment/>
   </data>
   <data name="Mint" xml:space="preserve">
     <value>铸造</value>
+    <comment/>
   </data>
   <data name="Collections" xml:space="preserve">
     <value>合集</value>
+    <comment/>
   </data>
   <data name="Toggle light mode" xml:space="preserve">
     <value>切换到白天</value>
+    <comment/>
   </data>
   <data name="Toggle dark mode" xml:space="preserve">
     <value>切换到夜间</value>
+    <comment/>
   </data>
   <data name="Select Token Pair" xml:space="preserve">
     <value>选择币对</value>
+    <comment/>
   </data>
   <data name="Select Options Kind" xml:space="preserve">
     <value>选择期权类型</value>
+    <comment/>
   </data>
   <data name="Call" xml:space="preserve">
     <value>看涨</value>
+    <comment/>
   </data>
   <data name="Put" xml:space="preserve">
     <value>看跌</value>
+    <comment/>
   </data>
   <data name="You Pay" xml:space="preserve">
     <value>你支付</value>
+    <comment/>
   </data>
   <data name="You Will Get" xml:space="preserve">
     <value>你将获得</value>
+    <comment/>
   </data>
   <data name="Select Maturity Date" xml:space="preserve">
     <value>选择到期日</value>
+    <comment/>
   </data>
   <data name="Check Allowance" xml:space="preserve">
     <value>校验零钱额度</value>
+    <comment/>
   </data>
   <data name="Approve" xml:space="preserve">
     <value>授权</value>
+    <comment/>
   </data>
   <data name="InvalidNetwork_Stmt" xml:space="preserve">
     <value>不支持的网络，请切换到支持的网络</value>
+    <comment/>
   </data>
   <data name="InsufficientBalance_Stmt" xml:space="preserve">
     <value>余额不足，请充值</value>
+    <comment/>
   </data>
   <data name="InvalidForm_Stmt" xml:space="preserve">
     <value>表单参数错误，请检查</value>
+    <comment/>
   </data>
   <data name="InsufficientAllowance_Stmt" xml:space="preserve">
     <value>零钱余额不足，请授权转移</value>
+    <comment/>
   </data>
   <data name="ApproveSuccess_Stmt" xml:space="preserve">
     <value>授权成功，现在去铸造</value>
+    <comment/>
   </data>
   <data name="TxCancelled_Stmt" xml:space="preserve">
     <value>您取消了本次交易</value>
+    <comment/>
   </data>
   <data name="OptionsMinted_Stmt" xml:space="preserve">
     <value>铸造成功，现在去交易吧</value>
+    <comment/>
   </data>
   <data name="MaturityTooEarly_Stmt" xml:space="preserve">
     <value>成熟日期不得早于</value>
+    <comment/>
   </data>
   <data name="Name" xml:space="preserve">
     <value>名称</value>
+    <comment/>
   </data>
   <data name="Contract Address" xml:space="preserve">
     <value>合约地址</value>
+    <comment/>
   </data>
   <data name="Category" xml:space="preserve">
     <value>类型</value>
+    <comment/>
   </data>
   <data name="Network" xml:space="preserve">
     <value>网络</value>
+    <comment/>
   </data>
   <data name="Barter" xml:space="preserve">
     <value>兑换</value>
+    <comment/>
   </data>
   <data name="List_Stmt" xml:space="preserve">
     <value>挂单</value>
+    <comment/>
   </data>
   <data name="Open_Stmt" xml:space="preserve">
     <value>拆开</value>
+    <comment/>
   </data>
   <data name="Exercise_Stmt" xml:space="preserve">
     <value>行权</value>
+    <comment/>
   </data>
   <data name="Draw_Stmt" xml:space="preserve">
     <value>开奖</value>
+    <comment/>
   </data>
   <data name="Burn_Stmt" xml:space="preserve">
     <value>销毁</value>
+    <comment/>
   </data>
   <data name="InsufficientBalanceToExercise_Stmt" xml:space="preserve">
     <value>余额不足无法行权</value>
+    <comment/>
   </data>
   <data name="InsufficientBalanceAfterApproveToExercise_Stmt" xml:space="preserve">
     <value>授权后余额仍旧不足，无法行权</value>
+    <comment/>
   </data>
   <data name="My Options NFT" xml:space="preserve">
     <value>我的期权NFT</value>
+    <comment/>
   </data>
   <data name="My Lottery NFT" xml:space="preserve">
     <value>我的彩票NFT</value>
+    <comment/>
   </data>
   <data name="My RedEnvelope NFT" xml:space="preserve">
     <value>我的红包NFT</value>
+    <comment/>
   </data>
   <data name="My Roulette NFT" xml:space="preserve">
     <value>我的轮盘NFT</value>
+    <comment/>
   </data>
   <data name="My BlackJack NFT" xml:space="preserve">
     <value>我的21点NFT</value>
+    <comment/>
   </data>
   <data name="ExerciseSuccess_Stmt" xml:space="preserve">
     <value>成功行权</value>
+    <comment/>
   </data>
   <data name="BurnSuccess_Stmt" xml:space="preserve">
     <value>成功销毁</value>
+    <comment/>
   </data>
   <data name="MintSuccess_Stmt" xml:space="preserve">
     <value>铸造成功</value>
+    <comment/>
   </data>
   <data name="Slogan" xml:space="preserve">
     <value>包装您的数字资产</value>
+    <comment/>
   </data>
   <data name="SloganDetail" xml:space="preserve">
     <value>我们提供一系列的工具来打包您的数字资产，经过包装后，您的资产将获得更多的流动性</value>
+    <comment/>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
     <value>连接钱包</value>
+    <comment/>
   </data>
   <data name="InstallMetamask_Stmt" xml:space="preserve">
     <value>请安装Metamask钱包</value>
+    <comment/>
   </data>
   <data name="Balance" xml:space="preserve">
     <value>余额</value>
+    <comment/>
   </data>
   <data name="BalanceIsEmpty_Stmt" xml:space="preserve">
     <value>余额不足？去uniswap或者binance充值一点到钱包里</value>
+    <comment/>
   </data>
   <data name="RecommendPrice_Stmt" xml:space="preserve">
     <value>为我推荐一个价格</value>
+    <comment/>
   </data>
   <data name="MintAmount" xml:space="preserve">
     <value>份数</value>
+    <comment/>
   </data>
   <data name="Lottery" xml:space="preserve">
     <value>彩票</value>
+    <comment/>
   </data>
   <data name="Lottery_DefaultPrice" xml:space="preserve">
     <value>默认售价(原生代币)</value>
+    <comment/>
   </data>
   <data name="Lottery_SoldPercent" xml:space="preserve">
     <value>售出可开奖比例(%)</value>
+    <comment/>
   </data>
   <data name="Buy" xml:space="preserve">
     <value>购买</value>
+    <comment/>
   </data>
   <data name="Holds" xml:space="preserve">
     <value>持有</value>
+    <comment/>
   </data>
   <data name="RedEnvelope" xml:space="preserve">
     <value>红包</value>
+    <comment/>
   </data>
   <data name="RedEnvelope Kind" xml:space="preserve">
     <value>红包类型</value>
+    <comment/>
   </data>
   <data name="Bet_Stmt" xml:space="preserve">
     <value>下注</value>
+    <comment/>
   </data>
   <data name="Roulette" xml:space="preserve">
     <value>轮盘</value>
+    <comment/>
   </data>
   <data name="TxSuccess_Stmt" xml:space="preserve">
     <value>交易成功</value>
+    <comment/>
   </data>
   <data name="Lottery_Intro" xml:space="preserve">
     <value>要发行你自己的彩票，你需要先存入一定的资产，然后选择开奖时间和份数，铸造成功后，去NFT交易市场挂单，就可以等待用户被你的珍贵资产吸引来购买</value>
+    <comment/>
   </data>
   <data name="Barter_Intro" xml:space="preserve">
     <value>铸造你的兑换NFT，你需要先存入你付出的资产，然后设置好你希望得到的资产，目前只支持FT兑换FT，NFT兑换NFT</value>
+    <comment/>
   </data>
   <data name="RedEnvelope_Intro" xml:space="preserve">
     <value>将你的ERC20/721/1155资产打包为一个红包NFT，去NFT市场挂单，然后将链接分享到群里，等待用户来抢红包</value>
+    <comment/>
   </data>
   <data name="Roulette_Intro" xml:space="preserve">
     <value>轮盘NFT限量发行3000个，下注资产类型一旦选定不可更改，可以选择赌ERC20/721/1155资产，为了确保你有这些资产，需要你做初始下注</value>
+    <comment/>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
     <value>发行你的兑换NFT</value>
+    <comment/>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
     <value>兑换即以物易物，在web3世界中我们已经有了uniswap来交换ERC20代币，有了opensea来用ERC20换ERC721，通过这个兑换NFT，我们可以实现NFT兑换NFT以及ERC20之间的兑换</value>
+    <comment/>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
     <value>发行和交易彩票</value>
+    <comment/>
   </data>
   <data name="Cta2_Intro" xml:space="preserve">
     <value>在现实生活中只有大公司能发行彩票，普通人只能购买，在web3世界，通过我们的彩票NFT，任何人都能发行和销售彩票，如果你擅长经营，可以把这当作一个事业，在链上获利</value>
+    <comment/>
   </data>
   <data name="Cta3_Header" xml:space="preserve">
     <value>发红包或者空投奖励</value>
+    <comment/>
   </data>
   <data name="Cta3_Intro" xml:space="preserve">
     <value>如果你是中国人，你一定对红包不陌生，我们这个红包NFT是web3世界的微信红包，你将红包创建好后，将opensea的链接发到任何地方，就可以等用户来抢红包，你的社区也将得到活跃</value>
+    <comment/>
   </data>
   <data name="Cta4_Header" xml:space="preserve">
     <value>玩玩轮盘</value>
+    <comment/>
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
     <value>声明一下，玩法有点类似赌博，但实际上不是，你可以mint出你自己的轮盘NFT，然后当作下注的凭证进行售卖，此NFT凭证的拥有者可以进行下注累积资金池，最后由这个token的铸造者进行开奖，所有下注的用户都有机会瓜分奖池</value>
+    <comment/>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
     <value>民主化</value>
+    <comment/>
   </data>
   <data name="Feature1_Intro" xml:space="preserve">
     <value>在web2世界，普通人几乎不可能运行一个股票交易所或者是彩票公司，但是web3给了普通人这个机会，你可以发行自己的期权，自己的彩票，然后获利，我相信web3是实现金融民主化的唯一方式</value>
+    <comment/>
   </data>
   <data name="Feature2_Header" xml:space="preserve">
     <value>隐私性</value>
+    <comment/>
   </data>
   <data name="Feature2_Intro" xml:space="preserve">
     <value>我们不追踪你的邮箱，不需要你注册账号，你可以完全匿名地进行交易</value>
+    <comment/>
   </data>
   <data name="Feature3_Header" xml:space="preserve">
     <value>DAO</value>
+    <comment/>
   </data>
   <data name="Feature3_Intro" xml:space="preserve">
     <value>我们是一个DAO，没人拥有这个组织，因此也没人能摧毁这个组织，只要区块链存在，只要NFT存在，我们将一直存在</value>
+    <comment/>
   </data>
   <data name="Features" xml:space="preserve">
     <value>特点</value>
+    <comment/>
   </data>
   <data name="Governor_Intro" xml:space="preserve">
     <value>目前Deswap是我的个人项目，我独自设计并且编写代码实现，但是我希望未来能做成一个社区，如果有人愿意合作的话请联系我 </value>
+    <comment/>
   </data>
   <data name="BlackJack" xml:space="preserve">
     <value>21点</value>
+    <comment/>
   </data>
   <data name="BlackJack_Intro" xml:space="preserve">
     <value>铸造出NFT后，代表你是这张桌子的庄家，你可以销售门票，邀请朋友们来下注，每次提走筹码时要消耗用户的门票</value>
+    <comment/>
   </data>
   <data name="MintSucceedGoTrade_Stmt" xml:space="preserve">
     <value>铸造成功，去交易</value>
+    <comment/>
   </data>
   <data name="Docs" xml:space="preserve">
     <value>文档</value>
+    <comment/>
   </data>
   <data name="My Tokens" xml:space="preserve">
     <value>我的代币</value>
+    <comment/>
   </data>
   <data name="Tokens" xml:space="preserve">
     <value>代币列表</value>
+    <comment/>
   </data>
   <data name="Select Asset Kind" xml:space="preserve">
     <value>选择资产类型</value>
+    <comment/>
   </data>
   <data name="Amount" xml:space="preserve">
     <value>金额</value>
+    <comment/>
   </data>
   <data name="Address" xml:space="preserve">
     <value>地址</value>
+    <comment/>
   </data>
   <data name="Sicbo" xml:space="preserve">
     <value>骰宝</value>
+    <comment/>
   </data>
   <data name="Sicbo_Intro" xml:space="preserve">
     <value>骰宝是一个中国传统的骰子游戏，玩家选择对应的位置下注，如果玩家赢了则庄家按倍率赔给玩家</value>
+    <comment/>
   </data>
   <data name="Deposit_Stmt" xml:space="preserve">
     <value>充值</value>
+    <comment/>
   </data>
   <data name="Win_Stmt" xml:space="preserve">
     <value>你赢了</value>
+    <comment/>
   </data>
   <data name="Lose_Stmt" xml:space="preserve">
     <value>你输了</value>
+    <comment/>
   </data>
   <data name="DiceNumber_Stmt" xml:space="preserve">
     <value>骰子点数是</value>
+    <comment/>
   </data>
   <data name="Sicbo_Small" xml:space="preserve">
     <value>小 (1:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_Big" xml:space="preserve">
     <value>大 (1:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_1" xml:space="preserve">
     <value>对 1 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_2" xml:space="preserve">
     <value>对 2 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_3" xml:space="preserve">
     <value>对 3 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_4" xml:space="preserve">
     <value>对 4 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_5" xml:space="preserve">
     <value>对 5 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificDouble_6" xml:space="preserve">
     <value>对 6 (10:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_1" xml:space="preserve">
     <value>三条 1 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_2" xml:space="preserve">
     <value>三条 2 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_3" xml:space="preserve">
     <value>三条 3 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_4" xml:space="preserve">
     <value>三条 4 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_5" xml:space="preserve">
     <value>三条 5 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_SpecificTriple_6" xml:space="preserve">
     <value>三条 6 (180:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_AnyTriple" xml:space="preserve">
     <value>三同 (30:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_4" xml:space="preserve">
     <value>4 点 (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_5" xml:space="preserve">
     <value>5 点 (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_6" xml:space="preserve">
     <value>6 点 (18:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_7" xml:space="preserve">
     <value>7 点 (12:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_8" xml:space="preserve">
     <value>8 点 (8:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_9" xml:space="preserve">
     <value>9 点 (7:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_10" xml:space="preserve">
     <value>10 点 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_11" xml:space="preserve">
     <value>11 点 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_12" xml:space="preserve">
     <value>12 点 (7:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_13" xml:space="preserve">
     <value>13 点 (8:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_14" xml:space="preserve">
     <value>14 点 (12:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_15" xml:space="preserve">
     <value>15 点 (18:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_16" xml:space="preserve">
     <value>16 点 (31:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_ThreeDiceTotal_17" xml:space="preserve">
     <value>17 点 (62:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_12" xml:space="preserve">
     <value>包含 1,2 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_13" xml:space="preserve">
     <value>包含 1,3 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_14" xml:space="preserve">
     <value>包含 1,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_15" xml:space="preserve">
     <value>包含 1,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_16" xml:space="preserve">
     <value>包含 1,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_23" xml:space="preserve">
     <value>包含 2,3 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_24" xml:space="preserve">
     <value>包含 2,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_25" xml:space="preserve">
     <value>包含 2,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_26" xml:space="preserve">
     <value>包含 2,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_34" xml:space="preserve">
     <value>包含 3,4 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_35" xml:space="preserve">
     <value>包含 3,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_36" xml:space="preserve">
     <value>包含 3,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_45" xml:space="preserve">
     <value>包含 4,5 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_46" xml:space="preserve">
     <value>包含 4,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_TwoDice_56" xml:space="preserve">
     <value>包含 5,6 (6:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_1" xml:space="preserve">
     <value>中 1 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_2" xml:space="preserve">
     <value>中 2 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_3" xml:space="preserve">
     <value>中 3 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_4" xml:space="preserve">
     <value>中 4 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_5" xml:space="preserve">
     <value>中 5 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="Sicbo_OneDice_6" xml:space="preserve">
     <value>中 6 (1:1/2:1/3:1)</value>
+    <comment/>
   </data>
   <data name="BetOptions" xml:space="preserve">
     <value>下注选项</value>
+    <comment/>
   </data>
   <data name="InitBet" xml:space="preserve">
     <value>初始下注</value>
+    <comment/>
   </data>
   <data name="Title" xml:space="preserve">
     <value>标题</value>
+    <comment/>
   </data>
   <data name="Vote" xml:space="preserve">
     <value>投票</value>
+    <comment/>
   </data>
   <data name="Vote_Intro" xml:space="preserve">
     <value>发起人mint出一个投票的NFT，分享到社交媒体，任何人都可以在规定时间内进行投票</value>
+    <comment/>
   </data>
   <data name="Writing" xml:space="preserve">
     <value>写作</value>
+    <comment/>
   </data>
   <data name="Collect" xml:space="preserve">
     <value>收藏</value>
+    <comment/>
   </data>
   <data name="MaxCollectors" xml:space="preserve">
     <value>最大收藏数</value>
+    <comment/>
   </data>
   <data name="CollectPrice" xml:space="preserve">
     <value>收藏价格</value>
+    <comment/>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>均分</value>
+    <comment/>
+  </data>
+  <data name="Random" xml:space="preserve">
+    <value>随机</value>
+    <comment/>
   </data>
 </root>

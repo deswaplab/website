@@ -27,3 +27,4 @@ dotnet publish -p:CompressionEnabled=false
 - [ ] 详情页合并，通过contractKind来决定渲染哪个页面
 - [ ] 去掉 /app 前缀，简化url
 - [ ] 切换到reservoir api
+- [ ] 调试下为啥mint barter失败
