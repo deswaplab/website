@@ -24,7 +24,4 @@ dotnet publish -p:CompressionEnabled=false
 - [ ] 思考如何改进writing，使得更符合开放互联网概念
 - [ ] 普通人可以创建自己的公众号，将作品投递到这个公众号里
 - [ ] 任何人都能部署自己的NFT合约(deploy contract)
-- [ ] 详情页合并，通过contractKind来决定渲染哪个页面
-- [ ] 去掉 /app 前缀，简化url
 - [ ] 切换到reservoir api
-- [ ] 调试下为啥mint barter失败

@@ -298,11 +298,11 @@
     <comment/>
   </data>
   <data name="Slogan" xml:space="preserve">
-    <value>Wrap your cryptos</value>
+    <value>We are the first functional NFT create platform</value>
     <comment/>
   </data>
   <data name="SloganDetail" xml:space="preserve">
-    <value>We provide a lot of tools to wrap your cryptos, with our help, your assets will get more liquidity.</value>
+    <value>Traditional NFTs are usually used for membership and digital art, We have given NFT a series of interesting gameplays and obtained a new functional NFT. At this time, these NFTs not only have transaction value, but also have additional value because of the underlying gameplay.</value>
     <comment/>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
@@ -386,35 +386,35 @@
     <comment/>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
-    <value>Mint your Barter NFT</value>
+    <value>Exchange on maturity</value>
     <comment/>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
-    <value>Barter means trading one thing using another thing without using money.     In web3 world, we use uniswap to trade ERC20 token using another ERC20 token, we use NFT marketplace like opensea to trade NFT using a FT like ETH or WETH.     The Barter NFT is a place to trade NFT by another NFT. In NFT world, one big problem is lack of liquidity, famous NFT projects are too expensive, unfamous NFT projects are too cheap that no one want to buy.    The Barter NFT is to solve this problem, you don't need to pay you ETH to buy a NFT, you just need to trade your NFT to get another NFT.    </value>
+    <value>The inspiration comes from the options in financial derivatives. Similar to options, you can lock an existing asset and choose the asset you hope to obtain in the future. After minting, you will get an exchange NFT. The person who owns this exchange NFT can transfer the agreed asset to exercise the right to you before the expiration date. In addition, we noticed that many people's NFTs lack liquidity, so our exchange not only supports FT for FT, but also supports NFT for NFT. If you have idle NFTs in your wallet, come and try to exchange with others.</value>
     <comment/>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
-    <value>Mint your Lottery NFT</value>
+    <value>Lottery &amp; Draw</value>
     <comment/>
   </data>
   <data name="Cta2_Intro" xml:space="preserve">
-    <value>    If you deposit a certain amount of assets, you can get a lottery NFT.     After the buyer buys the redemption rights in the NFT market, the lottery can be drawn after the lottery day.     In the end, one lucky person will get the assets you deposited. The deposited assets can be ERC20/ERC721/ERC1155 tokens,    the lottery NFT is a ERC1155 token, the more shares you own, the more chance you win.    </value>
+    <value>Spending $1 or nothing for a chance to win a big prize is a common promotional method in the Web2 world. We have moved this gameplay to Web3. Anyone can cast their idle assets (ERC20/721/1155 tokens) into an ERC1155 standard lottery NFT. The holder has the opportunity to participate in the final lottery. The rule is that the more shares you hold, the higher the probability of winning. If you want to try your luck, then come and try it.</value>
     <comment/>
   </data>
   <data name="Cta3_Header" xml:space="preserve">
-    <value>Mint your red envelope NFT</value>
+    <value>Red Envelope &amp; Airdrop</value>
     <comment/>
   </data>
   <data name="Cta3_Intro" xml:space="preserve">
-    <value>    red envelope is a Chinese tradition, people put some money in a red envelope and give it to others as a gift, the receiver can only open it once, and the money inside is a surprise.    Here you deposit some ERC20/ERC1155 tokens will mint a ERC1155 red envelope NFT, it is designed that every address can only buy once and open once,     if you choose to buy more than 1, you would see errors. Currently there are many meme coins in the web3 world, if one day those coins loose value,     you can use them to mint red envelope NFTs and send them to your friends for free.    </value>
+    <value>Red envelopes are a popular way of playing on the Chinese Internet. People in groups enhance their relationships by sending and grabbing red envelopes. We have moved this way of playing to Web3. You can mint idle assets (ERC20/1155 tokens) into an ERC1155 standard red envelope NFT, and then send these red envelopes through the NFT trading platform. If you want to send them for free, just set the price to 0. If you are worried about abuse, you can also set a price threshold. Assets that lack liquidity are the most suitable for sending red envelopes, because instead of leaving them idle in your wallet, it is better to share them with the community. As the number of holders increases, liquidity will also increase.</value>
     <comment/>
   </data>
   <data name="Cta4_Header" xml:space="preserve">
-    <value>Play the Roulette NFT game</value>
+    <value>The Roulette</value>
     <comment/>
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
-    <value>    The roulette NFT is a game, everyone can place bet into a roulette, the owner of the roulette NFT can draw the prize and tax some fees, the prize is the sum of all the bets.    The placed bets can be ERC20/ERC721/ERC1155 tokens. the roulette is fairy game, the owner can't cheat, the owner can't know the result before the draw.    </value>
+    <value>We moved the roulette game in the Web2 casino to the blockchain. Anyone can mint their own roulette NFT and invite friends to place bets. The holder of the roulette NFT decides when to draw the prize. In each round, a lucky address will be randomly selected to win all the bets. The lottery algorithm is agreed upon in the smart contract, which is absolutely fair. There is no need to worry about shady operations. The assets bet can be (ERC20/721/1155 tokens), just like lottery tickets. If you want to try your luck, come and try it!</value>
     <comment/>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
@@ -751,6 +751,22 @@
   </data>
   <data name="Random" xml:space="preserve">
     <value>Random</value>
+    <comment/>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Resources</value>
+    <comment/>
+  </data>
+  <data name="Follow US" xml:space="preserve">
+    <value>Follow US</value>
+    <comment/>
+  </data>
+  <data name="Other Features" xml:space="preserve">
+    <value>Other Features</value>
+    <comment/>
+  </data>
+  <data name="Other Features Content" xml:space="preserve">
+    <value>If the above introduction does not have the gameplay you like, we also provide dice, voting, writing, etc. The core is still to cast NFT, but these NFT can be used for betting or voting. If you are interested, you can click the document link above to learn more, or try it on the test network. We currently support multiple EVM test networks and multiple wallets, such as metamask, okx</value>
     <comment/>
   </data>
 </root>

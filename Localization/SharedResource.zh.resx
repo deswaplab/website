@@ -298,11 +298,11 @@
     <comment/>
   </data>
   <data name="Slogan" xml:space="preserve">
-    <value>包装您的数字资产</value>
+    <value>我们是第一个功能NFT创造平台</value>
     <comment/>
   </data>
   <data name="SloganDetail" xml:space="preserve">
-    <value>我们提供一系列的工具来打包您的数字资产，经过包装后，您的资产将获得更多的流动性</value>
+    <value>传统的NFT一般是用于身份认证或者是数字藏品，我们将NFT赋予了一系列有趣的玩法得到了一个新的功能NFT，此时这些NFT不仅具有交易价值，还因为底层的玩法拥有了额外的价值</value>
     <comment/>
   </data>
   <data name="Connect Wallet" xml:space="preserve">
@@ -386,35 +386,35 @@
     <comment/>
   </data>
   <data name="Cta1_Header" xml:space="preserve">
-    <value>发行你的兑换NFT</value>
+    <value>到期兑换</value>
     <comment/>
   </data>
   <data name="Cta1_Intro" xml:space="preserve">
-    <value>兑换即以物易物，在web3世界中我们已经有了uniswap来交换ERC20代币，有了opensea来用ERC20换ERC721，通过这个兑换NFT，我们可以实现NFT兑换NFT以及ERC20之间的兑换</value>
+    <value>灵感来自于金融衍生品里面的期权，类似于期权，您可以锁定一种已有的资产，选择好您希望未来获得的资产，铸造后，您将得到一个兑换NFT，拥有这个兑换NFT的人，可以在到期日之前转入约定的资产向您行权。另外我们注意到很多人的NFT缺少流动性，因此我们的兑换不仅支持FT换FT，还支持NFT换NFT，如果您钱包里有闲置的NFT，快来试试跟别人交换吧。</value>
     <comment/>
   </data>
   <data name="Cta2_Header" xml:space="preserve">
-    <value>发行和交易彩票</value>
+    <value>彩票与抽奖</value>
     <comment/>
   </data>
   <data name="Cta2_Intro" xml:space="preserve">
-    <value>在现实生活中只有大公司能发行彩票，普通人只能购买，在web3世界，通过我们的彩票NFT，任何人都能发行和销售彩票，如果你擅长经营，可以把这当作一个事业，在链上获利</value>
+    <value>花一元钱或者不花钱就有机会赢取大奖，在Web2世界中是一种很常见的促销手段，我们将这种玩法搬到了Web3上，任何人都能将自己的闲置资产（ERC20/721/1155代币）铸造为一个ERC1155标准的彩票NFT，持有者有机会参与最终的开奖，规则是持有的份额越多则中奖概率越高，如果你想碰碰运气，那就来试试吧。</value>
     <comment/>
   </data>
   <data name="Cta3_Header" xml:space="preserve">
-    <value>发红包或者空投奖励</value>
+    <value>红包与空投</value>
     <comment/>
   </data>
   <data name="Cta3_Intro" xml:space="preserve">
-    <value>如果你是中国人，你一定对红包不陌生，我们这个红包NFT是web3世界的微信红包，你将红包创建好后，将opensea的链接发到任何地方，就可以等用户来抢红包，你的社区也将得到活跃</value>
+    <value>红包是一种中国互联网上的流行的玩法，在群里人们通过发红包，抢红包来增进感情，我们将这种玩法搬到了Web3上，您可以将闲置资产（ERC20/1155代币）铸造为一个ERC1155标准的红包NFT，然后通过NFT交易平台将这些红包发出去，如果您想免费发放的话，只要将定价设置为0就行，如果您担心被滥用，也可以设置一个价格门槛。缺乏流动性的资产是最适合拿来发红包的，因为与其闲置在您的钱包里，不如分享给社区，持有人数上去了，流动性也会增加。</value>
     <comment/>
   </data>
   <data name="Cta4_Header" xml:space="preserve">
-    <value>玩玩轮盘</value>
+    <value>轮盘</value>
     <comment/>
   </data>
   <data name="Cta4_Intro" xml:space="preserve">
-    <value>声明一下，玩法有点类似赌博，但实际上不是，你可以mint出你自己的轮盘NFT，然后当作下注的凭证进行售卖，此NFT凭证的拥有者可以进行下注累积资金池，最后由这个token的铸造者进行开奖，所有下注的用户都有机会瓜分奖池</value>
+    <value>我们将Web2赌场中的轮盘游戏搬到了区块链上，任何人都可以铸造出自己的轮盘NFT，然后邀请朋友们来下注，轮盘NFT的持有者决定何时开奖，每轮开奖会随机选中一个幸运地址赢走所有赌注，开奖算法是在智能合约中约定的，绝对公平，不用担心暗箱操作，下注的资产可以是（ERC20/721/1155代币）跟彩票一样，如果你想碰碰运气，就来试试吧</value>
     <comment/>
   </data>
   <data name="Feature1_Header" xml:space="preserve">
@@ -751,6 +751,22 @@
   </data>
   <data name="Random" xml:space="preserve">
     <value>随机</value>
+    <comment/>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>资源</value>
+    <comment/>
+  </data>
+  <data name="Follow US" xml:space="preserve">
+    <value>关注我们</value>
+    <comment/>
+  </data>
+  <data name="Other Features" xml:space="preserve">
+    <value>其它玩法</value>
+    <comment/>
+  </data>
+  <data name="Other Features Content" xml:space="preserve">
+    <value>如果上面的介绍没有你喜欢的玩法，我们还提供了骰子，投票，写作等，核心还是铸造NFT，但是这些NFT可以用来下注或者用来投票，感兴趣的话可以点击上面的文档链接了解更多，或者去测试网上试试。我们目前支持多个EVM测试网，以及多种钱包，如metamask, okx</value>
     <comment/>
   </data>
 </root>
